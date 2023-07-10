@@ -1,0 +1,12 @@
+plugins {
+    id 'groovy-gradle-plugin'
+}
+
+repositories {
+    gradlePluginPortal()
+}
+
+wrapper {
+    distributionType = Wrapper.DistributionType.ALL
+    gradleVersion = "7.4.2"
+}

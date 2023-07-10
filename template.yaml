@@ -1,0 +1,137 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  AWS
+  
+  SAM Template for Nva Person Preferences API
+
+Globals:
+  Function:
+    Timeout: 20
+    Runtime: java17
+    MemorySize: 1536
+
+Parameters:
+  CognitoAuthorizerArn:
+    Type: 'AWS::SSM::Parameter::Value<String>'
+    Description: Reference to Cognito UserPool for the stage
+    Default: CognitoAuthorizerArn
+  ApiDomain:
+    Type: 'AWS::SSM::Parameter::Value<String>'
+    Description: The Api domain
+    Default: /NVA/ApiDomain
+  CustomDomainBasePath:
+    Type: String
+    Description: Base path mapping in CustomDomain
+    Default: preferences
+  Suffix:
+    Type: String
+    Default: ''
+    Description: Suffix used for naming resources for feature branches to avoid conflicts.
+
+Resources:
+
+  #===========================Tables========================================================
+
+  NvaPreferencesTable:
+    Type: AWS::DynamoDB::Table
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Delete
+    Properties:
+      TableName: !Sub nva-user-profile-${AWS::StackName}
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: identifier
+          AttributeType: S
+      KeySchema:
+        - AttributeName: identifier
+          KeyType: HASH
+      StreamSpecification:
+        StreamViewType: NEW_AND_OLD_IMAGES
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+
+  #===========================Api========================================================
+
+  PreferencesApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      AccessLogSetting:
+        DestinationArn: !GetAtt ApiAccessLogGroup.Arn
+        Format: '{ "apiId": "$context.apiId", "requestId": "$context.requestId", "requestTime": "$context.requestTime", "requestTimeEpoch": "$context.requestTimeEpoch", "httpMethod": "$context.httpMethod", "path": "$context.path", "status": "$context.status",  "error.message": "$context.error.message" }'
+      StageName: Prod
+      EndpointConfiguration: REGIONAL
+      DefinitionBody:
+        'Fn::Transform':
+          Name: AWS::Include
+          Parameters:
+            Location: ./docs/openapi.yaml
+
+  #===========================BasePathMappings========================================================
+
+  PersonPreferencesBasePathMapping:
+    Type: AWS::ApiGateway::BasePathMapping
+    Properties:
+      BasePath: !If
+        - WithSuffix
+        - !Sub ${CustomDomainBasePath}-${Suffix}
+        - !Sub ${CustomDomainBasePath}
+      DomainName: !Ref ApiDomain
+      RestApiId: !Ref PreferencesApi
+      Stage: !Ref PreferencesApi.Stage
+
+  #============================= Permissions =======================================================
+
+  PreferencesLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: [ lambda.amazonaws.com ]
+            Action: [ 'sts:AssumeRole' ]
+      Policies:
+        - PolicyName: invokeFunction
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lambda:InvokeFunction
+                Resource: '*'
+        - PolicyName: writeLog
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: '*'
+
+  #============================= Handlers ==========================================================
+
+  NvaCreateProfileHandler:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: preferences-rest
+      Handler: no.unit.nva.person.preferences.rest.CreateProfileHandler::handleRequest
+      Role: !GetAtt PreferencesLambdaRole.Arn
+      MemorySize: 1536
+      AutoPublishAlias: live
+      SnapStart:
+        ApplyOn: PublishedVersions
+      Environment:
+        Variables:
+          ALLOWED_ORIGIN: '*'
+          API_HOST: !Ref ApiDomain
+      Events:
+        GetEvent:
+          Type: Api
+          Properties:
+            Path: /
+            Method: post
+            RestApiId: !Ref PreferencesApi

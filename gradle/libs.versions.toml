@@ -1,0 +1,67 @@
+[versions]
+nva = '1.28.4'
+hamcrest = '2.2'
+junit = { strictly = '5.8.2' }
+mockito = '4.5.1'
+log4j = '2.17.1'
+slf4j = '1.8.0-beta4'
+awslog4j2 = '1.5.1'
+dynamoDbLocal = { strictly = '1.21.1' }
+awsSdk = { strictly = '1.12.462' }
+jackson = { strictly = '2.14.1' }
+hamcrestSpotify = { strictly = '1.2.0' }
+wiremock = { strictly = "2.35.0" }
+guava = { strictly = '31.1-jre' }
+resilience4jRetry = '2.0.2'
+vavrVersion = '0.10.2'
+zalandoProblem = { strictly = '0.27.1' }
+
+[libraries]
+nva-core = { group = "com.github.bibsysdev", name = "core", version.ref = "nva" }
+nva-apigateway = { group = "com.github.bibsysdev", name = "apigateway", version.ref = "nva" }
+nva-logutils = { group = "com.github.bibsysdev", name = "logutils", version.ref = "nva" }
+nva-testutils = { group = "com.github.bibsysdev", name = "nvatestutils", version.ref = "nva" }
+nva-json = { group = 'com.github.bibsysdev', name = 'json', version.ref = 'nva' }
+
+resilience4j-retry = { group = 'io.github.resilience4j', name = 'resilience4j-retry', version.ref = 'resilience4jRetry' }
+vavr = { group = 'io.vavr', name = 'vavr', version.ref = 'vavrVersion' }
+
+mockito-core = { group = 'org.mockito', name = 'mockito-core', version.ref = 'mockito' }
+hamcrest-base = { group = 'org.hamcrest', name = 'hamcrest', version.ref = 'hamcrest' }
+hamcrest-core = { group = 'org.hamcrest', name = 'hamcrest-core', version.ref = 'hamcrest' }
+hamcrest-jackson = { group = 'com.spotify', name = 'hamcrest-jackson', version.ref = 'hamcrestSpotify' }
+hamcrest-optional = { group = 'com.spotify', name = 'hamcrest-optional', version.ref = 'hamcrestSpotify' }
+junit-jupiter-params = { group = 'org.junit.jupiter', name = 'junit-jupiter-params', version.ref = 'junit' }
+junit-jupiter-api = { group = 'org.junit.jupiter', name = 'junit-jupiter-api', version.ref = 'junit' }
+junit-vintage-engine = { group = 'org.junit.vintage', name = 'junit-vintage-engine', version.ref = 'junit' }
+junit-jupiter-engine = { group = 'org.junit.jupiter', name = 'junit-jupiter-engine', version.ref = 'junit' }
+guava = { group = 'com.google.guava', name = 'guava', version.ref = 'guava' }
+
+
+wiremock = { group = "com.github.tomakehurst", name = "wiremock-jre8", version.ref = "wiremock" }
+
+jackson-core = { group = 'com.fasterxml.jackson.core', name = 'jackson-core', version.ref = 'jackson' }
+jackson-datatype-jdk8 = { group = 'com.fasterxml.jackson.datatype', name = 'jackson-datatype-jdk8', version.ref = 'jackson' }
+jackson-datatype-jsr310 = { group = 'com.fasterxml.jackson.datatype', name = 'jackson-datatype-jsr310', version.ref = 'jackson' }
+jackson-databind = { group = 'com.fasterxml.jackson.core', name = 'jackson-databind', version.ref = 'jackson' }
+jackson-annotations = { group = 'com.fasterxml.jackson.core', name = 'jackson-annotations', version.ref = 'jackson' }
+jackson-module-parameter-names = { group = 'com.fasterxml.jackson.module', name = 'jackson-module-parameter-names', version.ref = 'jackson' }
+jackson-datatype-problem = { group = 'org.zalando', name = 'jackson-datatype-problem', version.ref = 'zalandoProblem' }
+
+log4j-core = { group = 'org.apache.logging.log4j', name = 'log4j-core', version.ref = 'log4j' }
+log4j-api = { group = 'org.apache.logging.log4j', name = 'log4j-api', version.ref = 'log4j' }
+log4j-slf4j18-impl = { group = 'org.apache.logging.log4j', name = 'log4j-slf4j18-impl', version.ref = 'log4j' }
+slf4j-api = { group = 'org.slf4j', name = 'slf4j-api', version.ref = 'slf4j' }
+
+aws-java-sdk-core = { group = 'com.amazonaws', name = 'aws-java-sdk-core', version.ref = 'awsSdk' }
+aws-lambda-log4j2 = { group = 'com.amazonaws', name = 'aws-lambda-java-log4j2', version.ref = 'awslog4j2' }
+aws-sdk-dynamodb = { group = 'com.amazonaws', name = 'aws-java-sdk-dynamodb', version.ref = 'awsSdk' }
+dynamodDbLocal = { group = 'com.amazonaws', name = 'DynamoDBLocal', version.ref = 'dynamoDbLocal' }
+
+
+[bundles]
+testing = ['junit-jupiter-params', 'junit-jupiter-api', 'junit-vintage-engine',
+    'junit-jupiter-engine', 'mockito-core', 'hamcrest-base', 'hamcrest-core', 'hamcrest-jackson',
+    'hamcrest-optional', 'nva-logutils', 'nva-testutils', 'guava', 'wiremock']
+logging = ['log4j-core', 'log4j-api', 'log4j-slf4j18-impl', 'slf4j-api', 'aws-lambda-log4j2']
+jackson = ['jackson-core', 'jackson-datatype-jdk8', 'jackson-datatype-jsr310', 'jackson-databind', 'jackson-annotations', 'jackson-module-parameter-names']

@@ -1,0 +1,4 @@
+rootProject.name = 'nva-person-preferences'
+include 'preferences-commons'
+include 'preferences-rest'
+
