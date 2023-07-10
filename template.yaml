@@ -47,7 +47,7 @@ Resources:
 
   #===========================Tables========================================================
 
-  NvaUserProfileTable:
+  NvaPreferencesTable:
     Type: AWS::DynamoDB::Table
     UpdateReplacePolicy: Retain
     DeletionPolicy: Delete
@@ -158,7 +158,7 @@ Resources:
         Variables:
           ALLOWED_ORIGIN: '*'
           API_HOST: !Ref ApiDomain
-          TABLE_NAME: !Ref NvaUserProfileTable
+          TABLE_NAME: !Ref NvaPreferencesTable
           COGNITO_HOST: !Ref CognitoAuthorizationUri
       Events:
         GetEvent:
