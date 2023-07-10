@@ -96,7 +96,7 @@ Resources:
 
   #============================= Permissions =======================================================
 
-  PreferencesLambdaRole:
+  LambdaRole:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
@@ -107,14 +107,6 @@ Resources:
               Service: [ lambda.amazonaws.com ]
             Action: [ 'sts:AssumeRole' ]
       Policies:
-        - PolicyName: invokeFunction
-          PolicyDocument:
-            Version: 2012-10-17
-            Statement:
-              - Effect: Allow
-                Action:
-                  - lambda:InvokeFunction
-                Resource: '*'
         - PolicyName: writeLog
           PolicyDocument:
             Version: 2012-10-17
@@ -124,14 +116,14 @@ Resources:
                   - logs:CreateLogGroup
                   - logs:CreateLogStream
                   - logs:PutLogEvents
-                Resource: '*'
+                Resource: !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*:*'
 
   DatabaseAccessLambdaPermissions:
     Type: AWS::IAM::Policy
     Properties:
       PolicyName: !Sub DatabaseAccessLambdaPermissions-${AWS::StackName}
       Roles:
-        - !Ref PreferencesLambdaRole
+        - !Ref LambdaRole
       PolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -149,7 +141,7 @@ Resources:
     Properties:
       CodeUri: preferences-rest
       Handler: no.unit.nva.person.preferences.rest.CreateProfileHandler::handleRequest
-      Role: !GetAtt PreferencesLambdaRole.Arn
+      Role: !GetAtt LambdaRole.Arn
       MemorySize: 1536
       AutoPublishAlias: live
       SnapStart:
