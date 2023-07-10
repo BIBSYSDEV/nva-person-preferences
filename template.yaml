@@ -21,6 +21,9 @@ Parameters:
     Type: 'AWS::SSM::Parameter::Value<String>'
     Description: Reference to Cognito UserPool for the stage
     Default: CognitoAuthorizerArn
+  CognitoAuthorizationUri:
+    Type: 'AWS::SSM::Parameter::Value<String>'
+    Default: '/NVA/CognitoUri'
   ApiDomain:
     Type: 'AWS::SSM::Parameter::Value<String>'
     Description: The Api domain
@@ -123,6 +126,22 @@ Resources:
                   - logs:PutLogEvents
                 Resource: '*'
 
+  DatabaseAccessLambdaPermissions:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: !Sub DatabaseAccessLambdaPermissions-${AWS::StackName}
+      Roles:
+        - !Ref PreferencesLambdaRole
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - dynamodb:*
+            Resource:
+              - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/nva-orcid-${AWS::StackName}
+              - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/nva-orcid-${AWS::StackName}/index/*
+
   #============================= Handlers ==========================================================
 
   NvaCreateProfileHandler:
@@ -139,6 +158,7 @@ Resources:
         Variables:
           ALLOWED_ORIGIN: '*'
           API_HOST: !Ref ApiDomain
+          COGNITO_HOST: !Ref CognitoAuthorizationUri
       Events:
         GetEvent:
           Type: Api
