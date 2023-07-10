@@ -139,8 +139,8 @@ Resources:
             Action:
               - dynamodb:*
             Resource:
-              - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/nva-orcid-${AWS::StackName}
-              - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/nva-orcid-${AWS::StackName}/index/*
+              - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/nva-user-profile-${AWS::StackName}
+              - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/nva-user-profile-${AWS::StackName}/index/*
 
   #============================= Handlers ==========================================================
 
