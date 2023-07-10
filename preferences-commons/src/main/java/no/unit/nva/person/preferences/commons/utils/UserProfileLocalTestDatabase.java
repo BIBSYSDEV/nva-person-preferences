@@ -1,6 +1,5 @@
 package no.unit.nva.person.preferences.commons.utils;
 
-import static no.unit.nva.person.preferences.commons.service.ProfileService.TABLE_NAME;
 import static no.unit.nva.person.preferences.commons.service.ServiceWithTransactions.PRIMARY_PARTITION_KEY;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.local.embedded.DynamoDBEmbedded;
@@ -19,9 +18,9 @@ public class UserProfileLocalTestDatabase {
 
     protected AmazonDynamoDB client;
 
-    public void init() {
+    public void init(String tableName) {
         client = DynamoDBEmbedded.create().amazonDynamoDB();
-        CreateTableRequest request = createTableRequest();
+        CreateTableRequest request = createTableRequest(tableName);
         client.createTable(request);
     }
 
@@ -30,9 +29,9 @@ public class UserProfileLocalTestDatabase {
         client.shutdown();
     }
 
-    private CreateTableRequest createTableRequest() {
+    private CreateTableRequest createTableRequest(String tableName) {
         return new CreateTableRequest()
-                   .withTableName(TABLE_NAME)
+                   .withTableName(tableName)
                    .withAttributeDefinitions(attributeDefinitions())
                    .withKeySchema(primaryKeySchema())
                    .withBillingMode(BillingMode.PAY_PER_REQUEST);

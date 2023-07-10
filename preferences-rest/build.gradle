@@ -36,4 +36,5 @@ dependencies {
 test {
     useJUnitPlatform()
     environment "ALLOWED_ORIGIN", "*"
+    environment "TABLE_NAME", "nonExistentTable"
 }

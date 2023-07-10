@@ -27,15 +27,16 @@ import org.zalando.problem.Problem;
 public class CreateProfileHandlerTest extends UserProfileLocalTestDatabase {
 
     private static final Context CONTEXT = mock(Context.class);
+    public static final String TABLE_NAME = "nonExistentTableName";
     private ByteArrayOutputStream output;
     private ProfileService profileService;
     private CreateProfileHandler handler;
 
     @BeforeEach
     public void init() {
-        super.init();
+        super.init(TABLE_NAME);
         output = new ByteArrayOutputStream();
-        profileService = new ProfileService(client);
+        profileService = new ProfileService(client, TABLE_NAME);
         handler = new CreateProfileHandler(profileService);
     }
 

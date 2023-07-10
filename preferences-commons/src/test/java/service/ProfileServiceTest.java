@@ -10,19 +10,19 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.amazonaws.services.kms.model.NotFoundException;
 import java.util.List;
 import no.unit.nva.person.preferences.commons.model.Profile;
-import no.unit.nva.person.preferences.commons.service.ProfileService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import no.unit.nva.person.preferences.commons.utils.UserProfileLocalTestDatabase;
 
-public class PreferencesServiceTest extends UserProfileLocalTestDatabase {
+public class ProfileServiceTest extends UserProfileLocalTestDatabase {
 
-    private ProfileService profileService;
+    public static final String TABLE_NAME = "nonExistentTableName";
+    private no.unit.nva.person.preferences.commons.service.ProfileService profileService;
 
     @BeforeEach
     void initialize() {
-        super.init();
-        this.profileService = new ProfileService(client);
+        super.init(TABLE_NAME);
+        this.profileService = new no.unit.nva.person.preferences.commons.service.ProfileService(client, TABLE_NAME);
     }
 
     @Test

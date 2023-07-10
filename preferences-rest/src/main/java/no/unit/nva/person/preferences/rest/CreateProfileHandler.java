@@ -8,15 +8,17 @@ import no.unit.nva.person.preferences.commons.service.ProfileService;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.UnauthorizedException;
+import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
 
 public class CreateProfileHandler extends ApiGatewayHandler<Profile, Profile> {
 
+    private static final String TABLE_NAME = new Environment().readEnv("TABLE_NAME");
     private final ProfileService profileService;
 
     @JacocoGenerated
     public CreateProfileHandler() {
-        this(new ProfileService(AmazonDynamoDBClientBuilder.defaultClient()));
+        this(new ProfileService(AmazonDynamoDBClientBuilder.defaultClient(), TABLE_NAME));
     }
 
     public CreateProfileHandler(ProfileService profileService) {

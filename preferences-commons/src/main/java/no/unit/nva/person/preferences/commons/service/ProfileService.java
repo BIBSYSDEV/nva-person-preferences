@@ -16,13 +16,14 @@ import no.unit.nva.person.preferences.commons.model.ProfileDao;
 
 public class ProfileService {
 
-    public static final String TABLE_NAME = "user-profile";
     private static final String RESOURCE_NOT_FOUND_MESSAGE = "Could not find promoted publications";
     private final AmazonDynamoDB client;
     private final ServiceWithTransactions serviceWithTransactions;
+    private final String tableName;
 
-    public ProfileService(AmazonDynamoDB client) {
-        this.serviceWithTransactions = new ServiceWithTransactions(client, TABLE_NAME);
+    public ProfileService(AmazonDynamoDB client, String tableName) {
+        this.tableName = tableName;
+        this.serviceWithTransactions = new ServiceWithTransactions(client, tableName);
         this.client = client;
     }
 
@@ -74,7 +75,7 @@ public class ProfileService {
 
     private Map<String, AttributeValue> getResourceByPrimaryKey(Map<String, AttributeValue> primaryKey) {
         var result = client.getItem(new GetItemRequest()
-                                        .withTableName(TABLE_NAME)
+                                        .withTableName(tableName)
                                         .withKey(primaryKey));
         if (isNull(result.getItem())) {
             throw new NotFoundException(RESOURCE_NOT_FOUND_MESSAGE);
