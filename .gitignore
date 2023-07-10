@@ -40,3 +40,21 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+# Ignore Gradle GUI config
+gradle-app.setting
+
+# Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
+!gradle-wrapper.jar
+
+### Gradle Patch ###
+**/build/
+
+### SAM build output files ###
+/packaged.yaml
+/packaged_raw.yaml
+/sampackaged_raw.yaml
+/.aws-sam/build.toml
+
+# Ignore Gradle build output directory
+build

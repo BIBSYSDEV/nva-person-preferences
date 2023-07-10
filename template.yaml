@@ -10,6 +10,11 @@ Globals:
     Timeout: 20
     Runtime: java17
     MemorySize: 1536
+  Api:
+    Cors:
+      AllowMethods: "'PUT, GET,OPTIONS,DELETE,POST'"
+      AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,Location'"
+      AllowOrigin: "'*'"
 
 Parameters:
   CognitoAuthorizerArn:
@@ -29,7 +34,13 @@ Parameters:
     Default: ''
     Description: Suffix used for naming resources for feature branches to avoid conflicts.
 
+Conditions:
+  WithSuffix: !Not [ !Equals [ !Ref Suffix, '' ] ]
+
 Resources:
+
+  ApiAccessLogGroup:
+    Type: AWS::Logs::LogGroup
 
   #===========================Tables========================================================
 
