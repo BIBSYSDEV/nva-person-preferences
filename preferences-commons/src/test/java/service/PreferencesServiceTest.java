@@ -9,58 +9,58 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.amazonaws.services.kms.model.NotFoundException;
 import java.util.List;
-import no.unit.nva.person.preferences.commons.model.Profile;
+import no.unit.nva.person.preferences.commons.model.PersonPreferences;
+import no.unit.nva.person.preferences.commons.service.PreferencesService;
+import no.unit.nva.person.preferences.test.support.UserProfileLocalTestDatabase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import no.unit.nva.person.preferences.commons.utils.UserProfileLocalTestDatabase;
 
-public class ProfileServiceTest extends UserProfileLocalTestDatabase {
+public class PreferencesServiceTest extends UserProfileLocalTestDatabase {
 
     public static final String TABLE_NAME = "nonExistentTableName";
-    private no.unit.nva.person.preferences.commons.service.ProfileService profileService;
+    private PreferencesService preferencesService;
 
     @BeforeEach
     void initialize() {
         super.init(TABLE_NAME);
-        this.profileService = new no.unit.nva.person.preferences.commons.service.ProfileService(client, TABLE_NAME);
+        this.preferencesService = new PreferencesService(client, TABLE_NAME);
     }
 
     @Test
     void shouldPersistUserPreferences() {
-        var profile = new Profile.Builder()
+        var profile = new PersonPreferences.Builder()
                           .withIdentifier(randomUri())
                           .withPromotedPublication(List.of(randomString()))
                           .build()
-                          .create(profileService);
-        var persistedProfile = profileService.getProfileByIdentifier(profile.identifier());
+                          .create(preferencesService);
+        var persistedProfile = preferencesService.getPreferencesByIdentifier(profile.identifier());
         assertThat(persistedProfile, is(equalTo(profile)));
     }
 
     @Test
     void shouldUpdateExistingUserPreferences() {
-        var profile = new Profile.Builder()
+        var profile = new PersonPreferences.Builder()
                           .withIdentifier(randomUri())
                           .withPromotedPublication(List.of(randomString()))
                           .build()
-                          .create(profileService);
+                          .create(preferencesService);
 
         profile.copy()
             .withPromotedPublication(List.of())
             .build()
-            .update(profileService);
+            .update(preferencesService);
 
-        var peristedProfile = profileService.getProfileByIdentifier(
-            profile.identifier());
-        assertThat(peristedProfile.promotedPublications(), is(nullValue()));
+        var persistedPreferences = preferencesService.getPreferencesByIdentifier(profile.identifier());
+        assertThat(persistedPreferences.promotedPublications(), is(nullValue()));
     }
 
     @Test
-    void shouldThrowExceptionWhenFetchingNonExistentProfile() {
-        var profile = new Profile.Builder()
-                                  .withIdentifier(randomUri())
-                                  .withPromotedPublication(List.of(randomString()))
-                                  .build();
+    void shouldThrowExceptionWhenFetchingNonExistentPersonPreferences() {
+        var profile = new PersonPreferences.Builder()
+                          .withIdentifier(randomUri())
+                          .withPromotedPublication(List.of(randomString()))
+                          .build();
         assertThrows(NotFoundException.class,
-                     () -> profileService.getProfileByIdentifier(profile.identifier()));
+                     () -> preferencesService.getPreferencesByIdentifier(profile.identifier()));
     }
 }

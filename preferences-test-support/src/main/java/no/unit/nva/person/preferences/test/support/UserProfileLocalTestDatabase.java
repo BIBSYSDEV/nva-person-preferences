@@ -1,6 +1,6 @@
-package no.unit.nva.person.preferences.commons.utils;
+package no.unit.nva.person.preferences.test.support;
 
-import static no.unit.nva.person.preferences.commons.service.ServiceWithTransactions.PRIMARY_PARTITION_KEY;
+import static no.unit.nva.person.preferences.constants.PreferencesTransactionConstants.PRIMARY_PARTITION_KEY;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.local.embedded.DynamoDBEmbedded;
 import com.amazonaws.services.dynamodbv2.model.AttributeDefinition;
@@ -15,6 +15,7 @@ import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 
 public class UserProfileLocalTestDatabase {
+
 
     protected AmazonDynamoDB client;
 

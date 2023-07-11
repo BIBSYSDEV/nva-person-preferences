@@ -9,7 +9,7 @@ import static org.hamcrest.Matchers.not;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.List;
 import no.unit.nva.commons.json.JsonUtils;
-import no.unit.nva.person.preferences.commons.model.Profile;
+import no.unit.nva.person.preferences.commons.model.PersonPreferences;
 import org.junit.jupiter.api.Test;
 
 public class ProfileTest {
@@ -18,7 +18,7 @@ public class ProfileTest {
     void shouldMakeRoundTripWithoutLossOfInformation() throws JsonProcessingException {
         var userPreferences = randomUserPreferences();
         var objectAsString = JsonUtils.dtoObjectMapper.writeValueAsString(userPreferences);
-        var regeneratedObject = JsonUtils.dtoObjectMapper.readValue(objectAsString, Profile.class);
+        var regeneratedObject = JsonUtils.dtoObjectMapper.readValue(objectAsString, PersonPreferences.class);
         assertThat(userPreferences, is(equalTo(regeneratedObject)));
     }
 
@@ -31,8 +31,8 @@ public class ProfileTest {
         assertThat(userPreferences, is(not(equalTo(copy))));
     }
 
-    private Profile randomUserPreferences() {
-        return new Profile.Builder()
+    private PersonPreferences randomUserPreferences() {
+        return new PersonPreferences.Builder()
                    .withIdentifier(randomUri())
                    .withPromotedPublication(List.of(randomString()))
                    .build();
