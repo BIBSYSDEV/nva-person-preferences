@@ -2,7 +2,7 @@ plugins {
     id 'java'
 }
 
-group = 'no.unit.nva.person.preferences.storage'
+group = 'no.sikt.nva.person.preferences.storage'
 version = 'unspecified'
 
 repositories {
