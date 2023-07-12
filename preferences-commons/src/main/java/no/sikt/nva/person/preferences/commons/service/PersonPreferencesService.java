@@ -16,7 +16,7 @@ import no.sikt.nva.person.preferences.commons.model.PersonPreferencesDao;
 
 public class PersonPreferencesService {
 
-    private static final String RESOURCE_NOT_FOUND_MESSAGE = "Could not find promoted publications";
+    private static final String RESOURCE_NOT_FOUND_MESSAGE = "Could not find person preferences";
     private final AmazonDynamoDB client;
     private final ServiceWithTransactions serviceWithTransactions;
     private final String tableName;
@@ -43,7 +43,7 @@ public class PersonPreferencesService {
         serviceWithTransactions.sendTransactionWriteRequest(request);
     }
 
-    public PersonPreferences getPreferencesByIdentifier(URI personId) {
+    public PersonPreferences getPreferencesByPersonId(URI personId) {
         var dao = fetchDao(new PersonPreferencesDao.Builder().withPersonId(personId).build());
         return new PersonPreferences.Builder()
                    .withPersonId(dao.personId())

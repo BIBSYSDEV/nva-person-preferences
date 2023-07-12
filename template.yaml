@@ -144,11 +144,12 @@ Resources:
 
   #============================= Handlers ==========================================================
 
-  NvaCreatePreferencesHandler:
+  NvaCreatePersonPreferencesHandler:
     Type: AWS::Serverless::Function
+    Description: 'Creates person preferences'
     Properties:
       CodeUri: preferences-rest
-      Handler: no.unit.nva.person.preferences.rest.CreatePreferencesHandler::handleRequest
+      Handler: no.unit.nva.person.preferences.rest.CreatePersonPreferencesHandler::handleRequest
       Role: !GetAtt PreferencesLambdaRole.Arn
       MemorySize: 1536
       AutoPublishAlias: live

@@ -34,7 +34,7 @@ public class PersonPreferencesServiceTest extends LocalPreferencesTestDatabase {
                                     .build()
                                     .create();
         var persistedpersonPreferences = preferencesService
-                                             .getPreferencesByIdentifier(personPreferences.personId());
+                                             .getPreferencesByPersonId(personPreferences.personId());
         assertThat(persistedpersonPreferences, is(equalTo(personPreferences)));
     }
 
@@ -49,7 +49,7 @@ public class PersonPreferencesServiceTest extends LocalPreferencesTestDatabase {
 
         new PersonPreferences(userIdentifier, List.of(), preferencesService).update();
 
-        var persistedPreferences = preferencesService.getPreferencesByIdentifier(personPreferences.personId());
+        var persistedPreferences = preferencesService.getPreferencesByPersonId(personPreferences.personId());
         assertThat(persistedPreferences.promotedPublications(), is(emptyIterable()));
     }
 
@@ -60,6 +60,6 @@ public class PersonPreferencesServiceTest extends LocalPreferencesTestDatabase {
                                     .withPromotedPublications(List.of(randomString()))
                                     .build();
         assertThrows(NotFoundException.class,
-                     () -> preferencesService.getPreferencesByIdentifier(personPreferences.personId()));
+                     () -> preferencesService.getPreferencesByPersonId(personPreferences.personId()));
     }
 }

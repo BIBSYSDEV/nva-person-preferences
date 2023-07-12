@@ -20,7 +20,7 @@ paths:
         ]
       x-amazon-apigateway-integration:
         uri:
-          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCreateProfileHandler.Arn}:live/invocations
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCreatePersonPreferencesHandler.Arn}:live/invocations
         responses: { }
         httpMethod: POST
         type: AWS_PROXY

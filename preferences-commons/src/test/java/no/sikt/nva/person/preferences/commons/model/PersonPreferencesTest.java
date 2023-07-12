@@ -14,13 +14,13 @@ public class PersonPreferencesTest {
 
     @Test
     void shouldMakeRoundTripWithoutLossOfInformation() throws JsonProcessingException {
-        var userPreferences = randomUserPreferences();
+        var userPreferences = randomPersonPreferences();
         var objectAsString = JsonUtils.dtoObjectMapper.writeValueAsString(userPreferences);
         var regeneratedObject = JsonUtils.dtoObjectMapper.readValue(objectAsString, PersonPreferences.class);
         assertThat(userPreferences, is(equalTo(regeneratedObject)));
     }
 
-    private PersonPreferences randomUserPreferences() {
+    private PersonPreferences randomPersonPreferences() {
         return new PersonPreferences.Builder()
                    .withPersonId(randomUri())
                    .withPromotedPublications(List.of(randomString()))
