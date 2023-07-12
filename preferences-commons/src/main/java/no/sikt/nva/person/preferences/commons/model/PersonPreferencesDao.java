@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 import no.unit.nva.commons.json.JsonUtils;
 
-public record PersonPreferencesDao(URI identifier,
+public record PersonPreferencesDao(URI personId,
                                    List<String> promotedPublications,
                                    Instant created,
                                    Instant modified) {
@@ -23,25 +23,25 @@ public record PersonPreferencesDao(URI identifier,
 
     public PersonPreferencesDao.Builder copy() {
         return new PersonPreferencesDao.Builder()
-                   .withIdentifier(this.identifier)
-                   .withPromotedPublication(this.promotedPublications)
+                   .withPersonId(this.personId)
+                   .withPromotedPublications(this.promotedPublications)
                    .withCreatedDate(this.created)
                    .withModifiedDate(this.modified);
     }
 
     public static class Builder {
 
-        private URI identifier;
+        private URI personId;
         private List<String> promotedPublications;
         private Instant created;
         private Instant modified;
 
-        public Builder withIdentifier(URI userIdentifier) {
-            this.identifier = userIdentifier;
+        public Builder withPersonId(URI personId) {
+            this.personId = personId;
             return this;
         }
 
-        public Builder withPromotedPublication(List<String> promotedPublications) {
+        public Builder withPromotedPublications(List<String> promotedPublications) {
             this.promotedPublications = promotedPublications;
             return this;
         }
@@ -63,7 +63,7 @@ public record PersonPreferencesDao(URI identifier,
         }
 
         public PersonPreferencesDao build() {
-            return new PersonPreferencesDao(identifier, promotedPublications, created, modified);
+            return new PersonPreferencesDao(personId, promotedPublications, created, modified);
         }
     }
 }

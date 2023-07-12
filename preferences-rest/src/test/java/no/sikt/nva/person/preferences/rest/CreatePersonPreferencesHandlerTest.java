@@ -9,14 +9,8 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URI;
-import java.util.List;
 import no.sikt.nva.person.preferences.commons.model.PersonPreferences;
-import no.sikt.nva.person.preferences.commons.service.PreferencesService;
+import no.sikt.nva.person.preferences.commons.service.PersonPreferencesService;
 import no.sikt.nva.person.preferences.test.support.LocalPreferencesTestDatabase;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
@@ -24,34 +18,35 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.zalando.problem.Problem;
 
-public class CreateHandlerPreferencesTest extends LocalPreferencesTestDatabase {
+public class CreatePersonPreferencesHandlerTest extends LocalPreferencesTestDatabase {
 
     public static final String TABLE_NAME = "nonExistentTableName";
     private static final Context CONTEXT = mock(Context.class);
     private ByteArrayOutputStream output;
-    private PreferencesService preferencesService;
-    private CreatePreferencesHandler handler;
+    private PersonPreferencesService personPreferencesService;
+    private CreatePersonPreferencesHandler handler;
 
     @BeforeEach
     public void init() {
         super.init(TABLE_NAME);
         output = new ByteArrayOutputStream();
-        preferencesService = new PreferencesService(client, TABLE_NAME);
-        handler = new CreatePreferencesHandler(preferencesService);
+        personPreferencesService = new PersonPreferencesService(client, TABLE_NAME);
+        handler = new CreatePersonPreferencesHandler(personPreferencesService);
     }
 
     @Test
-    void shouldCreatePersonPreferences() throws IOException {
+    void shouldCreateProfileWhenAuthenticated() throws IOException {
         var personPreferences = profileWithCristinIdentifier(randomUri());
         handler.handleRequest(createRequest(personPreferences), output, CONTEXT);
         var response = GatewayResponse.fromOutputStream(output, PersonPreferences.class)
                            .getBodyObject(PersonPreferences.class);
 
-        assertThat(preferencesService.getPreferencesByIdentifier(response.id()), is(equalTo(personPreferences)));
+        assertThat(personPreferencesService.getPreferencesByPersonId(response.personId()),
+                   is(equalTo(personPreferences)));
     }
 
     @Test
-    void shouldReturnUnauthorizedWhenNonAuthorized() throws IOException {
+    void shouldReturnUnauthorizedWhenNotAuthorized() throws IOException {
         var personPreferences = profileWithCristinIdentifier(randomUri());
         handler.handleRequest(createUnauthorizedRequest(personPreferences), output, CONTEXT);
         var response = GatewayResponse.fromOutputStream(output, Problem.class);
@@ -70,7 +65,7 @@ public class CreateHandlerPreferencesTest extends LocalPreferencesTestDatabase {
         return new HandlerRequestBuilder<PersonPreferences>(dtoObjectMapper)
                    .withUserName(randomString())
                    .withCurrentCustomer(randomUri())
-                   .withPersonCristinId(personPreferences.id())
+                   .withPersonCristinId(personPreferences.personId())
                    .withCurrentCustomer(randomUri())
                    .withBody(personPreferences)
                    .build();
@@ -78,8 +73,8 @@ public class CreateHandlerPreferencesTest extends LocalPreferencesTestDatabase {
 
     private PersonPreferences profileWithCristinIdentifier(URI cristinIdentifier) {
         return new PersonPreferences.Builder()
-                   .withId(cristinIdentifier)
-                   .withPromotedPublication(List.of(randomString(), randomString()))
+                   .withPersonId(cristinIdentifier)
+                   .withPromotedPublications(List.of(randomString(), randomString()))
                    .build();
     }
 }

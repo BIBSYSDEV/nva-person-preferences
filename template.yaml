@@ -31,7 +31,7 @@ Parameters:
   CustomDomainBasePath:
     Type: String
     Description: Base path mapping in CustomDomain
-    Default: preferences
+    Default: person-preferences
   Suffix:
     Type: String
     Default: ''
@@ -67,7 +67,7 @@ Resources:
 
   #===========================Api========================================================
 
-  PreferencesApi:
+  PersonPreferencesApi:
     Type: AWS::Serverless::Api
     Properties:
       AccessLogSetting:
@@ -91,8 +91,8 @@ Resources:
         - !Sub ${CustomDomainBasePath}-${Suffix}
         - !Sub ${CustomDomainBasePath}
       DomainName: !Ref ApiDomain
-      RestApiId: !Ref PreferencesApi
-      Stage: !Ref PreferencesApi.Stage
+      RestApiId: !Ref PersonPreferencesApi
+      Stage: !Ref PersonPreferencesApi.Stage
 
   #============================= Permissions =======================================================
 
@@ -144,11 +144,12 @@ Resources:
 
   #============================= Handlers ==========================================================
 
-  NvaCreatePreferencesHandler:
+  NvaCreatePersonPreferencesHandler:
     Type: AWS::Serverless::Function
+    Description: 'Creates preferences for person'
     Properties:
       CodeUri: preferences-rest
-      Handler: no.sikt.nva.person.preferences.rest.CreatePreferencesHandler::handleRequest
+      Handler: no.sikt.nva.person.preferences.rest.CreatePersonPreferencesHandler::handleRequest
       Role: !GetAtt PreferencesLambdaRole.Arn
       MemorySize: 1536
       AutoPublishAlias: live
@@ -166,10 +167,11 @@ Resources:
           Properties:
             Path: /
             Method: post
-            RestApiId: !Ref PreferencesApi
+            RestApiId: !Ref PersonPreferencesApi
 
   NvaUpdatePreferencesHandler:
     Type: AWS::Serverless::Function
+    Description: 'Updates preferences for person'
     Properties:
       CodeUri: preferences-rest
       Handler: no.sikt.nva.person.preferences.rest.UpdatePreferencesHandler::handleRequest
@@ -189,5 +191,5 @@ Resources:
           Type: Api
           Properties:
             Path: /
-            Method: post
-            RestApiId: !Ref PreferencesApi
+            Method: put
+            RestApiId: !Ref PersonPreferencesApi

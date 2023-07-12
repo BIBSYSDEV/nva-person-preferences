@@ -1,7 +1,7 @@
 package no.sikt.nva.person.preferences.commons.service;
 
 import static java.util.Objects.isNull;
-import static no.sikt.nva.person.preferences.storage.PreferencesTransactionConstants.PRIMARY_PARTITION_KEY;
+import static no.sikt.nva.person.preferences.storage.PersonPreferencesTransactionConstants.PRIMARY_PARTITION_KEY;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.GetItemRequest;
@@ -14,14 +14,14 @@ import java.util.Map;
 import no.sikt.nva.person.preferences.commons.model.PersonPreferences;
 import no.sikt.nva.person.preferences.commons.model.PersonPreferencesDao;
 
-public class PreferencesService {
+public class PersonPreferencesService {
 
-    private static final String RESOURCE_NOT_FOUND_MESSAGE = "Could not find promoted publications";
+    private static final String RESOURCE_NOT_FOUND_MESSAGE = "Could not find person preferences";
     private final AmazonDynamoDB client;
     private final ServiceWithTransactions serviceWithTransactions;
     private final String tableName;
 
-    public PreferencesService(AmazonDynamoDB client, String tableName) {
+    public PersonPreferencesService(AmazonDynamoDB client, String tableName) {
         this.tableName = tableName;
         this.serviceWithTransactions = new ServiceWithTransactions(client, tableName);
         this.client = client;
@@ -43,11 +43,11 @@ public class PreferencesService {
         serviceWithTransactions.sendTransactionWriteRequest(request);
     }
 
-    public PersonPreferences getPreferencesByIdentifier(URI identifier) {
-        var dao = fetchDao(new PersonPreferencesDao.Builder().withIdentifier(identifier).build());
+    public PersonPreferences getPreferencesByPersonId(URI personId) {
+        var dao = fetchDao(new PersonPreferencesDao.Builder().withPersonId(personId).build());
         return new PersonPreferences.Builder()
-                   .withId(dao.identifier())
-                   .withPromotedPublication(dao.promotedPublications())
+                   .withPersonId(dao.personId())
+                   .withPromotedPublications(dao.promotedPublications())
                    .build();
     }
 
@@ -72,11 +72,11 @@ public class PreferencesService {
     }
 
     private Map<String, AttributeValue> primaryKey(PersonPreferences userPreferences) {
-        return Map.of(PRIMARY_PARTITION_KEY, new AttributeValue(userPreferences.id().toString()));
+        return Map.of(PRIMARY_PARTITION_KEY, new AttributeValue(userPreferences.personId().toString()));
     }
 
-    private PersonPreferencesDao fetchPersonPreferences(PersonPreferences profile) {
-        var primaryKey = primaryKey(profile);
+    private PersonPreferencesDao fetchPersonPreferences(PersonPreferences personPreferences) {
+        var primaryKey = primaryKey(personPreferences);
         return new PersonPreferencesDao.Builder()
                       .fromDynamoFormat(getResourceByPrimaryKey(primaryKey));
     }
