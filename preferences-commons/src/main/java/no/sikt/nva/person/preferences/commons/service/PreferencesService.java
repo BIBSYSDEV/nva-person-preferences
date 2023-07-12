@@ -75,8 +75,8 @@ public class PreferencesService {
         return Map.of(PRIMARY_PARTITION_KEY, new AttributeValue(userPreferences.id().toString()));
     }
 
-    private PersonPreferencesDao fetchPersonPreferences(PersonPreferences profile) {
-        var primaryKey = primaryKey(profile);
+    private PersonPreferencesDao fetchPersonPreferences(PersonPreferences personPreferences) {
+        var primaryKey = primaryKey(personPreferences);
         return new PersonPreferencesDao.Builder()
                       .fromDynamoFormat(getResourceByPrimaryKey(primaryKey));
     }

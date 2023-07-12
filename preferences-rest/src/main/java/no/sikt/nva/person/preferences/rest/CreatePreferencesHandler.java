@@ -31,11 +31,11 @@ public class CreatePreferencesHandler extends ApiGatewayHandler<PreferencesReque
     protected PersonPreferences processInput(PreferencesRequest input, RequestInfo requestInfo, Context context)
         throws UnauthorizedException {
         validateRequest(requestInfo);
-        return new PersonPreferences.Builder()
+        return new PersonPreferences.Builder(preferencesService)
                    .withId(requestInfo.getPersonCristinId())
                    .withPromotedPublication(input.promotedPublications())
                    .build()
-                   .create(preferencesService);
+                   .create();
     }
 
     @Override

@@ -3,7 +3,6 @@ plugins {
     id 'checkstyle'
     id 'pmd'
     id 'jacoco-report-aggregation'
-//    id 'test-report-aggregation'
 }
 
 
@@ -37,7 +36,6 @@ tasks.named('test') {
 }
 
 pmd {
-    toolVersion = '6.20.0'
     ruleSetConfig = rootProject.resources.text.fromFile('config/pmd/ruleset.xml')
     ruleSets = []
     ignoreFailures = false

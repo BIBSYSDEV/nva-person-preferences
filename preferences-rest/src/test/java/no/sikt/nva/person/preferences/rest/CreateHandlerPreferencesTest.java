@@ -41,38 +41,38 @@ public class CreateHandlerPreferencesTest extends LocalPreferencesTestDatabase {
     }
 
     @Test
-    void shouldCreateProfileWhenAuthenticatedCristinPerson() throws IOException {
-        var profile = profileWithCristinIdentifier(randomUri());
-        handler.handleRequest(createRequest(profile), output, CONTEXT);
+    void shouldCreateProfileWhenAuthenticated() throws IOException {
+        var personPreferences = profileWithCristinIdentifier(randomUri());
+        handler.handleRequest(createRequest(personPreferences), output, CONTEXT);
         var response = GatewayResponse.fromOutputStream(output, PersonPreferences.class)
                            .getBodyObject(PersonPreferences.class);
 
-        assertThat(preferencesService.getPreferencesByIdentifier(response.id()), is(equalTo(profile)));
+        assertThat(preferencesService.getPreferencesByIdentifier(response.id()), is(equalTo(personPreferences)));
     }
 
     @Test
-    void shouldReturnUnauthorizedWhenNonAuthorizedCristinPerson() throws IOException {
-        var profile = profileWithCristinIdentifier(randomUri());
-        handler.handleRequest(createUnauthorizedRequest(profile), output, CONTEXT);
+    void shouldReturnUnauthorizedWhenNotAuthorized() throws IOException {
+        var personPreferences = profileWithCristinIdentifier(randomUri());
+        handler.handleRequest(createUnauthorizedRequest(personPreferences), output, CONTEXT);
         var response = GatewayResponse.fromOutputStream(output, Problem.class);
 
         assertThat(response.getStatusCode(), is(equalTo(HttpURLConnection.HTTP_UNAUTHORIZED)));
     }
 
-    private InputStream createUnauthorizedRequest(PersonPreferences profile) throws JsonProcessingException {
+    private InputStream createUnauthorizedRequest(PersonPreferences personPreferences) throws JsonProcessingException {
         return new HandlerRequestBuilder<PersonPreferences>(dtoObjectMapper)
                    .withUserName(randomString())
-                   .withBody(profile)
+                   .withBody(personPreferences)
                    .build();
     }
 
-    private InputStream createRequest(PersonPreferences profile) throws JsonProcessingException {
+    private InputStream createRequest(PersonPreferences personPreferences) throws JsonProcessingException {
         return new HandlerRequestBuilder<PersonPreferences>(dtoObjectMapper)
                    .withUserName(randomString())
                    .withCurrentCustomer(randomUri())
-                   .withPersonCristinId(profile.id())
+                   .withPersonCristinId(personPreferences.id())
                    .withCurrentCustomer(randomUri())
-                   .withBody(profile)
+                   .withBody(personPreferences)
                    .build();
     }
 
