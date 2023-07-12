@@ -1,0 +1,18 @@
+plugins {
+    id 'java'
+}
+
+group = 'no.sikt.nva.person.preferences.storage'
+version = 'unspecified'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+
+}
+
+test {
+    useJUnitPlatform()
+}

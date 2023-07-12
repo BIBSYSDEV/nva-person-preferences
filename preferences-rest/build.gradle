@@ -1,39 +1,26 @@
 plugins {
-    id 'java'
+    id 'nva.person.preferences.java-conventions'
+    id 'nva.person.preferences.dynamo-db'
 }
-
-group = 'no.unit.nva.person.preferences.rest'
-version = 'unspecified'
-
-repositories {
-    mavenCentral()
-}
-
 dependencies {
-    implementation project(':preferences-commons')
-
+    implementation project(":preferences-commons")
     implementation libs.nva.core
     implementation libs.nva.json
-    implementation libs.nva.apigateway
 
-    implementation libs.jackson.databind
-    implementation libs.jackson.annotations
-
-    implementation libs.aws.java.sdk.core
+    implementation libs.nva.commons.apigateway
+    implementation libs.aws.lambda.java.core
     implementation libs.aws.sdk.dynamodb
 
-    implementation libs.bundles.testing
 
-    implementation(libs.dynamodDbLocal) {
-        exclude group: 'com.amazonaws', module: 'aws-java-sdk-dynamodb'
-        exclude group: 'com.amazonaws', module: 'aws-java-sdk-core'
+    testImplementation project(":preferences-test-support")
+    testImplementation libs.junit.jupiter.api
+    testImplementation libs.junit.jupiter.engine
+    testImplementation libs.mockito.core
+
+
+    test {
+        useJUnitPlatform()
+        environment "ALLOWED_ORIGIN", "*"
+        environment "TABLE_NAME", "nonExistentTable"
     }
-
-    testImplementation libs.jackson.datatype.problem
-    testImplementation libs.nva.testutils
-}
-
-test {
-    useJUnitPlatform()
-    environment "ALLOWED_ORIGIN", "*"
 }

@@ -1,0 +1,22 @@
+plugins {
+    id 'java'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation project(":preferences-storage")
+    implementation libs.aws.sdk.dynamodb
+    implementation libs.junit.jupiter.api
+
+    implementation(libs.dynamodDbLocal) {
+        exclude group: 'com.amazonaws', module: 'aws-java-sdk-dynamodb'
+        exclude group: 'com.amazonaws', module: 'aws-java-sdk-core'
+    }
+}
+
+test {
+    useJUnitPlatform()
+}
