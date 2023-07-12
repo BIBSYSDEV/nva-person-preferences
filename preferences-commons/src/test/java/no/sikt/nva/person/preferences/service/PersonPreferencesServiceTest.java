@@ -10,31 +10,31 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.amazonaws.services.kms.model.NotFoundException;
 import java.util.List;
 import no.sikt.nva.person.preferences.commons.model.PersonPreferences;
-import no.sikt.nva.person.preferences.commons.service.PreferencesService;
+import no.sikt.nva.person.preferences.commons.service.PersonPreferencesService;
 import no.sikt.nva.person.preferences.test.support.LocalPreferencesTestDatabase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class PreferencesServiceTest extends LocalPreferencesTestDatabase {
+public class PersonPreferencesServiceTest extends LocalPreferencesTestDatabase {
 
     public static final String TABLE_NAME = "nonExistentTableName";
-    private PreferencesService preferencesService;
+    private PersonPreferencesService preferencesService;
 
     @BeforeEach
     void initialize() {
         super.init(TABLE_NAME);
-        this.preferencesService = new PreferencesService(client, TABLE_NAME);
+        this.preferencesService = new PersonPreferencesService(client, TABLE_NAME);
     }
 
     @Test
     void shouldPersistUserPreferences() {
         var personPreferences = new PersonPreferences.Builder(preferencesService)
-                                    .withId(randomUri())
-                                    .withPromotedPublication(List.of(randomString()))
+                                    .withPersonId(randomUri())
+                                    .withPromotedPublications(List.of(randomString()))
                                     .build()
                                     .create();
         var persistedpersonPreferences = preferencesService
-                                             .getPreferencesByIdentifier(personPreferences.id());
+                                             .getPreferencesByIdentifier(personPreferences.personId());
         assertThat(persistedpersonPreferences, is(equalTo(personPreferences)));
     }
 
@@ -42,24 +42,24 @@ public class PreferencesServiceTest extends LocalPreferencesTestDatabase {
     void shouldUpdateExistingUserPreferences() {
         var userIdentifier = randomUri();
         var personPreferences = new PersonPreferences.Builder(preferencesService)
-                                    .withId(userIdentifier)
-                                    .withPromotedPublication(List.of(randomString()))
+                                    .withPersonId(userIdentifier)
+                                    .withPromotedPublications(List.of(randomString()))
                                     .build()
                                     .create();
 
         new PersonPreferences(userIdentifier, List.of(), preferencesService).update();
 
-        var persistedPreferences = preferencesService.getPreferencesByIdentifier(personPreferences.id());
+        var persistedPreferences = preferencesService.getPreferencesByIdentifier(personPreferences.personId());
         assertThat(persistedPreferences.promotedPublications(), is(emptyIterable()));
     }
 
     @Test
     void shouldThrowExceptionWhenFetchingNonExistentPersonPreferences() {
         var personPreferences = new PersonPreferences.Builder()
-                                    .withId(randomUri())
-                                    .withPromotedPublication(List.of(randomString()))
+                                    .withPersonId(randomUri())
+                                    .withPromotedPublications(List.of(randomString()))
                                     .build();
         assertThrows(NotFoundException.class,
-                     () -> preferencesService.getPreferencesByIdentifier(personPreferences.id()));
+                     () -> preferencesService.getPreferencesByIdentifier(personPreferences.personId()));
     }
 }

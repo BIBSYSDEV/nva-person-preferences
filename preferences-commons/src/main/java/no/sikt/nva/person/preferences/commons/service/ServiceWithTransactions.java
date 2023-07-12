@@ -1,6 +1,6 @@
 package no.sikt.nva.person.preferences.commons.service;
 
-import static no.sikt.nva.person.preferences.storage.PreferencesTransactionConstants.PRIMARY_PARTITION_KEY;
+import static no.sikt.nva.person.preferences.storage.PersonPreferencesTransactionConstants.PRIMARY_PARTITION_KEY;
 import static nva.commons.core.attempt.Try.attempt;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
@@ -55,7 +55,7 @@ public class ServiceWithTransactions {
 
     private Put constructUpdatePut(PersonPreferencesDao dao) {
         var expressionAttributeValues = Map.of(
-            PARTITION_KEY_VALUE_PLACEHOLDER, new AttributeValue(dao.identifier().toString()));
+            PARTITION_KEY_VALUE_PLACEHOLDER, new AttributeValue(dao.personId().toString()));
         return new Put()
                    .withItem(dao.toDynamoFormat())
                    .withTableName(tableName)

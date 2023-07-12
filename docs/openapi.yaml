@@ -5,7 +5,7 @@ info:
 paths:
   /:
     post:
-      description: 'Creates preferences for user'
+      description: 'Creates preferences for person'
       requestBody:
         required: true
         content:

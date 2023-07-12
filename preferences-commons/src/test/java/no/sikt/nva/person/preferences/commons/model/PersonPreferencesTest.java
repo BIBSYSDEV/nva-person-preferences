@@ -22,8 +22,8 @@ public class PersonPreferencesTest {
 
     private PersonPreferences randomUserPreferences() {
         return new PersonPreferences.Builder()
-                   .withId(randomUri())
-                   .withPromotedPublication(List.of(randomString()))
+                   .withPersonId(randomUri())
+                   .withPromotedPublications(List.of(randomString()))
                    .build();
     }
 }

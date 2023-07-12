@@ -1,6 +1,6 @@
 package no.sikt.nva.person.preferences.test.support;
 
-import static no.sikt.nva.person.preferences.storage.PreferencesTransactionConstants.PRIMARY_PARTITION_KEY;
+import static no.sikt.nva.person.preferences.storage.PersonPreferencesTransactionConstants.PRIMARY_PARTITION_KEY;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.local.embedded.DynamoDBEmbedded;
 import com.amazonaws.services.dynamodbv2.model.AttributeDefinition;

@@ -5,24 +5,24 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.lambda.runtime.Context;
 import java.net.HttpURLConnection;
 import no.sikt.nva.person.preferences.commons.model.PersonPreferences;
-import no.sikt.nva.person.preferences.commons.service.PreferencesService;
+import no.sikt.nva.person.preferences.commons.service.PersonPreferencesService;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.UnauthorizedException;
 import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
 
-public class CreatePreferencesHandler extends ApiGatewayHandler<PreferencesRequest, PersonPreferences> {
+public class CreatePersonPreferencesHandler extends ApiGatewayHandler<PreferencesRequest, PersonPreferences> {
 
     private static final String TABLE_NAME = new Environment().readEnv("TABLE_NAME");
-    private final PreferencesService preferencesService;
+    private final PersonPreferencesService preferencesService;
 
     @JacocoGenerated
-    public CreatePreferencesHandler() {
-        this(new PreferencesService(AmazonDynamoDBClientBuilder.defaultClient(), TABLE_NAME));
+    public CreatePersonPreferencesHandler() {
+        this(new PersonPreferencesService(AmazonDynamoDBClientBuilder.defaultClient(), TABLE_NAME));
     }
 
-    public CreatePreferencesHandler(PreferencesService preferencesService) {
+    public CreatePersonPreferencesHandler(PersonPreferencesService preferencesService) {
         super(PreferencesRequest.class);
         this.preferencesService = preferencesService;
     }
@@ -32,8 +32,8 @@ public class CreatePreferencesHandler extends ApiGatewayHandler<PreferencesReque
         throws UnauthorizedException {
         validateRequest(requestInfo);
         return new PersonPreferences.Builder(preferencesService)
-                   .withId(requestInfo.getPersonCristinId())
-                   .withPromotedPublication(input.promotedPublications())
+                   .withPersonId(requestInfo.getPersonCristinId())
+                   .withPromotedPublications(input.promotedPublications())
                    .build()
                    .create();
     }
