@@ -67,32 +67,32 @@ Resources:
 
   #===========================Api========================================================
 
-#  PreferencesApi:
-#    Type: AWS::Serverless::Api
-#    Properties:
-#      AccessLogSetting:
-#        DestinationArn: !GetAtt ApiAccessLogGroup.Arn
-#        Format: '{ "apiId": "$context.apiId", "requestId": "$context.requestId", "requestTime": "$context.requestTime", "requestTimeEpoch": "$context.requestTimeEpoch", "httpMethod": "$context.httpMethod", "path": "$context.path", "status": "$context.status",  "error.message": "$context.error.message" }'
-#      StageName: Prod
-#      EndpointConfiguration: REGIONAL
-#      DefinitionBody:
-#        'Fn::Transform':
-#          Name: AWS::Include
-#          Parameters:
-#            Location: ./docs/openapi.yaml
+  PreferencesApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      AccessLogSetting:
+        DestinationArn: !GetAtt ApiAccessLogGroup.Arn
+        Format: '{ "apiId": "$context.apiId", "requestId": "$context.requestId", "requestTime": "$context.requestTime", "requestTimeEpoch": "$context.requestTimeEpoch", "httpMethod": "$context.httpMethod", "path": "$context.path", "status": "$context.status",  "error.message": "$context.error.message" }'
+      StageName: Prod
+      EndpointConfiguration: REGIONAL
+      DefinitionBody:
+        'Fn::Transform':
+          Name: AWS::Include
+          Parameters:
+            Location: ./docs/openapi.yaml
 
   #===========================BasePathMappings========================================================
 
-#  PersonPreferencesBasePathMapping:
-#    Type: AWS::ApiGateway::BasePathMapping
-#    Properties:
-#      BasePath: !If
-#        - WithSuffix
-#        - !Sub ${CustomDomainBasePath}-${Suffix}
-#        - !Sub ${CustomDomainBasePath}
-#      DomainName: !Ref ApiDomain
-#      RestApiId: !Ref PreferencesApi
-#      Stage: !Ref PreferencesApi.Stage
+  PersonPreferencesBasePathMapping:
+    Type: AWS::ApiGateway::BasePathMapping
+    Properties:
+      BasePath: !If
+        - WithSuffix
+        - !Sub ${CustomDomainBasePath}-${Suffix}
+        - !Sub ${CustomDomainBasePath}
+      DomainName: !Ref ApiDomain
+      RestApiId: !Ref PreferencesApi
+      Stage: !Ref PreferencesApi.Stage
 
   #============================= Permissions =======================================================
 
@@ -144,27 +144,27 @@ Resources:
 
   #============================= Handlers ==========================================================
 
-#  NvaCreatePersonPreferencesHandler:
-#    Type: AWS::Serverless::Function
-#    Description: 'Creates person preferences'
-#    Properties:
-#      CodeUri: preferences-rest
-#      Handler: no.unit.nva.person.preferences.rest.CreatePersonPreferencesHandler::handleRequest
-#      Role: !GetAtt PreferencesLambdaRole.Arn
-#      MemorySize: 1536
-#      AutoPublishAlias: live
-#      SnapStart:
-#        ApplyOn: PublishedVersions
-#      Environment:
-#        Variables:
-#          ALLOWED_ORIGIN: '*'
-#          API_HOST: !Ref ApiDomain
-#          TABLE_NAME: !Ref NvaPersonPreferencesTable
-#          COGNITO_HOST: !Ref CognitoAuthorizationUri
-#      Events:
-#        GetEvent:
-#          Type: Api
-#          Properties:
-#            Path: /
-#            Method: post
-#            RestApiId: !Ref PreferencesApi
+  NvaCreatePersonPreferencesHandler:
+    Type: AWS::Serverless::Function
+    Description: 'Creates person preferences'
+    Properties:
+      CodeUri: preferences-rest
+      Handler: no.unit.nva.person.preferences.rest.CreatePersonPreferencesHandler::handleRequest
+      Role: !GetAtt PreferencesLambdaRole.Arn
+      MemorySize: 1536
+      AutoPublishAlias: live
+      SnapStart:
+        ApplyOn: PublishedVersions
+      Environment:
+        Variables:
+          ALLOWED_ORIGIN: '*'
+          API_HOST: !Ref ApiDomain
+          TABLE_NAME: !Ref NvaPersonPreferencesTable
+          COGNITO_HOST: !Ref CognitoAuthorizationUri
+      Events:
+        GetEvent:
+          Type: Api
+          Properties:
+            Path: /
+            Method: post
+            RestApiId: !Ref PreferencesApi
