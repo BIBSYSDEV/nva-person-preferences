@@ -5,26 +5,26 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.lambda.runtime.Context;
 import java.net.HttpURLConnection;
 import no.sikt.nva.person.preferences.commons.model.PersonPreferences;
-import no.sikt.nva.person.preferences.commons.service.PreferencesService;
+import no.sikt.nva.person.preferences.commons.service.PersonPreferencesService;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.UnauthorizedException;
 import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
 
-public class UpdatePreferencesHandler extends ApiGatewayHandler<PreferencesRequest, Void> {
+public class UpdatePersonPreferencesHandler extends ApiGatewayHandler<PreferencesRequest, Void> {
 
     private static final String TABLE_NAME = new Environment().readEnv("TABLE_NAME");
-    private final PreferencesService preferencesService;
+    private final PersonPreferencesService personPreferencesService;
 
     @JacocoGenerated
-    public UpdatePreferencesHandler() {
-        this(new PreferencesService(AmazonDynamoDBClientBuilder.defaultClient(), TABLE_NAME));
+    public UpdatePersonPreferencesHandler() {
+        this(new PersonPreferencesService(AmazonDynamoDBClientBuilder.defaultClient(), TABLE_NAME));
     }
 
-    public UpdatePreferencesHandler(PreferencesService preferencesService) {
+    public UpdatePersonPreferencesHandler(PersonPreferencesService personPreferencesService) {
         super(PreferencesRequest.class);
-        this.preferencesService = preferencesService;
+        this.personPreferencesService = personPreferencesService;
     }
 
     @Override
@@ -33,11 +33,11 @@ public class UpdatePreferencesHandler extends ApiGatewayHandler<PreferencesReque
 
         validateRequest(requestInfo);
 
-        new PersonPreferences.Builder()
-            .withId(requestInfo.getPersonCristinId())
-            .withPromotedPublication(input.promotedPublications())
+        new PersonPreferences.Builder(personPreferencesService)
+            .withPersonId(requestInfo.getPersonCristinId())
+            .withPromotedPublications(input.promotedPublications())
             .build()
-            .update(preferencesService);
+            .update();
 
         return null;
     }
