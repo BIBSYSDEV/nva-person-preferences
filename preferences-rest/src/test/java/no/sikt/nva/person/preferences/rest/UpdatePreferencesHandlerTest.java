@@ -24,39 +24,46 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.zalando.problem.Problem;
 
-public class CreateHandlerPreferencesTest extends LocalPreferencesTestDatabase {
+public class UpdatePreferencesHandlerTest extends LocalPreferencesTestDatabase {
 
     public static final String TABLE_NAME = "nonExistentTableName";
     private static final Context CONTEXT = mock(Context.class);
     private ByteArrayOutputStream output;
     private PreferencesService preferencesService;
-    private CreatePreferencesHandler handler;
+    private UpdatePreferencesHandler handler;
 
     @BeforeEach
     public void init() {
         super.init(TABLE_NAME);
         output = new ByteArrayOutputStream();
         preferencesService = new PreferencesService(client, TABLE_NAME);
-        handler = new CreatePreferencesHandler(preferencesService);
+        handler = new UpdatePreferencesHandler(preferencesService);
     }
 
     @Test
-    void shouldCreatePersonPreferences() throws IOException {
-        var personPreferences = profileWithCristinIdentifier(randomUri());
-        handler.handleRequest(createRequest(personPreferences), output, CONTEXT);
-        var response = GatewayResponse.fromOutputStream(output, PersonPreferences.class)
-                           .getBodyObject(PersonPreferences.class);
+    void shouldUpdatePersonPreferences() throws IOException {
+        var existingPersonPreferences = persistPersonPreferences();
+        var updatePersonPreferences = existingPersonPreferences.copy()
+                                          .withPromotedPublication(null)
+                                          .build();
+        handler.handleRequest(createRequest(updatePersonPreferences), output, CONTEXT);
 
-        assertThat(preferencesService.getPreferencesByIdentifier(response.id()), is(equalTo(personPreferences)));
+        assertThat(preferencesService.getPreferencesByIdentifier(existingPersonPreferences.id()),
+                   is(equalTo(updatePersonPreferences)));
     }
 
     @Test
     void shouldReturnUnauthorizedWhenNonAuthorized() throws IOException {
-        var personPreferences = profileWithCristinIdentifier(randomUri());
-        handler.handleRequest(createUnauthorizedRequest(personPreferences), output, CONTEXT);
+        var profile = profileWithCristinIdentifier(randomUri());
+        handler.handleRequest(createUnauthorizedRequest(profile), output, CONTEXT);
         var response = GatewayResponse.fromOutputStream(output, Problem.class);
 
         assertThat(response.getStatusCode(), is(equalTo(HttpURLConnection.HTTP_UNAUTHORIZED)));
+    }
+
+    private PersonPreferences persistPersonPreferences() {
+        return profileWithCristinIdentifier(randomUri())
+                   .create(preferencesService);
     }
 
     private InputStream createUnauthorizedRequest(PersonPreferences personPreferences) throws JsonProcessingException {
