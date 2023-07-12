@@ -167,4 +167,4 @@ Resources:
           Properties:
             Path: /
             Method: post
-            RestApiId: !Ref PreferencesApi
+            RestApiId: !Ref PersonPreferencesApi
