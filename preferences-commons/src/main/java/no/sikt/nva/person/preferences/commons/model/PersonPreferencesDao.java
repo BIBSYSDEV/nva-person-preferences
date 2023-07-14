@@ -11,7 +11,7 @@ import java.util.Map;
 import no.unit.nva.commons.json.JsonUtils;
 
 public record PersonPreferencesDao(URI personId,
-                                   List<String> promotedPublications,
+                                   List<URI> promotedPublications,
                                    Instant created,
                                    Instant modified) {
 
@@ -32,7 +32,7 @@ public record PersonPreferencesDao(URI personId,
     public static class Builder {
 
         private URI personId;
-        private List<String> promotedPublications;
+        private List<URI> promotedPublications;
         private Instant created;
         private Instant modified;
 
@@ -41,7 +41,7 @@ public record PersonPreferencesDao(URI personId,
             return this;
         }
 
-        public Builder withPromotedPublications(List<String> promotedPublications) {
+        public Builder withPromotedPublications(List<URI> promotedPublications) {
             this.promotedPublications = promotedPublications;
             return this;
         }

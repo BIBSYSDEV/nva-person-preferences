@@ -1,6 +1,5 @@
 package no.sikt.nva.person.preferences.service;
 
-import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.emptyIterable;
@@ -30,7 +29,7 @@ public class PersonPreferencesServiceTest extends LocalPreferencesTestDatabase {
     void shouldPersistUserPreferences() {
         var personPreferences = new PersonPreferences.Builder(preferencesService)
                                     .withPersonId(randomUri())
-                                    .withPromotedPublications(List.of(randomString()))
+                                    .withPromotedPublications(List.of(randomUri()))
                                     .build()
                                     .create();
         var persistedpersonPreferences = preferencesService
@@ -43,7 +42,7 @@ public class PersonPreferencesServiceTest extends LocalPreferencesTestDatabase {
         var userIdentifier = randomUri();
         var personPreferences = new PersonPreferences.Builder(preferencesService)
                                     .withPersonId(userIdentifier)
-                                    .withPromotedPublications(List.of(randomString()))
+                                    .withPromotedPublications(List.of(randomUri()))
                                     .build()
                                     .create();
 
@@ -57,7 +56,7 @@ public class PersonPreferencesServiceTest extends LocalPreferencesTestDatabase {
     void shouldThrowExceptionWhenFetchingNonExistentPersonPreferences() {
         var personPreferences = new PersonPreferences.Builder()
                                     .withPersonId(randomUri())
-                                    .withPromotedPublications(List.of(randomString()))
+                                    .withPromotedPublications(List.of(randomUri()))
                                     .build();
         assertThrows(NotFoundException.class,
                      () -> preferencesService.getPreferencesByPersonId(personPreferences.personId()));

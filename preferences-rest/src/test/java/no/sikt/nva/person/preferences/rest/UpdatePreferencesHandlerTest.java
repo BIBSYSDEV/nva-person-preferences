@@ -82,7 +82,7 @@ public class UpdatePreferencesHandlerTest extends LocalPreferencesTestDatabase {
     private PersonPreferences profileWithCristinIdentifier(URI cristinIdentifier) {
         return new PersonPreferences.Builder(personPreferencesService)
                    .withPersonId(cristinIdentifier)
-                   .withPromotedPublications(List.of(randomString(), randomString()))
+                   .withPromotedPublications(List.of(randomUri(), randomUri()))
                    .build();
     }
 }
