@@ -80,7 +80,7 @@ public class CreatePersonPreferencesHandlerTest extends LocalPreferencesTestData
     private PersonPreferences profileWithCristinIdentifier(URI cristinIdentifier) {
         return new PersonPreferences.Builder()
                    .withPersonId(cristinIdentifier)
-                   .withPromotedPublications(List.of(randomString(), randomString()))
+                   .withPromotedPublications(List.of(randomUri(), randomUri()))
                    .build();
     }
 }

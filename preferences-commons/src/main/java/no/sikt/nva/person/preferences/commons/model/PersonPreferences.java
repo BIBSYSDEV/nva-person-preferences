@@ -12,7 +12,7 @@ import no.sikt.nva.person.preferences.commons.service.PersonPreferencesService;
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 @JsonSerialize
 public record PersonPreferences(URI personId,
-                                List<String> promotedPublications,
+                                List<URI> promotedPublications,
                                 @JsonIgnore PersonPreferencesService personPreferencesService) {
 
     public PersonPreferences create() {
@@ -37,7 +37,7 @@ public record PersonPreferences(URI personId,
 
         private PersonPreferencesService preferencesService;
         private URI personId;
-        private List<String> promotedPublications;
+        private List<URI> promotedPublications;
 
         public Builder(PersonPreferencesService preferencesService) {
             this.preferencesService = preferencesService;
@@ -51,7 +51,7 @@ public record PersonPreferences(URI personId,
             return this;
         }
 
-        public Builder withPromotedPublications(List<String> promotedPublications) {
+        public Builder withPromotedPublications(List<URI> promotedPublications) {
             this.promotedPublications = nonNull(promotedPublications) ? promotedPublications : Collections.emptyList();
             return this;
         }
