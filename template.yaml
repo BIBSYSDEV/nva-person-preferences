@@ -146,10 +146,10 @@ Resources:
 
   NvaCreatePersonPreferencesHandler:
     Type: AWS::Serverless::Function
-    Description: 'Creates person preferences'
+    Description: 'Creates preferences for person'
     Properties:
       CodeUri: preferences-rest
-      Handler: no.unit.nva.person.preferences.rest.CreatePersonPreferencesHandler::handleRequest
+      Handler: no.sikt.nva.person.preferences.rest.CreatePersonPreferencesHandler::handleRequest
       Role: !GetAtt PreferencesLambdaRole.Arn
       MemorySize: 1536
       AutoPublishAlias: live
@@ -167,4 +167,29 @@ Resources:
           Properties:
             Path: /
             Method: post
+            RestApiId: !Ref PersonPreferencesApi
+
+  NvaUpdatePreferencesHandler:
+    Type: AWS::Serverless::Function
+    Description: 'Updates preferences for person'
+    Properties:
+      CodeUri: preferences-rest
+      Handler: no.sikt.nva.person.preferences.rest.UpdatePreferencesHandler::handleRequest
+      Role: !GetAtt PreferencesLambdaRole.Arn
+      MemorySize: 1536
+      AutoPublishAlias: live
+      SnapStart:
+        ApplyOn: PublishedVersions
+      Environment:
+        Variables:
+          ALLOWED_ORIGIN: '*'
+          API_HOST: !Ref ApiDomain
+          TABLE_NAME: !Ref NvaPersonPreferencesTable
+          COGNITO_HOST: !Ref CognitoAuthorizationUri
+      Events:
+        GetEvent:
+          Type: Api
+          Properties:
+            Path: /
+            Method: put
             RestApiId: !Ref PersonPreferencesApi

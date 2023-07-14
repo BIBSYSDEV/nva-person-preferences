@@ -2,8 +2,8 @@ package no.sikt.nva.person.preferences.commons.model;
 
 import static java.util.Objects.nonNull;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import java.beans.Transient;
 import java.net.URI;
 import java.util.Collections;
 import java.util.List;
@@ -13,26 +13,24 @@ import no.sikt.nva.person.preferences.commons.service.PersonPreferencesService;
 @JsonSerialize
 public record PersonPreferences(URI personId,
                                 List<String> promotedPublications,
-                                @Transient PersonPreferencesService preferencesService) {
-
-    public PersonPreferences(URI personId,
-                             List<String> promotedPublications,
-                             PersonPreferencesService preferencesService) {
-        this.personId = personId;
-        this.preferencesService = preferencesService;
-        this.promotedPublications = nonNull(promotedPublications) ? promotedPublications : Collections.emptyList();
-    }
+                                @JsonIgnore PersonPreferencesService personPreferencesService) {
 
     public PersonPreferences create() {
-        return preferencesService.createProfile(this);
+        return personPreferencesService.createProfile(this);
     }
 
     public void update() {
-        preferencesService.updateProfile(this);
+        personPreferencesService.updateProfile(this);
     }
 
     public PersonPreferencesDao toDao() {
         return new PersonPreferencesDao(personId, promotedPublications, null, null);
+    }
+
+    public Builder copy() {
+        return new PersonPreferences.Builder(personPreferencesService)
+                   .withPersonId(this.personId)
+                   .withPromotedPublications(this.promotedPublications);
     }
 
     public static class Builder {
@@ -54,7 +52,7 @@ public record PersonPreferences(URI personId,
         }
 
         public Builder withPromotedPublications(List<String> promotedPublications) {
-            this.promotedPublications = promotedPublications;
+            this.promotedPublications = nonNull(promotedPublications) ? promotedPublications : Collections.emptyList();
             return this;
         }
 
