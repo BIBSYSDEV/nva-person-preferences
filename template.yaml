@@ -55,10 +55,10 @@ Resources:
       TableName: !Sub nva-person-preferences-${AWS::StackName}
       BillingMode: PAY_PER_REQUEST
       AttributeDefinitions:
-        - AttributeName: identifier
+        - AttributeName: personId
           AttributeType: S
       KeySchema:
-        - AttributeName: identifier
+        - AttributeName: personId
           KeyType: HASH
       StreamSpecification:
         StreamViewType: NEW_AND_OLD_IMAGES
