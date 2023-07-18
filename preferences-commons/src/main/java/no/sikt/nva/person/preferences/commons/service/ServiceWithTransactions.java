@@ -46,11 +46,14 @@ public class ServiceWithTransactions {
     }
 
     private Put constructNewPut(PersonPreferencesDao dao) {
+        var expressionAttributeValues = Map.of(
+            PARTITION_KEY_VALUE_PLACEHOLDER, new AttributeValue(dao.personId().toString()));
         return new Put()
                    .withItem(dao.toDynamoFormat())
                    .withTableName(tableName)
                    .withConditionExpression(KEY_NOT_EXISTS_CONDITION)
-                   .withExpressionAttributeNames(Map.of(PARTITION_KEY_NAME_PLACEHOLDER, PRIMARY_PARTITION_KEY));
+                   .withExpressionAttributeNames(Map.of(PARTITION_KEY_NAME_PLACEHOLDER, PRIMARY_PARTITION_KEY))
+                   .withExpressionAttributeValues(expressionAttributeValues);
     }
 
     private Put constructUpdatePut(PersonPreferencesDao dao) {
