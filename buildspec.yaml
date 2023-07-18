@@ -5,6 +5,8 @@ phases:
     runtime-versions:
       java: corretto17
     commands:
+      - pip install wheel # Temp workaround: https://github.com/aws/aws-cli/issues/8036
+      - pip install "Cython<3.0" "pyyaml<6" --no-build-isolation  # Temp workaround: https://github.com/aws/aws-cli/issues/8036
       - pip3 install aws-sam-cli
   build:
     commands:
