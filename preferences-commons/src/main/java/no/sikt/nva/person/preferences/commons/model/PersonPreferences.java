@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.net.URI;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import no.sikt.nva.person.preferences.commons.service.PersonPreferencesService;
@@ -13,7 +14,7 @@ import no.sikt.nva.person.preferences.commons.service.PersonPreferencesService;
 @JsonSerialize
 public record PersonPreferences(URI personId,
                                 List<URI> promotedPublications,
-                                @JsonIgnore PersonPreferencesService personPreferencesService) {
+                                @JsonIgnore PersonPreferencesService personPreferencesService, Instant created, Instant modified) {
 
     public PersonPreferences create() {
         return personPreferencesService.createProfile(this);
@@ -38,6 +39,8 @@ public record PersonPreferences(URI personId,
         private PersonPreferencesService preferencesService;
         private URI personId;
         private List<URI> promotedPublications;
+        private Instant created;
+        private Instant mmodified;
 
         public Builder(PersonPreferencesService preferencesService) {
             this.preferencesService = preferencesService;
@@ -60,11 +63,23 @@ public record PersonPreferences(URI personId,
             return new PersonPreferences.Builder()
                        .withPersonId(dao.personId())
                        .withPromotedPublications(dao.promotedPublications())
+                       .withCreated(dao.created())
+                       .withModified(dao.modified())
                        .build();
         }
 
         public PersonPreferences build() {
-            return new PersonPreferences(personId, promotedPublications, preferencesService);
+            return new PersonPreferences(personId, promotedPublications, preferencesService, created, mmodified);
+        }
+
+        public Builder withCreated(Instant created) {
+            this.created = created;
+            return this;
+        }
+
+        public Builder withModified(Instant modified) {
+            this.mmodified = modified;
+            return this;
         }
     }
 }

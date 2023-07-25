@@ -80,6 +80,30 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Problem"
+  /{personId+}:
+    parameters:
+      - in: path
+        name: personId+
+        schema:
+          type: string
+        required: true
+    get:
+      description: 'Fetches preferences for person'
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaFetchPersonPreferencesHandler.Arn}:live/invocations
+        responses: { }
+        httpMethod: POST
+        type: AWS_PROXY
+      responses:
+        '200':
+          description: "Successfully fetched"
+        '500':
+          description: "Internal server error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Problem"
 components:
   schemas:
     Profile:

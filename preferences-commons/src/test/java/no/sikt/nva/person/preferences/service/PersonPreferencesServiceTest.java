@@ -7,6 +7,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.amazonaws.services.kms.model.NotFoundException;
+import java.time.Instant;
 import java.util.List;
 import no.sikt.nva.person.preferences.commons.model.PersonPreferences;
 import no.sikt.nva.person.preferences.commons.service.PersonPreferencesService;
@@ -30,6 +31,8 @@ public class PersonPreferencesServiceTest extends LocalPreferencesTestDatabase {
         var personPreferences = new PersonPreferences.Builder(preferencesService)
                                     .withPersonId(randomUri())
                                     .withPromotedPublications(List.of(randomUri()))
+                                    .withCreated(Instant.now())
+                                    .withModified(Instant.now())
                                     .build()
                                     .create();
         var persistedpersonPreferences = preferencesService
@@ -46,7 +49,7 @@ public class PersonPreferencesServiceTest extends LocalPreferencesTestDatabase {
                                     .build()
                                     .create();
 
-        new PersonPreferences(userIdentifier, List.of(), preferencesService).update();
+        new PersonPreferences(userIdentifier, List.of(), preferencesService, null, null).update();
 
         var persistedPreferences = preferencesService.getPreferencesByPersonId(personPreferences.personId());
         assertThat(persistedPreferences.promotedPublications(), is(emptyIterable()));

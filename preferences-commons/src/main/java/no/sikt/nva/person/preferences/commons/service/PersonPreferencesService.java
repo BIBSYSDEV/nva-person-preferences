@@ -48,6 +48,8 @@ public class PersonPreferencesService {
         return new PersonPreferences.Builder()
                    .withPersonId(dao.personId())
                    .withPromotedPublications(dao.promotedPublications())
+                   .withCreated(dao.created())
+                   .withModified(dao.created())
                    .build();
     }
 
