@@ -14,7 +14,8 @@ import no.sikt.nva.person.preferences.commons.service.PersonPreferencesService;
 @JsonSerialize
 public record PersonPreferences(URI personId,
                                 List<URI> promotedPublications,
-                                @JsonIgnore PersonPreferencesService personPreferencesService, Instant created, Instant modified) {
+                                @JsonIgnore PersonPreferencesService personPreferencesService,
+                                Instant created, Instant modified) {
 
     public PersonPreferences create() {
         return personPreferencesService.createProfile(this);
@@ -30,8 +31,8 @@ public record PersonPreferences(URI personId,
 
     public Builder copy() {
         return new PersonPreferences.Builder(personPreferencesService)
-                   .withPersonId(this.personId)
-                   .withPromotedPublications(this.promotedPublications);
+            .withPersonId(this.personId)
+            .withPromotedPublications(this.promotedPublications);
     }
 
     public static class Builder {
@@ -61,11 +62,11 @@ public record PersonPreferences(URI personId,
 
         public PersonPreferences fromDao(PersonPreferencesDao dao) {
             return new PersonPreferences.Builder()
-                       .withPersonId(dao.personId())
-                       .withPromotedPublications(dao.promotedPublications())
-                       .withCreated(dao.created())
-                       .withModified(dao.modified())
-                       .build();
+                .withPersonId(dao.personId())
+                .withPromotedPublications(dao.promotedPublications())
+                .withCreated(dao.created())
+                .withModified(dao.modified())
+                .build();
         }
 
         public PersonPreferences build() {
