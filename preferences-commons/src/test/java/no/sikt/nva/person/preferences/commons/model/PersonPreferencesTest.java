@@ -1,6 +1,5 @@
 package no.sikt.nva.person.preferences.commons.model;
 
-import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -34,7 +33,7 @@ public class PersonPreferencesTest {
     private PersonPreferences randomPersonPreferences() {
         return new PersonPreferences.Builder()
                    .withPersonId(randomUri())
-                   .withPromotedPublications(List.of(randomString()))
+                   .withPromotedPublications(List.of(randomUri()))
                    .build();
     }
 }

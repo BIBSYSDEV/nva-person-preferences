@@ -13,6 +13,7 @@ dependencies {
 
     testImplementation project(":preferences-test-support")
     testImplementation libs.bundles.testing
+    testImplementation project(path: ':preferences-test-support')
 }
 
 test {
