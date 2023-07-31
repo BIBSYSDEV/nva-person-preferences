@@ -1,9 +1,12 @@
 package no.sikt.nva.person.preferences.rest;
 
+import static java.net.HttpURLConnection.HTTP_NOT_FOUND;
+import static no.sikt.nva.person.preferences.rest.FetchPersonPreferencesHandler.PERSON_PREFERENCES_NOT_FOUND_MESSAGE;
 import static no.sikt.nva.person.preferences.rest.PersonPreferencesRestHandlersTestConfig.restApiMapper;
 import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
 import static org.apache.http.HttpHeaders.ACCEPT;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
@@ -24,6 +27,7 @@ import nva.commons.apigateway.GatewayResponse;
 import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.zalando.problem.Problem;
 
 class FetchPersonPreferencesHandlerTest extends LocalPreferencesTestDatabase {
 
@@ -54,6 +58,17 @@ class FetchPersonPreferencesHandlerTest extends LocalPreferencesTestDatabase {
                    is(equalTo(response.getBodyObject(PersonPreferencesDao.class))));
     }
 
+    @Test
+    void shouldReturnNotFoundWhenPersonIdentifierDoesNotExist() throws IOException {
+        var request = createRequest(randomUri());
+        handler.handleRequest(request, output, CONTEXT);
+        var response = GatewayResponse.fromOutputStream(output, Problem.class);
+        var detail = response.getBodyObject(Problem.class).getDetail();
+
+        assertThat(response.getStatusCode(), is(equalTo(HTTP_NOT_FOUND)));
+        assertThat(detail, containsString(PERSON_PREFERENCES_NOT_FOUND_MESSAGE));
+    }
+
     private PersonPreferences profileWithCristinIdentifier(URI cristinIdentifier) {
         return new PersonPreferences.Builder(personPreferencesService)
             .withPersonId(cristinIdentifier)
@@ -69,4 +84,6 @@ class FetchPersonPreferencesHandlerTest extends LocalPreferencesTestDatabase {
             .withPathParameters(pathParameters)
             .build();
     }
+
+
 }

@@ -98,6 +98,12 @@ paths:
       responses:
         '200':
           description: "Successfully fetched"
+        '404':
+          description: "Person preferences not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Problem"
         '500':
           description: "Internal server error"
           content:
