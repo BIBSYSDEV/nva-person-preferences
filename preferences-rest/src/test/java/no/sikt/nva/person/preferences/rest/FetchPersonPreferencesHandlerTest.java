@@ -16,6 +16,7 @@ import java.net.URI;
 import java.util.List;
 import java.util.Map;
 import no.sikt.nva.person.preferences.commons.model.PersonPreferences;
+import no.sikt.nva.person.preferences.commons.model.PersonPreferencesDao;
 import no.sikt.nva.person.preferences.commons.service.PersonPreferencesService;
 import no.sikt.nva.person.preferences.test.support.LocalPreferencesTestDatabase;
 import no.unit.nva.testutils.HandlerRequestBuilder;
@@ -27,11 +28,11 @@ import org.junit.jupiter.api.Test;
 class FetchPersonPreferencesHandlerTest extends LocalPreferencesTestDatabase {
 
     public static final String TABLE_NAME = "nonExistentTableName";
+    public static final String IDENTIFIER = "personId";
     private static final Context CONTEXT = mock(Context.class);
     private ByteArrayOutputStream output;
     private PersonPreferencesService personPreferencesService;
     private FetchPersonPreferencesHandler handler;
-    public static final String IDENTIFIER = "personId";
 
     @BeforeEach
     public void init() {
@@ -47,10 +48,10 @@ class FetchPersonPreferencesHandlerTest extends LocalPreferencesTestDatabase {
         var request = createRequest(personPreferences.personId());
 
         handler.handleRequest(request, output, CONTEXT);
-        var response = GatewayResponse.fromOutputStream(output, PersonPreferences.class);
+        var response = GatewayResponse.fromOutputStream(output, PersonPreferencesDao.class);
 
-        assertThat(personPreferencesService.getPreferencesByPersonId(personPreferences.personId()),
-                   is(equalTo(response.getBodyObject(PersonPreferences.class))));
+        assertThat(personPreferencesService.fetchPreferencesByPersonId(personPreferences.personId()),
+                   is(equalTo(response.getBodyObject(PersonPreferencesDao.class))));
     }
 
     private PersonPreferences profileWithCristinIdentifier(URI cristinIdentifier) {

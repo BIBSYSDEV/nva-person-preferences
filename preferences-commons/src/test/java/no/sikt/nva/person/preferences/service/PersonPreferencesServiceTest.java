@@ -7,7 +7,6 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.amazonaws.services.kms.model.NotFoundException;
-import java.time.Instant;
 import java.util.List;
 import no.sikt.nva.person.preferences.commons.model.PersonPreferences;
 import no.sikt.nva.person.preferences.commons.service.PersonPreferencesService;
@@ -29,38 +28,50 @@ public class PersonPreferencesServiceTest extends LocalPreferencesTestDatabase {
     @Test
     void shouldPersistUserPreferences() {
         var personPreferences = new PersonPreferences.Builder(preferencesService)
-                                    .withPersonId(randomUri())
-                                    .withPromotedPublications(List.of(randomUri()))
-                                    .withCreated(Instant.now())
-                                    .withModified(Instant.now())
-                                    .build()
-                                    .create();
+            .withPersonId(randomUri())
+            .withPromotedPublications(List.of(randomUri()))
+            .build()
+            .create();
         var persistedpersonPreferences = preferencesService
-                                             .getPreferencesByPersonId(personPreferences.personId());
-        assertThat(persistedpersonPreferences.personId(), is(equalTo(personPreferences.personId())));
+            .getPreferencesByPersonId(personPreferences.personId());
+        assertThat(persistedpersonPreferences, is(equalTo(personPreferences)));
     }
 
     @Test
     void shouldUpdateExistingUserPreferences() {
         var userIdentifier = randomUri();
         var personPreferences = new PersonPreferences.Builder(preferencesService)
-                                    .withPersonId(userIdentifier)
-                                    .withPromotedPublications(List.of(randomUri()))
-                                    .build()
-                                    .create();
+            .withPersonId(userIdentifier)
+            .withPromotedPublications(List.of(randomUri()))
+            .build()
+            .create();
 
-        new PersonPreferences(userIdentifier, List.of(), preferencesService, null, null).update();
+        new PersonPreferences(userIdentifier, List.of(), preferencesService).update();
 
         var persistedPreferences = preferencesService.getPreferencesByPersonId(personPreferences.personId());
         assertThat(persistedPreferences.promotedPublications(), is(emptyIterable()));
     }
 
     @Test
+    void shouldFetchUserPreferences() {
+        var userIdentifier = randomUri();
+        var personPreferences = new PersonPreferences.Builder(preferencesService)
+            .withPersonId(userIdentifier)
+            .withPromotedPublications(List.of(randomUri()))
+            .build()
+            .create();
+
+        var persistedpersonPreferences = preferencesService
+            .fetchPreferencesByPersonId(personPreferences.personId());
+        assertThat(persistedpersonPreferences.personId(), is(equalTo(personPreferences.personId())));
+    }
+
+    @Test
     void shouldThrowExceptionWhenFetchingNonExistentPersonPreferences() {
         var personPreferences = new PersonPreferences.Builder()
-                                    .withPersonId(randomUri())
-                                    .withPromotedPublications(List.of(randomUri()))
-                                    .build();
+            .withPersonId(randomUri())
+            .withPromotedPublications(List.of(randomUri()))
+            .build();
         assertThrows(NotFoundException.class,
                      () -> preferencesService.getPreferencesByPersonId(personPreferences.personId()));
     }

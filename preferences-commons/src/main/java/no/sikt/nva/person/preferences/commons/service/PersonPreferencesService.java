@@ -48,9 +48,17 @@ public class PersonPreferencesService {
         return new PersonPreferences.Builder()
                    .withPersonId(dao.personId())
                    .withPromotedPublications(dao.promotedPublications())
-                   .withCreated(dao.created())
-                   .withModified(dao.created())
                    .build();
+    }
+
+    public PersonPreferencesDao fetchPreferencesByPersonId(URI personId) {
+        var dao = fetchDao(new PersonPreferencesDao.Builder().withPersonId(personId).build());
+        return new PersonPreferencesDao.Builder()
+            .withPersonId(dao.personId())
+            .withPromotedPublications(dao.promotedPublications())
+            .withCreatedDate(dao.created())
+            .withModifiedDate(dao.created())
+            .build();
     }
 
     private static PersonPreferencesDao injectCreatedTimeStamp(PersonPreferencesDao personPreferencesDao) {
