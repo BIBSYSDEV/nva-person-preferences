@@ -23,6 +23,10 @@ public record PersonPreferences(URI personId,
         personPreferencesService.updateProfile(this);
     }
 
+    public PersonPreferences fetch() {
+        return personPreferencesService.fetchProfile(this);
+    }
+
     public PersonPreferencesDao toDao() {
         return new PersonPreferencesDao(personId, promotedPublications, null, null);
     }

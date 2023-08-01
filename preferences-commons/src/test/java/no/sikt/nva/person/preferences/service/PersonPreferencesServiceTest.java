@@ -61,9 +61,9 @@ public class PersonPreferencesServiceTest extends LocalPreferencesTestDatabase {
             .build()
             .create();
 
-        var persistedpersonPreferences = preferencesService
-            .fetchPreferencesByPersonId(personPreferences.personId());
-        assertThat(persistedpersonPreferences.personId(), is(equalTo(personPreferences.personId())));
+        new PersonPreferences(userIdentifier, List.of(), preferencesService).fetch();
+        var persistedpersonPreferences = preferencesService.getPreferencesByPersonId(personPreferences.personId());
+        assertThat(persistedpersonPreferences, is(equalTo(personPreferences)));
     }
 
     @Test

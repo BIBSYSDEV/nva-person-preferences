@@ -19,7 +19,6 @@ import java.net.URI;
 import java.util.List;
 import java.util.Map;
 import no.sikt.nva.person.preferences.commons.model.PersonPreferences;
-import no.sikt.nva.person.preferences.commons.model.PersonPreferencesDao;
 import no.sikt.nva.person.preferences.commons.service.PersonPreferencesService;
 import no.sikt.nva.person.preferences.test.support.LocalPreferencesTestDatabase;
 import no.unit.nva.testutils.HandlerRequestBuilder;
@@ -52,10 +51,10 @@ class FetchPersonPreferencesHandlerTest extends LocalPreferencesTestDatabase {
         var request = createRequest(personPreferences.personId());
 
         handler.handleRequest(request, output, CONTEXT);
-        var response = GatewayResponse.fromOutputStream(output, PersonPreferencesDao.class);
+        var response = GatewayResponse.fromOutputStream(output, PersonPreferences.class);
 
-        assertThat(personPreferencesService.fetchPreferencesByPersonId(personPreferences.personId()),
-                   is(equalTo(response.getBodyObject(PersonPreferencesDao.class))));
+        assertThat(personPreferencesService.getPreferencesByPersonId(personPreferences.personId()),
+                   is(equalTo(response.getBodyObject(PersonPreferences.class))));
     }
 
     @Test
@@ -84,6 +83,4 @@ class FetchPersonPreferencesHandlerTest extends LocalPreferencesTestDatabase {
             .withPathParameters(pathParameters)
             .build();
     }
-
-
 }
