@@ -28,12 +28,12 @@ public class PersonPreferencesServiceTest extends LocalPreferencesTestDatabase {
     @Test
     void shouldPersistUserPreferences() {
         var personPreferences = new PersonPreferences.Builder(preferencesService)
-                                    .withPersonId(randomUri())
-                                    .withPromotedPublications(List.of(randomUri()))
-                                    .build()
-                                    .create();
+            .withPersonId(randomUri())
+            .withPromotedPublications(List.of(randomUri()))
+            .build()
+            .create();
         var persistedpersonPreferences = preferencesService
-                                             .getPreferencesByPersonId(personPreferences.personId());
+            .getPreferencesByPersonId(personPreferences.personId());
         assertThat(persistedpersonPreferences, is(equalTo(personPreferences)));
     }
 
@@ -41,10 +41,10 @@ public class PersonPreferencesServiceTest extends LocalPreferencesTestDatabase {
     void shouldUpdateExistingUserPreferences() {
         var userIdentifier = randomUri();
         var personPreferences = new PersonPreferences.Builder(preferencesService)
-                                    .withPersonId(userIdentifier)
-                                    .withPromotedPublications(List.of(randomUri()))
-                                    .build()
-                                    .create();
+            .withPersonId(userIdentifier)
+            .withPromotedPublications(List.of(randomUri()))
+            .build()
+            .create();
 
         new PersonPreferences(userIdentifier, List.of(), preferencesService).update();
 
@@ -53,11 +53,25 @@ public class PersonPreferencesServiceTest extends LocalPreferencesTestDatabase {
     }
 
     @Test
+    void shouldFetchUserPreferences() {
+        var userIdentifier = randomUri();
+        var personPreferences = new PersonPreferences.Builder(preferencesService)
+            .withPersonId(userIdentifier)
+            .withPromotedPublications(List.of(randomUri()))
+            .build()
+            .create();
+
+        new PersonPreferences(userIdentifier, List.of(), preferencesService).fetch();
+        var persistedpersonPreferences = preferencesService.getPreferencesByPersonId(personPreferences.personId());
+        assertThat(persistedpersonPreferences, is(equalTo(personPreferences)));
+    }
+
+    @Test
     void shouldThrowExceptionWhenFetchingNonExistentPersonPreferences() {
         var personPreferences = new PersonPreferences.Builder()
-                                    .withPersonId(randomUri())
-                                    .withPromotedPublications(List.of(randomUri()))
-                                    .build();
+            .withPersonId(randomUri())
+            .withPromotedPublications(List.of(randomUri()))
+            .build();
         assertThrows(NotFoundException.class,
                      () -> preferencesService.getPreferencesByPersonId(personPreferences.personId()));
     }

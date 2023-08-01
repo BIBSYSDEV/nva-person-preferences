@@ -43,32 +43,40 @@ public class PersonPreferencesService {
         serviceWithTransactions.sendTransactionWriteRequest(request);
     }
 
+    public PersonPreferences fetchProfile(PersonPreferences personPreferences) {
+        var dao = fetchPersonPreferences(personPreferences);
+        return new PersonPreferences.Builder()
+            .withPersonId(dao.personId())
+            .withPromotedPublications(dao.promotedPublications())
+            .build();
+    }
+
     public PersonPreferences getPreferencesByPersonId(URI personId) {
         var dao = fetchDao(new PersonPreferencesDao.Builder().withPersonId(personId).build());
         return new PersonPreferences.Builder()
-                   .withPersonId(dao.personId())
-                   .withPromotedPublications(dao.promotedPublications())
-                   .build();
+            .withPersonId(dao.personId())
+            .withPromotedPublications(dao.promotedPublications())
+            .build();
     }
 
     private static PersonPreferencesDao injectCreatedTimeStamp(PersonPreferencesDao personPreferencesDao) {
         return personPreferencesDao.copy()
-                   .withCreatedDate(Instant.now())
-                   .withModifiedDate(Instant.now())
-                   .build();
+            .withCreatedDate(Instant.now())
+            .withModifiedDate(Instant.now())
+            .build();
     }
 
     private static PersonPreferencesDao injectModifiedTimeStamp(PersonPreferences personPreferences,
                                                                 PersonPreferencesDao profile) {
         return personPreferences.toDao().copy()
-                   .withCreatedDate(profile.created())
-                   .withModifiedDate(Instant.now())
-                   .build();
+            .withCreatedDate(profile.created())
+            .withModifiedDate(Instant.now())
+            .build();
     }
 
     private PersonPreferencesDao fetchDao(PersonPreferencesDao dao) {
         return new PersonPreferencesDao.Builder()
-                   .fromDynamoFormat(getResourceByPrimaryKey(dao.toDynamoFormat()));
+            .fromDynamoFormat(getResourceByPrimaryKey(dao.toDynamoFormat()));
     }
 
     private Map<String, AttributeValue> primaryKey(PersonPreferences userPreferences) {
@@ -78,7 +86,7 @@ public class PersonPreferencesService {
     private PersonPreferencesDao fetchPersonPreferences(PersonPreferences personPreferences) {
         var primaryKey = primaryKey(personPreferences);
         return new PersonPreferencesDao.Builder()
-                      .fromDynamoFormat(getResourceByPrimaryKey(primaryKey));
+            .fromDynamoFormat(getResourceByPrimaryKey(primaryKey));
     }
 
     private Map<String, AttributeValue> getResourceByPrimaryKey(Map<String, AttributeValue> primaryKey) {
