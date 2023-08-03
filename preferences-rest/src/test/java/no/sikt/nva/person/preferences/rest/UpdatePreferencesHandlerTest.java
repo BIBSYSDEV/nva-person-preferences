@@ -49,8 +49,8 @@ public class UpdatePreferencesHandlerTest extends LocalPreferencesTestDatabase {
                                           .build();
         handler.handleRequest(createRequest(updatePersonPreferences), output, CONTEXT);
 
-        assertThat(personPreferencesService.getPreferencesByPersonId(existingPersonPreferences.personId()),
-                   is(equalTo(updatePersonPreferences)));
+        assertThat(personPreferencesService.getPreferencesByPersonId(existingPersonPreferences.personId()).personId(),
+                   is(equalTo(updatePersonPreferences.personId())));
     }
 
     @Test

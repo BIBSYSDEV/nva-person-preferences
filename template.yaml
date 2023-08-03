@@ -193,3 +193,26 @@ Resources:
             Path: /
             Method: put
             RestApiId: !Ref PersonPreferencesApi
+
+  NvaFetchPersonPreferencesHandler:
+    Type: AWS::Serverless::Function
+    Description: 'Fetches preferences for person'
+    Properties:
+      CodeUri: preferences-rest
+      Handler: no.sikt.nva.person.preferences.rest.FetchPersonPreferencesHandler::handleRequest
+      Role: !GetAtt PreferencesLambdaRole.Arn
+      MemorySize: 1536
+      AutoPublishAlias: live
+      SnapStart:
+        ApplyOn: PublishedVersions
+      Environment:
+        Variables:
+          ALLOWED_ORIGIN: '*'
+          TABLE_NAME: !Ref NvaPersonPreferencesTable2
+      Events:
+        GetEvent:
+          Type: Api
+          Properties:
+            Path: /{personId+}
+            Method: get
+            RestApiId: !Ref PersonPreferencesApi

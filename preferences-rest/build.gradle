@@ -10,6 +10,7 @@ dependencies {
     implementation libs.nva.commons.apigateway
     implementation libs.aws.lambda.java.core
     implementation libs.aws.sdk.dynamodb
+    implementation libs.bundles.logging
 
 
     testImplementation project(":preferences-test-support")

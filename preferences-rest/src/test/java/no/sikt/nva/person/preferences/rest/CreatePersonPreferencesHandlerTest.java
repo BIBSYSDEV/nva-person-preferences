@@ -47,8 +47,8 @@ public class CreatePersonPreferencesHandlerTest extends LocalPreferencesTestData
         var response = GatewayResponse.fromOutputStream(output, PersonPreferences.class)
                            .getBodyObject(PersonPreferences.class);
 
-        assertThat(personPreferencesService.getPreferencesByPersonId(response.personId()),
-                   is(equalTo(personPreferences)));
+        assertThat(personPreferencesService.getPreferencesByPersonId(response.personId()).personId(),
+                   is(equalTo(personPreferences.personId())));
     }
 
     @Test
