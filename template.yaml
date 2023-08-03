@@ -174,7 +174,7 @@ Resources:
     Description: 'Updates preferences for person'
     Properties:
       CodeUri: preferences-rest
-      Handler: no.sikt.nva.person.preferences.rest.UpdatePreferencesHandler::handleRequest
+      Handler: no.sikt.nva.person.preferences.rest.UpdatePersonPreferencesHandler::handleRequest
       Role: !GetAtt PreferencesLambdaRole.Arn
       MemorySize: 1536
       AutoPublishAlias: live
