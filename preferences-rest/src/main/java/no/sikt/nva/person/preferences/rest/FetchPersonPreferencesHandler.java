@@ -5,6 +5,8 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.lambda.runtime.Context;
 import java.net.HttpURLConnection;
 import java.net.URI;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.function.Function;
 import no.sikt.nva.person.preferences.commons.model.PersonPreferences;
 import no.sikt.nva.person.preferences.commons.service.PersonPreferencesService;
@@ -39,11 +41,9 @@ public class FetchPersonPreferencesHandler extends ApiGatewayHandler<Void, Perso
 
         var personId = getPersonId(requestInfo);
 
-        return attempt(() -> new PersonPreferences.Builder(personPreferencesService)
-            .withPersonId(personId)
-            .build()
-            .fetch())
-            .orElseThrow(personPreferencesNotFound(personId));
+        return attempt(() -> new PersonPreferences.Builder(personPreferencesService).withPersonId(personId)
+                                 .build()
+                                 .fetch()).orElseThrow(personPreferencesNotFound(personId));
     }
 
     @Override
@@ -51,13 +51,12 @@ public class FetchPersonPreferencesHandler extends ApiGatewayHandler<Void, Perso
         return HttpURLConnection.HTTP_OK;
     }
 
-    private static Function<Failure<PersonPreferences>, NotFoundException> personPreferencesNotFound(
-        URI personId) {
+    private static Function<Failure<PersonPreferences>, NotFoundException> personPreferencesNotFound(URI personId) {
         return failure -> new NotFoundException(PERSON_PREFERENCES_NOT_FOUND_MESSAGE + personId);
     }
 
     private static URI getPersonId(RequestInfo requestInfo) {
         var personId = requestInfo.getPathParameters().get(PERSON_ID);
-        return URI.create(personId);
+        return URI.create(URLDecoder.decode(personId, StandardCharsets.UTF_8));
     }
 }
