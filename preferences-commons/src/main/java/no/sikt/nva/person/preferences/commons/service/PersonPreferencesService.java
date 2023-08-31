@@ -15,7 +15,7 @@ import nva.commons.apigateway.exceptions.NotFoundException;
 
 public class PersonPreferencesService {
 
-    private static final String RESOURCE_NOT_FOUND_MESSAGE = "Could not find person preferences";
+    public static final String RESOURCE_NOT_FOUND_MESSAGE = "Could not find person preferences";
     private final AmazonDynamoDB client;
     private final ServiceWithTransactions serviceWithTransactions;
     private final String tableName;

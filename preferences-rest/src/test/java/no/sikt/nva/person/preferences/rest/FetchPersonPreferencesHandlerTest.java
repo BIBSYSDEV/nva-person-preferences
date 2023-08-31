@@ -1,7 +1,7 @@
 package no.sikt.nva.person.preferences.rest;
 
 import static java.net.HttpURLConnection.HTTP_NOT_FOUND;
-import static no.sikt.nva.person.preferences.rest.FetchPersonPreferencesHandler.PERSON_PREFERENCES_NOT_FOUND_MESSAGE;
+import static no.sikt.nva.person.preferences.commons.service.PersonPreferencesService.RESOURCE_NOT_FOUND_MESSAGE;
 import static no.sikt.nva.person.preferences.rest.PersonPreferencesRestHandlersTestConfig.restApiMapper;
 import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
 import static org.apache.http.HttpHeaders.ACCEPT;
@@ -66,7 +66,7 @@ class FetchPersonPreferencesHandlerTest extends LocalPreferencesTestDatabase {
         var detail = response.getBodyObject(Problem.class).getDetail();
 
         assertThat(response.getStatusCode(), is(equalTo(HTTP_NOT_FOUND)));
-        assertThat(detail, containsString(PERSON_PREFERENCES_NOT_FOUND_MESSAGE));
+        assertThat(detail, containsString(RESOURCE_NOT_FOUND_MESSAGE));
     }
 
     private PersonPreferences profileWithCristinIdentifier(URI cristinIdentifier) {

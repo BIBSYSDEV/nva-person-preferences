@@ -14,17 +14,17 @@ import nva.commons.apigateway.exceptions.UnauthorizedException;
 import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
 
-public class UpdatePersonPreferencesHandler extends ApiGatewayHandler<PreferencesRequest, PersonPreferences> {
+public class UpsertPersonPreferencesHandler extends ApiGatewayHandler<PreferencesRequest, PersonPreferences> {
 
     private static final String TABLE_NAME = new Environment().readEnv("TABLE_NAME");
     private final PersonPreferencesService personPreferencesService;
 
     @JacocoGenerated
-    public UpdatePersonPreferencesHandler() {
+    public UpsertPersonPreferencesHandler() {
         this(new PersonPreferencesService(AmazonDynamoDBClientBuilder.defaultClient(), TABLE_NAME));
     }
 
-    public UpdatePersonPreferencesHandler(PersonPreferencesService personPreferencesService) {
+    public UpsertPersonPreferencesHandler(PersonPreferencesService personPreferencesService) {
         super(PreferencesRequest.class);
         this.personPreferencesService = personPreferencesService;
     }

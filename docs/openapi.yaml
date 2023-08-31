@@ -44,7 +44,7 @@ paths:
     parameters:
       - in: path
         name: cristinId
-        description: 'Cristin identifier of authenticated user'
+        description: 'UTF-8 Encoded cristin identifier of nva user'
         schema:
           type: string
         required: true

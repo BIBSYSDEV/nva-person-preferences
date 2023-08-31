@@ -25,20 +25,20 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.zalando.problem.Problem;
 
-public class UpdatePreferencesHandlerTest extends LocalPreferencesTestDatabase {
+public class UpsertPersonPreferencesHandlerTest extends LocalPreferencesTestDatabase {
 
     public static final String TABLE_NAME = "nonExistentTableName";
     private static final Context CONTEXT = mock(Context.class);
     private ByteArrayOutputStream output;
     private PersonPreferencesService personPreferencesService;
-    private UpdatePersonPreferencesHandler handler;
+    private UpsertPersonPreferencesHandler handler;
 
     @BeforeEach
     public void init() {
         super.init(TABLE_NAME);
         output = new ByteArrayOutputStream();
         personPreferencesService = new PersonPreferencesService(client, TABLE_NAME);
-        handler = new UpdatePersonPreferencesHandler(personPreferencesService);
+        handler = new UpsertPersonPreferencesHandler(personPreferencesService);
     }
 
     @Test
