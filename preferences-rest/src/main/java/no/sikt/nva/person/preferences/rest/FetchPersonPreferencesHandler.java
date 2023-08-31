@@ -13,14 +13,11 @@ import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class FetchPersonPreferencesHandler extends ApiGatewayHandler<Void, PersonPreferences> {
 
-    private static final Logger logger = LoggerFactory.getLogger(FetchPersonPreferencesHandler.class);
     private static final String TABLE_NAME = new Environment().readEnv("TABLE_NAME");
-    private static final String PERSON_ID = "personId";
+    private static final String CRISTIN_ID = "cristinId";
     private final PersonPreferencesService personPreferencesService;
 
     @JacocoGenerated
@@ -49,9 +46,6 @@ public class FetchPersonPreferencesHandler extends ApiGatewayHandler<Void, Perso
     }
 
     private static URI getPersonId(RequestInfo requestInfo) {
-        var personId = requestInfo.getPathParameters().get(PERSON_ID);
-        logger.info("PersonId {}:", personId);
-        logger.info("Decoded personId {}", URI.create(URLDecoder.decode(personId, StandardCharsets.UTF_8)));
-        return URI.create(URLDecoder.decode(personId, StandardCharsets.UTF_8));
+        return URI.create(URLDecoder.decode(requestInfo.getPathParameters().get(CRISTIN_ID), StandardCharsets.UTF_8));
     }
 }
