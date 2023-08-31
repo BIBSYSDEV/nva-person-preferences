@@ -188,6 +188,6 @@ Resources:
         GetEvent:
           Type: Api
           Properties:
-            Path: /{personId}
+            Path: /{cristinId+}
             Method: get
             RestApiId: !Ref PersonPreferencesApi

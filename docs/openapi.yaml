@@ -40,10 +40,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Problem"
-  /{cristinId}:
+  /{cristinId+}:
     parameters:
       - in: path
-        name: cristinId
+        name: cristinId+
         description: 'UTF-8 Encoded cristin identifier of nva user'
         schema:
           type: string
