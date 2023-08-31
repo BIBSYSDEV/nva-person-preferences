@@ -144,37 +144,12 @@ Resources:
 
   #============================= Handlers ==========================================================
 
-  NvaCreatePersonPreferencesHandler:
+  UpsertPersonPreferencesHandler:
     Type: AWS::Serverless::Function
-    Description: 'Creates preferences for person'
     Properties:
+      Description: 'Creates/Updates preferences for person'
       CodeUri: preferences-rest
-      Handler: no.sikt.nva.person.preferences.rest.CreatePersonPreferencesHandler::handleRequest
-      Role: !GetAtt PreferencesLambdaRole.Arn
-      MemorySize: 1536
-      AutoPublishAlias: live
-      SnapStart:
-        ApplyOn: PublishedVersions
-      Environment:
-        Variables:
-          ALLOWED_ORIGIN: '*'
-          API_HOST: !Ref ApiDomain
-          TABLE_NAME: !Ref NvaPersonPreferencesTable2
-          COGNITO_HOST: !Ref CognitoAuthorizationUri
-      Events:
-        GetEvent:
-          Type: Api
-          Properties:
-            Path: /
-            Method: post
-            RestApiId: !Ref PersonPreferencesApi
-
-  NvaUpdatePreferencesHandler:
-    Type: AWS::Serverless::Function
-    Description: 'Updates preferences for person'
-    Properties:
-      CodeUri: preferences-rest
-      Handler: no.sikt.nva.person.preferences.rest.UpdatePersonPreferencesHandler::handleRequest
+      Handler: no.sikt.nva.person.preferences.rest.UpsertPersonPreferencesHandler::handleRequest
       Role: !GetAtt PreferencesLambdaRole.Arn
       MemorySize: 1536
       AutoPublishAlias: live
@@ -194,10 +169,10 @@ Resources:
             Method: put
             RestApiId: !Ref PersonPreferencesApi
 
-  NvaFetchPersonPreferencesHandler:
+  FetchPersonPreferencesHandler:
     Type: AWS::Serverless::Function
-    Description: 'Fetches preferences for person'
     Properties:
+      Description: 'Fetches preferences for person'
       CodeUri: preferences-rest
       Handler: no.sikt.nva.person.preferences.rest.FetchPersonPreferencesHandler::handleRequest
       Role: !GetAtt PreferencesLambdaRole.Arn
@@ -213,6 +188,6 @@ Resources:
         GetEvent:
           Type: Api
           Properties:
-            Path: /{personId+}
+            Path: /{cristinId+}
             Method: get
             RestApiId: !Ref PersonPreferencesApi

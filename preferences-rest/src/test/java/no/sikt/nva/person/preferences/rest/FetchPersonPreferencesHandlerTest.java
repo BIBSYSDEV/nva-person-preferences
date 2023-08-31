@@ -1,7 +1,7 @@
 package no.sikt.nva.person.preferences.rest;
 
 import static java.net.HttpURLConnection.HTTP_NOT_FOUND;
-import static no.sikt.nva.person.preferences.rest.FetchPersonPreferencesHandler.PERSON_PREFERENCES_NOT_FOUND_MESSAGE;
+import static no.sikt.nva.person.preferences.commons.service.PersonPreferencesService.RESOURCE_NOT_FOUND_MESSAGE;
 import static no.sikt.nva.person.preferences.rest.PersonPreferencesRestHandlersTestConfig.restApiMapper;
 import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
 import static org.apache.http.HttpHeaders.ACCEPT;
@@ -23,6 +23,7 @@ import no.sikt.nva.person.preferences.commons.service.PersonPreferencesService;
 import no.sikt.nva.person.preferences.test.support.LocalPreferencesTestDatabase;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
+import nva.commons.apigateway.exceptions.NotFoundException;
 import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,7 +32,7 @@ import org.zalando.problem.Problem;
 class FetchPersonPreferencesHandlerTest extends LocalPreferencesTestDatabase {
 
     public static final String TABLE_NAME = "nonExistentTableName";
-    public static final String IDENTIFIER = "personId";
+    public static final String CRISTIN_ID = "cristinId";
     private static final Context CONTEXT = mock(Context.class);
     private ByteArrayOutputStream output;
     private PersonPreferencesService personPreferencesService;
@@ -46,14 +47,14 @@ class FetchPersonPreferencesHandlerTest extends LocalPreferencesTestDatabase {
     }
 
     @Test
-    void shouldFetchPersonPreferences() throws IOException {
-        var personPreferences = profileWithCristinIdentifier(randomUri()).create();
+    void shouldFetchPersonPreferences() throws IOException, NotFoundException {
+        var personPreferences = profileWithCristinIdentifier(randomUri()).upsert();
         var request = createRequest(personPreferences.personId());
 
         handler.handleRequest(request, output, CONTEXT);
         var response = GatewayResponse.fromOutputStream(output, PersonPreferences.class);
 
-        assertThat(personPreferencesService.getPreferencesByPersonId(personPreferences.personId()),
+        assertThat(personPreferencesService.fetchPreferences(personPreferences),
                    is(equalTo(response.getBodyObject(PersonPreferences.class))));
     }
 
@@ -65,7 +66,7 @@ class FetchPersonPreferencesHandlerTest extends LocalPreferencesTestDatabase {
         var detail = response.getBodyObject(Problem.class).getDetail();
 
         assertThat(response.getStatusCode(), is(equalTo(HTTP_NOT_FOUND)));
-        assertThat(detail, containsString(PERSON_PREFERENCES_NOT_FOUND_MESSAGE));
+        assertThat(detail, containsString(RESOURCE_NOT_FOUND_MESSAGE));
     }
 
     private PersonPreferences profileWithCristinIdentifier(URI cristinIdentifier) {
@@ -76,7 +77,7 @@ class FetchPersonPreferencesHandlerTest extends LocalPreferencesTestDatabase {
     }
 
     private InputStream createRequest(URI identifier) throws JsonProcessingException {
-        var pathParameters = Map.of(IDENTIFIER, identifier.toString());
+        var pathParameters = Map.of(CRISTIN_ID, identifier.toString());
         var headers = Map.of(ACCEPT, ContentType.APPLICATION_JSON.getMimeType());
         return new HandlerRequestBuilder<InputStream>(restApiMapper)
             .withHeaders(headers)

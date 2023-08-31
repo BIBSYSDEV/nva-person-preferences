@@ -8,6 +8,7 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 import no.sikt.nva.person.preferences.commons.service.PersonPreferencesService;
+import nva.commons.apigateway.exceptions.NotFoundException;
 
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 @JsonSerialize
@@ -15,16 +16,12 @@ public record PersonPreferences(URI personId,
                                 List<URI> promotedPublications,
                                 @JsonIgnore PersonPreferencesService personPreferencesService) {
 
-    public PersonPreferences create() {
-        return personPreferencesService.createProfile(this);
+    public PersonPreferences upsert() throws NotFoundException {
+        return personPreferencesService.upsertPreferences(this);
     }
 
-    public void update() {
-        personPreferencesService.updateProfile(this);
-    }
-
-    public PersonPreferences fetch() {
-        return personPreferencesService.fetchProfile(this);
+    public PersonPreferences fetch() throws NotFoundException {
+        return personPreferencesService.fetchPreferences(this);
     }
 
     public PersonPreferencesDao toDao() {

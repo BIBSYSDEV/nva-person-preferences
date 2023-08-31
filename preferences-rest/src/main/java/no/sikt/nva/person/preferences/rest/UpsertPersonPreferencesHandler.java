@@ -5,42 +5,46 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.lambda.runtime.Context;
 import java.net.HttpURLConnection;
 import no.sikt.nva.person.preferences.commons.model.PersonPreferences;
+import no.sikt.nva.person.preferences.commons.model.PersonPreferences.Builder;
 import no.sikt.nva.person.preferences.commons.service.PersonPreferencesService;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
+import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.apigateway.exceptions.UnauthorizedException;
 import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
 
-public class CreatePersonPreferencesHandler extends ApiGatewayHandler<PreferencesRequest, PersonPreferences> {
+public class UpsertPersonPreferencesHandler extends ApiGatewayHandler<PreferencesRequest, PersonPreferences> {
 
     private static final String TABLE_NAME = new Environment().readEnv("TABLE_NAME");
-    private final PersonPreferencesService preferencesService;
+    private final PersonPreferencesService personPreferencesService;
 
     @JacocoGenerated
-    public CreatePersonPreferencesHandler() {
+    public UpsertPersonPreferencesHandler() {
         this(new PersonPreferencesService(AmazonDynamoDBClientBuilder.defaultClient(), TABLE_NAME));
     }
 
-    public CreatePersonPreferencesHandler(PersonPreferencesService preferencesService) {
+    public UpsertPersonPreferencesHandler(PersonPreferencesService personPreferencesService) {
         super(PreferencesRequest.class);
-        this.preferencesService = preferencesService;
+        this.personPreferencesService = personPreferencesService;
     }
 
     @Override
     protected PersonPreferences processInput(PreferencesRequest input, RequestInfo requestInfo, Context context)
-        throws UnauthorizedException {
+        throws UnauthorizedException, NotFoundException {
+
         validateRequest(requestInfo);
-        return new PersonPreferences.Builder(preferencesService)
+
+        return new Builder(personPreferencesService)
                    .withPersonId(requestInfo.getPersonCristinId())
                    .withPromotedPublications(input.promotedPublications())
                    .build()
-                   .create();
+                   .upsert();
     }
 
     @Override
     protected Integer getSuccessStatusCode(PreferencesRequest input, PersonPreferences output) {
-        return HttpURLConnection.HTTP_CREATED;
+        return HttpURLConnection.HTTP_OK;
     }
 
     private static void validateRequest(RequestInfo requestInfo) throws UnauthorizedException {

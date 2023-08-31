@@ -4,54 +4,14 @@ info:
   version: 1.0.0
 paths:
   /:
-    post:
-      description: 'Creates preferences for person'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Profile'
-      security:
-        - CognitoUserPool: [
-          'https://api.nva.unit.no/scopes/backend',
-          'https://api.nva.unit.no/scopes/frontend',
-          'aws.cognito.signin.user.admin',
-        ]
-      x-amazon-apigateway-integration:
-        uri:
-          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCreatePersonPreferencesHandler.Arn}:live/invocations
-        responses: { }
-        httpMethod: POST
-        type: AWS_PROXY
-      responses:
-        '201':
-          description: "Successfully created"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Profile"
-        '401':
-          description: "Unauthorized"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Problem"
-
-        '500':
-          description: "Internal server error"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Problem"
     put:
-      description: 'Updates preferences for person'
+      description: 'Creates/Updates preferences for person'
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Profile'
+              $ref: '#/components/schemas/Preferences'
       security:
         - CognitoUserPool: [
           'https://api.nva.unit.no/scopes/backend',
@@ -60,13 +20,13 @@ paths:
         ]
       x-amazon-apigateway-integration:
         uri:
-          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaUpdatePreferencesHandler.Arn}:live/invocations
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UpsertPersonPreferencesHandler.Arn}:live/invocations
         responses: { }
         httpMethod: POST
         type: AWS_PROXY
       responses:
         '200':
-          description: "Successfully updated"
+          description: "Successfully created/updated"
         '401':
           description: "Unauthorized"
           content:
@@ -80,10 +40,11 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Problem"
-  /{personId+}:
+  /{cristinId+}:
     parameters:
       - in: path
-        name: personId+
+        name: cristinId+
+        description: 'UTF-8 Encoded cristin identifier of nva user'
         schema:
           type: string
         required: true
@@ -91,7 +52,7 @@ paths:
       description: 'Fetches preferences for person'
       x-amazon-apigateway-integration:
         uri:
-          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaFetchPersonPreferencesHandler.Arn}:live/invocations
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${FetchPersonPreferencesHandler.Arn}:live/invocations
         responses: { }
         httpMethod: POST
         type: AWS_PROXY
@@ -112,13 +73,10 @@ paths:
                 $ref: "#/components/schemas/Problem"
 components:
   schemas:
-    Profile:
+    Preferences:
       type: object
-      description: Object containing user identifier and list of promoted publications
+      description: Object containing preferences
       properties:
-        identifier:
-          type: string
-          description: URI identifier of cristin user
         promotedPublications:
           type: array
           description: Array containing publication identifiers
