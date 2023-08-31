@@ -52,7 +52,7 @@ paths:
       description: 'Fetches preferences for person'
       x-amazon-apigateway-integration:
         uri:
-          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaFetchPersonPreferencesHandler.Arn}:live/invocations
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${FetchPersonPreferencesHandler.Arn}:live/invocations
         responses: { }
         httpMethod: POST
         type: AWS_PROXY
