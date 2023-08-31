@@ -32,7 +32,7 @@ import org.zalando.problem.Problem;
 class FetchPersonPreferencesHandlerTest extends LocalPreferencesTestDatabase {
 
     public static final String TABLE_NAME = "nonExistentTableName";
-    public static final String IDENTIFIER = "personId";
+    public static final String CRISTIN_ID = "cristinId";
     private static final Context CONTEXT = mock(Context.class);
     private ByteArrayOutputStream output;
     private PersonPreferencesService personPreferencesService;
@@ -77,7 +77,7 @@ class FetchPersonPreferencesHandlerTest extends LocalPreferencesTestDatabase {
     }
 
     private InputStream createRequest(URI identifier) throws JsonProcessingException {
-        var pathParameters = Map.of(IDENTIFIER, identifier.toString());
+        var pathParameters = Map.of(CRISTIN_ID, identifier.toString());
         var headers = Map.of(ACCEPT, ContentType.APPLICATION_JSON.getMimeType());
         return new HandlerRequestBuilder<InputStream>(restApiMapper)
             .withHeaders(headers)
