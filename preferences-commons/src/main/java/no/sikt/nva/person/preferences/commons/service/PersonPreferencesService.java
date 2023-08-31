@@ -6,13 +6,12 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.GetItemRequest;
 import com.amazonaws.services.dynamodbv2.model.TransactWriteItemsRequest;
-import com.amazonaws.services.kms.model.NotFoundException;
-import java.net.URI;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import no.sikt.nva.person.preferences.commons.model.PersonPreferences;
 import no.sikt.nva.person.preferences.commons.model.PersonPreferencesDao;
+import nva.commons.apigateway.exceptions.NotFoundException;
 
 public class PersonPreferencesService {
 
@@ -27,7 +26,25 @@ public class PersonPreferencesService {
         this.client = client;
     }
 
-    public PersonPreferences createProfile(PersonPreferences personPreferences) {
+    public PersonPreferences upsertPreferences(PersonPreferences personPreferences) throws NotFoundException {
+        var primaryKey = primaryKey(personPreferences);
+        var persistedDao = client.getItem(new GetItemRequest()
+                                              .withTableName(tableName)
+                                              .withKey(primaryKey));
+        return isNull(persistedDao.getItem())
+                   ? createPreferences(personPreferences)
+                   : updatePreferences(personPreferences);
+    }
+
+    public PersonPreferences fetchPreferences(PersonPreferences personPreferences) throws NotFoundException {
+        var dao = fetchPersonPreferences(personPreferences);
+        return new PersonPreferences.Builder()
+                   .withPersonId(dao.personId())
+                   .withPromotedPublications(dao.promotedPublications())
+                   .build();
+    }
+
+    private PersonPreferences createPreferences(PersonPreferences personPreferences) throws NotFoundException {
         var dao = injectCreatedTimeStamp(personPreferences.toDao());
         var transactionItem = serviceWithTransactions.newPutTransactionItem(dao);
         var request = new TransactWriteItemsRequest().withTransactItems(List.of(transactionItem));
@@ -35,28 +52,13 @@ public class PersonPreferencesService {
         return new PersonPreferences.Builder().fromDao(fetchPersonPreferences(personPreferences));
     }
 
-    public void updateProfile(PersonPreferences personPreferences) {
+    private PersonPreferences updatePreferences(PersonPreferences personPreferences) throws NotFoundException {
         var persistedDao = fetchPersonPreferences(personPreferences);
         var dao = injectModifiedTimeStamp(personPreferences, persistedDao);
         var transactionItem = serviceWithTransactions.updatePutTransactionItem(dao);
         var request = new TransactWriteItemsRequest().withTransactItems(List.of(transactionItem));
         serviceWithTransactions.sendTransactionWriteRequest(request);
-    }
-
-    public PersonPreferences fetchProfile(PersonPreferences personPreferences) {
-        var dao = fetchPersonPreferences(personPreferences);
-        return new PersonPreferences.Builder()
-            .withPersonId(dao.personId())
-            .withPromotedPublications(dao.promotedPublications())
-            .build();
-    }
-
-    public PersonPreferences getPreferencesByPersonId(URI personId) {
-        var dao = fetchDao(new PersonPreferencesDao.Builder().withPersonId(personId).build());
-        return new PersonPreferences.Builder()
-            .withPersonId(dao.personId())
-            .withPromotedPublications(dao.promotedPublications())
-            .build();
+        return new PersonPreferences.Builder().fromDao(fetchPersonPreferences(personPreferences));
     }
 
     private static PersonPreferencesDao injectCreatedTimeStamp(PersonPreferencesDao personPreferencesDao) {
@@ -74,22 +76,18 @@ public class PersonPreferencesService {
             .build();
     }
 
-    private PersonPreferencesDao fetchDao(PersonPreferencesDao dao) {
-        return new PersonPreferencesDao.Builder()
-            .fromDynamoFormat(getResourceByPrimaryKey(dao.toDynamoFormat()));
-    }
-
     private Map<String, AttributeValue> primaryKey(PersonPreferences userPreferences) {
         return Map.of(PRIMARY_PARTITION_KEY, new AttributeValue(userPreferences.personId().toString()));
     }
 
-    private PersonPreferencesDao fetchPersonPreferences(PersonPreferences personPreferences) {
+    private PersonPreferencesDao fetchPersonPreferences(PersonPreferences personPreferences) throws NotFoundException {
         var primaryKey = primaryKey(personPreferences);
         return new PersonPreferencesDao.Builder()
             .fromDynamoFormat(getResourceByPrimaryKey(primaryKey));
     }
 
-    private Map<String, AttributeValue> getResourceByPrimaryKey(Map<String, AttributeValue> primaryKey) {
+    private Map<String, AttributeValue> getResourceByPrimaryKey(Map<String, AttributeValue> primaryKey)
+        throws NotFoundException {
         var result = client.getItem(new GetItemRequest()
                                         .withTableName(tableName)
                                         .withKey(primaryKey));

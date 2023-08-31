@@ -5,14 +5,16 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.lambda.runtime.Context;
 import java.net.HttpURLConnection;
 import no.sikt.nva.person.preferences.commons.model.PersonPreferences;
+import no.sikt.nva.person.preferences.commons.model.PersonPreferences.Builder;
 import no.sikt.nva.person.preferences.commons.service.PersonPreferencesService;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
+import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.apigateway.exceptions.UnauthorizedException;
 import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
 
-public class UpdatePersonPreferencesHandler extends ApiGatewayHandler<PreferencesRequest, Void> {
+public class UpdatePersonPreferencesHandler extends ApiGatewayHandler<PreferencesRequest, PersonPreferences> {
 
     private static final String TABLE_NAME = new Environment().readEnv("TABLE_NAME");
     private final PersonPreferencesService personPreferencesService;
@@ -28,22 +30,20 @@ public class UpdatePersonPreferencesHandler extends ApiGatewayHandler<Preference
     }
 
     @Override
-    protected Void processInput(PreferencesRequest input, RequestInfo requestInfo, Context context)
-        throws UnauthorizedException {
+    protected PersonPreferences processInput(PreferencesRequest input, RequestInfo requestInfo, Context context)
+        throws UnauthorizedException, NotFoundException {
 
         validateRequest(requestInfo);
 
-        new PersonPreferences.Builder(personPreferencesService)
-            .withPersonId(requestInfo.getPersonCristinId())
-            .withPromotedPublications(input.promotedPublications())
-            .build()
-            .update();
-
-        return null;
+        return new Builder(personPreferencesService)
+                   .withPersonId(requestInfo.getPersonCristinId())
+                   .withPromotedPublications(input.promotedPublications())
+                   .build()
+                   .upsert();
     }
 
     @Override
-    protected Integer getSuccessStatusCode(PreferencesRequest input, Void output) {
+    protected Integer getSuccessStatusCode(PreferencesRequest input, PersonPreferences output) {
         return HttpURLConnection.HTTP_OK;
     }
 

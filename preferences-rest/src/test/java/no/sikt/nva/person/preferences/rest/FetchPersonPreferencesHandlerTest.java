@@ -23,6 +23,7 @@ import no.sikt.nva.person.preferences.commons.service.PersonPreferencesService;
 import no.sikt.nva.person.preferences.test.support.LocalPreferencesTestDatabase;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
+import nva.commons.apigateway.exceptions.NotFoundException;
 import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -46,14 +47,14 @@ class FetchPersonPreferencesHandlerTest extends LocalPreferencesTestDatabase {
     }
 
     @Test
-    void shouldFetchPersonPreferences() throws IOException {
-        var personPreferences = profileWithCristinIdentifier(randomUri()).create();
+    void shouldFetchPersonPreferences() throws IOException, NotFoundException {
+        var personPreferences = profileWithCristinIdentifier(randomUri()).upsert();
         var request = createRequest(personPreferences.personId());
 
         handler.handleRequest(request, output, CONTEXT);
         var response = GatewayResponse.fromOutputStream(output, PersonPreferences.class);
 
-        assertThat(personPreferencesService.getPreferencesByPersonId(personPreferences.personId()),
+        assertThat(personPreferencesService.fetchPreferences(personPreferences),
                    is(equalTo(response.getBodyObject(PersonPreferences.class))));
     }
 

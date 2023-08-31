@@ -20,6 +20,7 @@ import no.sikt.nva.person.preferences.commons.service.PersonPreferencesService;
 import no.sikt.nva.person.preferences.test.support.LocalPreferencesTestDatabase;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
+import nva.commons.apigateway.exceptions.NotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.zalando.problem.Problem;
@@ -41,15 +42,26 @@ public class UpdatePreferencesHandlerTest extends LocalPreferencesTestDatabase {
     }
 
     @Test
-    void shouldUpdatePersonPreferences() throws IOException {
-        var existingPersonPreferences = profileWithCristinIdentifier(randomUri()).create();
+    void shouldCreatePersonPreferencesWhenDoesNotExist() throws IOException, NotFoundException {
+        var existingPersonPreferences = profileWithCristinIdentifier(randomUri());
         var updatePersonPreferences = existingPersonPreferences.copy()
-                                          .withPersonId(existingPersonPreferences.personId())
                                           .withPromotedPublications(List.of())
                                           .build();
         handler.handleRequest(createRequest(updatePersonPreferences), output, CONTEXT);
 
-        assertThat(personPreferencesService.getPreferencesByPersonId(existingPersonPreferences.personId()).personId(),
+        assertThat(personPreferencesService.fetchPreferences(existingPersonPreferences).personId(),
+                   is(equalTo(updatePersonPreferences.personId())));
+    }
+
+    @Test
+    void shouldUpdatePersonPreferencesWhenExist() throws IOException, NotFoundException {
+        var existingPersonPreferences = profileWithCristinIdentifier(randomUri()).upsert();
+        var updatePersonPreferences = existingPersonPreferences.copy()
+                                          .withPromotedPublications(List.of())
+                                          .build();
+        handler.handleRequest(createRequest(updatePersonPreferences), output, CONTEXT);
+
+        assertThat(personPreferencesService.fetchPreferences(existingPersonPreferences).personId(),
                    is(equalTo(updatePersonPreferences.personId())));
     }
 
