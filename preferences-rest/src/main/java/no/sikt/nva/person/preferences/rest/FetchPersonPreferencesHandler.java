@@ -35,7 +35,7 @@ public class FetchPersonPreferencesHandler extends ApiGatewayHandler<Void, Perso
         throws ApiGatewayException {
 
         return new PersonPreferences.Builder(personPreferencesService)
-                                 .withPersonId(getPersonId(requestInfo))
+                                 .withPersonId(getCristinId(requestInfo))
                                  .build()
                                  .fetch();
     }
@@ -45,7 +45,7 @@ public class FetchPersonPreferencesHandler extends ApiGatewayHandler<Void, Perso
         return HttpURLConnection.HTTP_OK;
     }
 
-    private static URI getPersonId(RequestInfo requestInfo) {
+    private static URI getCristinId(RequestInfo requestInfo) {
         return URI.create(URLDecoder.decode(requestInfo.getPathParameters().get(CRISTIN_ID), StandardCharsets.UTF_8));
     }
 }

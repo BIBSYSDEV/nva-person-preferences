@@ -4,6 +4,9 @@ import static java.util.Objects.isNull;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.lambda.runtime.Context;
 import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import no.sikt.nva.person.preferences.commons.model.PersonPreferences;
 import no.sikt.nva.person.preferences.commons.model.PersonPreferences.Builder;
 import no.sikt.nva.person.preferences.commons.service.PersonPreferencesService;
@@ -16,6 +19,7 @@ import nva.commons.core.JacocoGenerated;
 
 public class UpsertPersonPreferencesHandler extends ApiGatewayHandler<PreferencesRequest, PersonPreferences> {
 
+    private static final String CRISTIN_ID = "cristinId";
     private static final String TABLE_NAME = new Environment().readEnv("TABLE_NAME");
     private final PersonPreferencesService personPreferencesService;
 
@@ -54,6 +58,11 @@ public class UpsertPersonPreferencesHandler extends ApiGatewayHandler<Preference
     }
 
     private static boolean isNotAuthenticated(RequestInfo requestInfo) throws UnauthorizedException {
-        return isNull(requestInfo.getCurrentCustomer()) && isNull(requestInfo.getPersonCristinId());
+        return isNull(requestInfo.getCurrentCustomer()) && isNull(requestInfo.getPersonCristinId())
+            || !getCristinId(requestInfo).equals(requestInfo.getPersonCristinId());
+    }
+
+    private static URI getCristinId(RequestInfo requestInfo) {
+        return URI.create(URLDecoder.decode(requestInfo.getPathParameters().get(CRISTIN_ID), StandardCharsets.UTF_8));
     }
 }
