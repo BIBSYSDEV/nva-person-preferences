@@ -15,6 +15,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 import no.sikt.nva.person.preferences.commons.model.PersonPreferences;
 import no.sikt.nva.person.preferences.commons.service.PersonPreferencesService;
 import no.sikt.nva.person.preferences.test.support.LocalPreferencesTestDatabase;
@@ -74,9 +75,30 @@ public class UpsertPersonPreferencesHandlerTest extends LocalPreferencesTestData
         assertThat(response.getStatusCode(), is(equalTo(HttpURLConnection.HTTP_UNAUTHORIZED)));
     }
 
+    @Test
+    void shouldReturnUnauthorizedWhenProvidedCristinIdDoesNotMatch() throws IOException {
+        var profile = profileWithCristinIdentifier(randomUri());
+        handler.handleRequest(createRequestWithNotMatchingCristinIds(profile), output, CONTEXT);
+        var response = GatewayResponse.fromOutputStream(output, Problem.class);
+
+        assertThat(response.getStatusCode(), is(equalTo(HttpURLConnection.HTTP_UNAUTHORIZED)));
+    }
+
     private InputStream createUnauthorizedRequest(PersonPreferences personPreferences) throws JsonProcessingException {
         return new HandlerRequestBuilder<PersonPreferences>(dtoObjectMapper)
                    .withUserName(randomString())
+                   .withBody(personPreferences)
+                   .build();
+    }
+
+    private InputStream createRequestWithNotMatchingCristinIds(PersonPreferences personPreferences)
+        throws JsonProcessingException {
+        return new HandlerRequestBuilder<PersonPreferences>(dtoObjectMapper)
+                   .withUserName(randomString())
+                   .withCurrentCustomer(randomUri())
+                   .withPersonCristinId(personPreferences.personId())
+                   .withCurrentCustomer(randomUri())
+                   .withPathParameters(Map.of("cristinId", randomString()))
                    .withBody(personPreferences)
                    .build();
     }
@@ -87,6 +109,7 @@ public class UpsertPersonPreferencesHandlerTest extends LocalPreferencesTestData
                    .withCurrentCustomer(randomUri())
                    .withPersonCristinId(personPreferences.personId())
                    .withCurrentCustomer(randomUri())
+                   .withPathParameters(Map.of("cristinId", personPreferences.personId().toString()))
                    .withBody(personPreferences)
                    .build();
     }

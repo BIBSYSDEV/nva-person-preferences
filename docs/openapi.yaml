@@ -3,7 +3,37 @@ info:
   title: NVA Preferences API
   version: 1.0.0
 paths:
-  /:
+  /{cristinId+}:
+    parameters:
+      - in: path
+        name: cristinId+
+        description: 'UTF-8 Encoded cristin identifier of nva user'
+        schema:
+          type: string
+        required: true
+    get:
+      description: 'Fetches preferences for person'
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${FetchPersonPreferencesHandler.Arn}:live/invocations
+        responses: { }
+        httpMethod: POST
+        type: AWS_PROXY
+      responses:
+        '200':
+          description: "Successfully fetched"
+        '404':
+          description: "Person preferences not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+        '500':
+          description: "Internal server error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Problem"
     put:
       description: 'Creates/Updates preferences for person'
       requestBody:
@@ -34,37 +64,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/Problem"
 
-        '500':
-          description: "Internal server error"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Problem"
-  /{cristinId+}:
-    parameters:
-      - in: path
-        name: cristinId+
-        description: 'UTF-8 Encoded cristin identifier of nva user'
-        schema:
-          type: string
-        required: true
-    get:
-      description: 'Fetches preferences for person'
-      x-amazon-apigateway-integration:
-        uri:
-          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${FetchPersonPreferencesHandler.Arn}:live/invocations
-        responses: { }
-        httpMethod: POST
-        type: AWS_PROXY
-      responses:
-        '200':
-          description: "Successfully fetched"
-        '404':
-          description: "Person preferences not found"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Problem"
         '500':
           description: "Internal server error"
           content:
