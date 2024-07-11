@@ -12,6 +12,7 @@ import no.sikt.nva.person.preferences.commons.model.PersonPreferences.Builder;
 import no.sikt.nva.person.preferences.commons.service.PersonPreferencesService;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
+import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.apigateway.exceptions.UnauthorizedException;
 import nva.commons.core.Environment;
@@ -34,10 +35,14 @@ public class UpsertPersonPreferencesHandler extends ApiGatewayHandler<Preference
     }
 
     @Override
+    protected void validateRequest(PreferencesRequest preferencesRequest, RequestInfo requestInfo, Context context)
+        throws ApiGatewayException {
+        validateRequest(requestInfo);
+    }
+
+    @Override
     protected PersonPreferences processInput(PreferencesRequest input, RequestInfo requestInfo, Context context)
         throws UnauthorizedException, NotFoundException {
-
-        validateRequest(requestInfo);
 
         return new Builder(personPreferencesService)
                    .withPersonId(requestInfo.getPersonCristinId())

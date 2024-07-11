@@ -31,6 +31,11 @@ public class FetchPersonPreferencesHandler extends ApiGatewayHandler<Void, Perso
     }
 
     @Override
+    protected void validateRequest(Void unused, RequestInfo requestInfo, Context context) throws ApiGatewayException {
+        //Do nothing
+    }
+
+    @Override
     protected PersonPreferences processInput(Void input, RequestInfo requestInfo, Context context)
         throws ApiGatewayException {
 
