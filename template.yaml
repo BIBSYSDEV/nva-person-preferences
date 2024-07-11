@@ -36,6 +36,10 @@ Parameters:
     Type: String
     Default: ''
     Description: Suffix used for naming resources for feature branches to avoid conflicts.
+  AllowedOrigins:
+    Type: String
+    Description: comma separated list of external clients that are allowed to contact the HTTP APIs, "*" indicates that all origins are allowed
+    Default: '*'
 
 Conditions:
   WithSuffix: !Not [ !Equals [ !Ref Suffix, '' ] ]
@@ -157,7 +161,7 @@ Resources:
         ApplyOn: PublishedVersions
       Environment:
         Variables:
-          ALLOWED_ORIGIN: '*'
+          ALLOWED_ORIGIN: !Ref AllowedOrigins
           API_HOST: !Ref ApiDomain
           TABLE_NAME: !Ref NvaPersonPreferencesTable2
           COGNITO_HOST: !Ref CognitoAuthorizationUri
@@ -182,7 +186,7 @@ Resources:
         ApplyOn: PublishedVersions
       Environment:
         Variables:
-          ALLOWED_ORIGIN: '*'
+          ALLOWED_ORIGIN: !Ref AllowedOrigins
           TABLE_NAME: !Ref NvaPersonPreferencesTable2
       Events:
         GetEvent:
