@@ -68,6 +68,9 @@ Resources:
         StreamViewType: NEW_AND_OLD_IMAGES
       PointInTimeRecoverySpecification:
         PointInTimeRecoveryEnabled: true
+      Tags:
+        - Key: IncludedInBackup
+          Value: 'true'
 
   #===========================Api========================================================
 
