@@ -20,6 +20,11 @@ public record PersonPreferences(URI personId,
                                 LicenseInfo licenseInfo,
                                 @JsonIgnore PersonPreferencesService personPreferencesService) {
 
+    @Override
+    public LicenseInfo licenseInfo() {
+        return nonNull(licenseInfo) ? licenseInfo : new LicenseInfo(null, null);
+    }
+
     public PersonPreferences upsert() throws NotFoundException {
         return personPreferencesService.upsertPreferences(this);
     }
@@ -32,8 +37,8 @@ public record PersonPreferences(URI personId,
         return new PersonPreferencesDao.Builder()
                 .withPersonId(personId)
                 .withPromotedPublications(promotedPublications)
-                .withLicenseUri(licenseInfo.licenseUri())
-                .withLicenseSignedDate(licenseInfo.signed())
+                .withLicenseUri(licenseInfo().licenseUri())
+                .withLicenseSignedDate(licenseInfo().signed())
                 .build();
     }
 
@@ -41,7 +46,7 @@ public record PersonPreferences(URI personId,
         return new PersonPreferences.Builder(personPreferencesService)
                 .withPersonId(this.personId)
                 .withPromotedPublications(this.promotedPublications)
-                .withLicenseInfo(this.licenseInfo);
+                .withLicenseInfo(this.licenseInfo());
     }
 
     public static class Builder {
