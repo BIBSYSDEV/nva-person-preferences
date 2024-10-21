@@ -1,38 +1,46 @@
 package no.sikt.nva.person.preferences.commons.model;
 
-import static nva.commons.core.attempt.Try.attempt;
 import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.document.ItemUtils;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
+import no.unit.nva.commons.json.JsonUtils;
+
 import java.net.URI;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
-import no.unit.nva.commons.json.JsonUtils;
+
+import static nva.commons.core.attempt.Try.attempt;
 
 public record PersonPreferencesDao(URI personId,
                                    List<URI> promotedPublications,
+                                   Instant licenseSignedDate,
+                                   URI licenseUri,
                                    Instant created,
                                    Instant modified) {
 
     public Map<String, AttributeValue> toDynamoFormat() {
         var item = attempt(() -> Item.fromJSON(
-            JsonUtils.dynamoObjectMapper.writeValueAsString(this))).orElseThrow();
+                JsonUtils.dynamoObjectMapper.writeValueAsString(this))).orElseThrow();
         return ItemUtils.toAttributeValues(item);
     }
 
     public PersonPreferencesDao.Builder copy() {
         return new PersonPreferencesDao.Builder()
-                   .withPersonId(this.personId)
-                   .withPromotedPublications(this.promotedPublications)
-                   .withCreatedDate(this.created)
-                   .withModifiedDate(this.modified);
+                .withPersonId(this.personId)
+                .withPromotedPublications(this.promotedPublications)
+                .withLicenseUri(this.licenseUri)
+                .withLicenseSignedDate(this.licenseSignedDate)
+                .withCreatedDate(this.created)
+                .withModifiedDate(this.modified);
     }
 
     public static class Builder {
 
         private URI personId;
         private List<URI> promotedPublications;
+        private Instant licenseSignedDate;
+        private URI licenseUri;
         private Instant created;
         private Instant modified;
 
@@ -56,14 +64,31 @@ public record PersonPreferencesDao(URI personId,
             return this;
         }
 
+        public Builder withLicenseSignedDate(Instant licenseSignedDate) {
+            this.licenseSignedDate = licenseSignedDate;
+            return this;
+        }
+
+        public Builder withLicenseUri(URI licenseUri) {
+            this.licenseUri = licenseUri;
+            return this;
+        }
+
+
         public PersonPreferencesDao fromDynamoFormat(Map<String, AttributeValue> map) {
             return attempt(() -> JsonUtils.dynamoObjectMapper.readValue(ItemUtils.toItem(map).toJSON(),
-                                                                        PersonPreferencesDao.class))
-                       .orElseThrow();
+                    PersonPreferencesDao.class))
+                    .orElseThrow();
         }
 
         public PersonPreferencesDao build() {
-            return new PersonPreferencesDao(personId, promotedPublications, created, modified);
+            return new PersonPreferencesDao(
+                    personId,
+                    promotedPublications,
+                    licenseSignedDate,
+                    licenseUri,
+                    created,
+                    modified);
         }
     }
 }
