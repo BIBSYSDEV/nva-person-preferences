@@ -38,7 +38,7 @@ public class ServiceWithTransactions {
     }
 
     protected TransactWriteItem updatePutTransactionItem(PersonPreferencesDao data) {
-        return new TransactWriteItem().withPut(constructUpdatePut(data));
+        return new TransactWriteItem().withUpdate(constructUpdatePut(data)).withPut(constructUpdatePut(data));
     }
 
     private static String keyNotExistsCondition() {

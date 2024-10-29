@@ -14,8 +14,6 @@ import static nva.commons.core.attempt.Try.attempt;
 
 public record PersonPreferencesDao(URI personId,
                                    List<URI> promotedPublications,
-                                   Instant licenseSignedDate,
-                                   URI licenseUri,
                                    Instant created,
                                    Instant modified) {
 
@@ -29,8 +27,6 @@ public record PersonPreferencesDao(URI personId,
         return new PersonPreferencesDao.Builder()
                 .withPersonId(this.personId)
                 .withPromotedPublications(this.promotedPublications)
-                .withLicenseUri(this.licenseUri)
-                .withLicenseSignedDate(this.licenseSignedDate)
                 .withCreatedDate(this.created)
                 .withModifiedDate(this.modified);
     }
@@ -39,8 +35,6 @@ public record PersonPreferencesDao(URI personId,
 
         private URI personId;
         private List<URI> promotedPublications;
-        private Instant licenseSignedDate;
-        private URI licenseUri;
         private Instant created;
         private Instant modified;
 
@@ -64,16 +58,6 @@ public record PersonPreferencesDao(URI personId,
             return this;
         }
 
-        public Builder withLicenseSignedDate(Instant licenseSignedDate) {
-            this.licenseSignedDate = licenseSignedDate;
-            return this;
-        }
-
-        public Builder withLicenseUri(URI licenseUri) {
-            this.licenseUri = licenseUri;
-            return this;
-        }
-
 
         public PersonPreferencesDao fromDynamoFormat(Map<String, AttributeValue> map) {
             return attempt(() -> JsonUtils.dynamoObjectMapper.readValue(ItemUtils.toItem(map).toJSON(),
@@ -85,8 +69,6 @@ public record PersonPreferencesDao(URI personId,
             return new PersonPreferencesDao(
                     personId,
                     promotedPublications,
-                    licenseSignedDate,
-                    licenseUri,
                     created,
                     modified);
         }

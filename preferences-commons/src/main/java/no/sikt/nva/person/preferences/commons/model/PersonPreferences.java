@@ -17,13 +17,8 @@ import static java.util.Objects.nonNull;
 @JsonSerialize
 public record PersonPreferences(URI personId,
                                 List<URI> promotedPublications,
-                                LicenseInfo licenseInfo,
                                 @JsonIgnore PersonPreferencesService personPreferencesService) {
 
-    @Override
-    public LicenseInfo licenseInfo() {
-        return nonNull(licenseInfo) ? licenseInfo : new LicenseInfo(null, null);
-    }
 
     public PersonPreferences upsert() throws NotFoundException {
         return personPreferencesService.upsertPreferences(this);
@@ -37,24 +32,19 @@ public record PersonPreferences(URI personId,
         return new PersonPreferencesDao.Builder()
                 .withPersonId(personId)
                 .withPromotedPublications(promotedPublications)
-                .withLicenseUri(licenseInfo().licenseUri())
-                .withLicenseSignedDate(licenseInfo().signed())
                 .build();
     }
 
     public Builder copy() {
         return new PersonPreferences.Builder(personPreferencesService)
                 .withPersonId(this.personId)
-                .withPromotedPublications(this.promotedPublications)
-                .withLicenseInfo(this.licenseInfo());
+                .withPromotedPublications(this.promotedPublications);
     }
 
     public static class Builder {
 
         private PersonPreferencesService preferencesService;
         private URI personId;
-        private Instant licenseSignedDate;
-        private URI licenseUri;
         private List<URI> promotedPublications;
 
         public Builder(PersonPreferencesService preferencesService) {
@@ -74,26 +64,9 @@ public record PersonPreferences(URI personId,
             return this;
         }
 
-        public Builder withLicenseSignedDate(Instant licenseSignedDate) {
-            this.licenseSignedDate = licenseSignedDate;
-            return this;
-        }
-
-        public Builder withLicenseUri(URI licenseUri) {
-            this.licenseUri = licenseUri;
-            return this;
-        }
-
-        public Builder withLicenseInfo(LicenseInfo licenseInfo) {
-            return withLicenseUri(licenseInfo.licenseUri())
-                    .withLicenseSignedDate(licenseInfo.signed());
-        }
-
         public PersonPreferences fromDao(PersonPreferencesDao dao) {
             return new PersonPreferences.Builder()
                     .withPersonId(dao.personId())
-                    .withLicenseUri(dao.licenseUri())
-                    .withLicenseSignedDate(dao.licenseSignedDate())
                     .withPromotedPublications(dao.promotedPublications())
                     .build();
         }
@@ -102,7 +75,6 @@ public record PersonPreferences(URI personId,
             return new PersonPreferences(
                     personId,
                     promotedPublications,
-                    new LicenseInfo(licenseSignedDate,licenseUri),
                     preferencesService);
         }
     }
