@@ -1,14 +1,13 @@
-package no.sikt.nva.person.preferences.rest;
+package no.sikt.nva.person.licenceinfo.rest;
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.lambda.runtime.Context;
-import no.sikt.nva.person.preferences.commons.model.PersonPreferences;
-import no.sikt.nva.person.preferences.commons.model.PersonPreferencesDao.Builder;
+import no.sikt.nva.person.preferences.commons.model.LicenseInfo;
+import no.sikt.nva.person.preferences.commons.model.LicenseInfoDao;
 import no.sikt.nva.person.preferences.commons.service.PersonService;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
-import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.apigateway.exceptions.UnauthorizedException;
 import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
@@ -20,49 +19,45 @@ import java.nio.charset.StandardCharsets;
 
 import static java.util.Objects.isNull;
 
-public class UpsertPersonPreferencesHandler extends ApiGatewayHandler<PreferencesRequest, PersonPreferences> {
+public class UpsertLicenseInfoHandler extends ApiGatewayHandler<LicenseInfo, LicenseInfo> {
 
     private static final String CRISTIN_ID = "cristinId";
     private static final String TABLE_NAME = new Environment().readEnv("TABLE_NAME");
-    private final PersonService personPreferencesService;
+    private final PersonService dynamoDbService;
 
     @JacocoGenerated
-    public UpsertPersonPreferencesHandler() {
+    public UpsertLicenseInfoHandler() {
         this(new PersonService(AmazonDynamoDBClientBuilder.defaultClient(), TABLE_NAME));
     }
 
-    public UpsertPersonPreferencesHandler(PersonService personPreferencesService) {
-        super(PreferencesRequest.class);
-        this.personPreferencesService = personPreferencesService;
+    public UpsertLicenseInfoHandler(PersonService personPreferencesService) {
+        super(LicenseInfo.class);
+        this.dynamoDbService = personPreferencesService;
     }
 
+
     @Override
-    protected void validateRequest(PreferencesRequest preferencesRequest, RequestInfo requestInfo, Context context)
+    protected void validateRequest(LicenseInfo licenseInfo, RequestInfo requestInfo, Context context)
         throws ApiGatewayException {
-        validateRequest(requestInfo);
+        if (isNotAuthenticated(requestInfo)) {
+            throw new UnauthorizedException();
+        }
     }
 
     @Override
-    protected PersonPreferences processInput(PreferencesRequest input, RequestInfo requestInfo, Context context)
-        throws UnauthorizedException, NotFoundException {
-
-        return new Builder()
+    protected LicenseInfo processInput(LicenseInfo input, RequestInfo requestInfo, Context context)
+        throws ApiGatewayException {
+        return new LicenseInfoDao.Builder()
             .withPersonId(requestInfo.getPersonCristinId())
-            .withPromotedPublications(input.promotedPublications())
+            .withLicenseUri(input.licenseUri())
             .build()
-            .upsert(personPreferencesService)
+            .upsert(dynamoDbService)
             .toDto();
     }
 
     @Override
-    protected Integer getSuccessStatusCode(PreferencesRequest input, PersonPreferences output) {
+    protected Integer getSuccessStatusCode(LicenseInfo licenseInfo, LicenseInfo o) {
         return HttpURLConnection.HTTP_OK;
-    }
-
-    private static void validateRequest(RequestInfo requestInfo) throws UnauthorizedException {
-        if (isNotAuthenticated(requestInfo)) {
-            throw new UnauthorizedException();
-        }
     }
 
     private static boolean isNotAuthenticated(RequestInfo requestInfo) throws UnauthorizedException {
@@ -73,4 +68,5 @@ public class UpsertPersonPreferencesHandler extends ApiGatewayHandler<Preference
     private static URI getCristinId(RequestInfo requestInfo) {
         return URI.create(URLDecoder.decode(requestInfo.getPathParameters().get(CRISTIN_ID), StandardCharsets.UTF_8));
     }
+
 }

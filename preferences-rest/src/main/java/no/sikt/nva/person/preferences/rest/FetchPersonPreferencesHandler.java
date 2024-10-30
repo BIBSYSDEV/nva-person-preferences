@@ -6,8 +6,10 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+
 import no.sikt.nva.person.preferences.commons.model.PersonPreferences;
-import no.sikt.nva.person.preferences.commons.service.PersonPreferencesService;
+import no.sikt.nva.person.preferences.commons.model.PersonPreferencesDao;
+import no.sikt.nva.person.preferences.commons.service.PersonService;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
@@ -18,16 +20,16 @@ public class FetchPersonPreferencesHandler extends ApiGatewayHandler<Void, Perso
 
     private static final String TABLE_NAME = new Environment().readEnv("TABLE_NAME");
     private static final String CRISTIN_ID = "cristinId";
-    private final PersonPreferencesService personPreferencesService;
+    private final PersonService dynamoDbService;
 
     @JacocoGenerated
     public FetchPersonPreferencesHandler() {
-        this(new PersonPreferencesService(AmazonDynamoDBClientBuilder.defaultClient(), TABLE_NAME));
+        this(new PersonService(AmazonDynamoDBClientBuilder.defaultClient(), TABLE_NAME));
     }
 
-    public FetchPersonPreferencesHandler(PersonPreferencesService personPreferencesService) {
+    public FetchPersonPreferencesHandler(PersonService personPreferencesService) {
         super(Void.class);
-        this.personPreferencesService = personPreferencesService;
+        this.dynamoDbService = personPreferencesService;
     }
 
     @Override
@@ -39,10 +41,11 @@ public class FetchPersonPreferencesHandler extends ApiGatewayHandler<Void, Perso
     protected PersonPreferences processInput(Void input, RequestInfo requestInfo, Context context)
         throws ApiGatewayException {
 
-        return new PersonPreferences.Builder(personPreferencesService)
-                                 .withPersonId(getCristinId(requestInfo))
-                                 .build()
-                                 .fetch();
+        return new PersonPreferencesDao.Builder()
+            .withPersonId(getCristinId(requestInfo))
+            .build()
+            .fetch(dynamoDbService)
+            .toDto();
     }
 
     @Override

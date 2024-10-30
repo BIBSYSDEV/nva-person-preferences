@@ -1,58 +1,78 @@
 package no.sikt.nva.person.preferences.commons.model;
 
+import com.amazonaws.services.dynamodbv2.document.ItemUtils;
+import com.amazonaws.services.dynamodbv2.model.AttributeValue;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import no.sikt.nva.person.preferences.commons.service.PersonService;
+import no.unit.nva.commons.json.JsonUtils;
+import nva.commons.apigateway.exceptions.NotFoundException;
 
 import java.net.URI;
 import java.time.Instant;
+import java.util.Map;
 
-public class LicenseInfoDao extends PersonDao {
+import static nva.commons.core.attempt.Try.attempt;
 
-    private final Instant licenseSignedDate;
-    private final URI licenseUri;
+@JsonSerialize
+public record LicenseInfoDao(
+    URI personId,
+    Instant created,
+    Instant modified,
+    URI licenseUri
+) implements Persistable<LicenseInfoDao> {
 
-    public LicenseInfoDao(Builder<?> builder) {
-        super(builder);
-        this.licenseSignedDate = builder.licenseSignedDate;
-        this.licenseUri = builder.licenseUri;
-    }
-
-    public Instant getLicenseSignedDate() {
-        return licenseSignedDate;
-    }
-
-    public URI getLicenseUri() {
-        return licenseUri;
+    @Override
+    public LicenseInfoDao upsert(PersonService service) throws NotFoundException {
+        return new Builder()
+            .fromDynamoFormat(service.upsert(this));
     }
 
     @Override
-    public LicenseInfoDao.Builder<?> copy() {
-        return new LicenseInfoDao.Builder<>()
-                .withPersonId(this.getPersonId())
-                .withCreatedDate(this.getCreated())
-                .withModifiedDate(this.getModified())
-                .withLicenseSignedDate(this.getLicenseSignedDate())
-                .withLicenseUri(this.getLicenseUri());
+    public LicenseInfoDao fetch(PersonService service) throws NotFoundException {
+        return new Builder()
+            .fromDynamoFormat(service.fetchResource(this));
     }
 
+    @Override
+    public Map<String, AttributeValue> toDynamoFormat() {
+        return Persistable.toDynamoFormat(this);
 
-    public static class Builder<T extends Builder<T>> extends PersonDao.Builder<T> {
+    }
 
-        private Instant licenseSignedDate;
+    public LicenseInfo toDto() {
+        return new LicenseInfo.Builder()
+            .fromDao(this);
+    }
+
+    public static class Builder {
+        private URI personId;
         private URI licenseUri;
 
-
-        public T withLicenseSignedDate(Instant licenseSignedDate) {
-            this.licenseSignedDate = licenseSignedDate;
-            return self();
+        public Builder withPersonId(URI personId) {
+            this.personId = personId;
+            return this;
         }
 
-        public T withLicenseUri(URI licenseUri) {
+
+        public Builder withLicenseUri(URI licenseUri) {
             this.licenseUri = licenseUri;
-            return self();
+            return this;
         }
 
-        @Override
+        public LicenseInfoDao fromDynamoFormat(Map<String, AttributeValue> dynamoDbMap) {
+            return attempt(() -> JsonUtils.dynamoObjectMapper.readValue(ItemUtils.toItem(dynamoDbMap).toJSON(),
+                LicenseInfoDao.class))
+                .orElseThrow();
+        }
+
         public LicenseInfoDao build() {
-            return new LicenseInfoDao(this);
+            var timestamp = Instant.now();
+            return new LicenseInfoDao(
+                personId,
+                timestamp,
+                timestamp,
+                licenseUri);
         }
     }
+
 }

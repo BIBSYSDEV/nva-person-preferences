@@ -1,106 +1,127 @@
 package no.sikt.nva.person.preferences.service;
 
-import no.sikt.nva.person.preferences.commons.model.LicenseInfo2;
-import no.sikt.nva.person.preferences.commons.model.PersonPreferences;
-import no.sikt.nva.person.preferences.commons.service.PersonPreferencesService;
+import no.sikt.nva.person.preferences.commons.model.LicenseInfoDao;
+import no.sikt.nva.person.preferences.commons.model.PersonPreferencesDao;
+import no.sikt.nva.person.preferences.commons.service.PersonService;
 import no.sikt.nva.person.preferences.test.support.LocalPreferencesTestDatabase;
 import nva.commons.apigateway.exceptions.NotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.time.Instant;
 import java.util.List;
 
 import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.emptyIterable;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class PersonPreferencesServiceTest extends LocalPreferencesTestDatabase {
 
     public static final String TABLE_NAME = "nonExistentTableName";
-    private PersonPreferencesService preferencesService;
+    private PersonService preferencesService;
+    private PersonService theService;
 
     @BeforeEach
     void initialize() {
         super.init(TABLE_NAME);
-        this.preferencesService = new PersonPreferencesService(client, TABLE_NAME);
+        this.preferencesService = new PersonService(client, TABLE_NAME);
+        this.theService = new PersonService(client, TABLE_NAME);
     }
 
     @Test
     void shouldPersistUserPreferences() throws NotFoundException {
-        var personPreferences = new PersonPreferences.Builder(preferencesService)
-                .withPersonId(randomUri())
-                .withPromotedPublications(List.of(randomUri()))
-                .build()
-                .upsert();
-        var persistedpersonPreferences = preferencesService
-                .fetchPreferences(personPreferences);
+        var personPreferences = new PersonPreferencesDao.Builder()
+            .withPersonId(randomUri())
+            .withPromotedPublications(List.of(randomUri()))
+            .build()
+            .upsert(preferencesService);
+
+        var persistedpersonPreferences = new PersonPreferencesDao.Builder()
+            .withPersonId(personPreferences.personId())
+            .build()
+            .fetch(preferencesService);
         assertThat(persistedpersonPreferences, is(equalTo(personPreferences)));
     }
 
     @Test
     void shouldUpdateExistingUserPreferences() throws NotFoundException {
         var userIdentifier = randomUri();
-        var personPreferences = new PersonPreferences
-                .Builder(preferencesService)
-                .withPersonId(userIdentifier)
-                .withPromotedPublications(List.of(randomUri()))
-                .build()
-                .upsert();
+        var personPreferences = new PersonPreferencesDao
+            .Builder()
+            .withPersonId(userIdentifier)
+            .withPromotedPublications(List.of(randomUri()))
+            .build()
+            .upsert(preferencesService);
 
-        new PersonPreferences(userIdentifier, List.of(), null, preferencesService).upsert();
+        assertThat(personPreferences.promotedPublications(), hasSize(1));
 
-        var persistedPreferences = preferencesService.fetchPreferences(personPreferences);
+        var persistedPreferences = new PersonPreferencesDao
+            .Builder()
+            .withPersonId(userIdentifier)
+            .build()
+            .upsert(preferencesService).toDto();
+
         assertThat(persistedPreferences.promotedPublications(), is(emptyIterable()));
+    }
+
+    @Test
+    void shouldUpdateExistingUserPreferences2() throws NotFoundException {
+        var userIdentifier = randomUri();
+        var takeOne = new PersonPreferencesDao
+            .Builder()
+            .withPersonId(userIdentifier)
+            .withPromotedPublications(List.of(randomUri()))
+            .build()
+            .upsert(theService);
+
+        assertThat(takeOne.promotedPublications(), hasSize(1));
+
+        var takeTwo = new PersonPreferencesDao.Builder()
+            .withPersonId(userIdentifier)
+            .build()
+            .upsert(theService);
+
+        assertNull(takeTwo.promotedPublications());
     }
 
     @Test
     void shouldUpdateLicenseInfo() throws NotFoundException {
         var userIdentifier = randomUri();
-        var personPreferences = new PersonPreferences
-                .Builder(preferencesService)
-                .withPersonId(userIdentifier)
-                .withPromotedPublications(List.of(randomUri()))
-                .build()
-                .upsert();
+        var personPreferences = new LicenseInfoDao.Builder()
+            .withPersonId(userIdentifier)
+            .withLicenseUri(randomUri())
+            .build();
+        var licenseInfo = personPreferences.upsert(theService);
 
-        var licenseInfo = new LicenseInfo2(Instant.now(), randomUri());
-
-        new PersonPreferences.Builder(preferencesService)
-                .withPersonId(userIdentifier)
-                .withLicenseInfo(licenseInfo)
-                .build().upsert();
-
-
-        var persistedPreferences = preferencesService.fetchPreferences(personPreferences);
-        assertThat(persistedPreferences.licenseInfo(), is(equalTo(licenseInfo)));
-        assertThat(persistedPreferences.promotedPublications(), is(equalTo(personPreferences.promotedPublications())));
+        assertThat(licenseInfo, is(equalTo(licenseInfo)));
     }
 
     @Test
     void shouldFetchUserPreferences() throws nva.commons.apigateway.exceptions.NotFoundException {
         var userIdentifier = randomUri();
-        var personPreferences = new PersonPreferences.Builder(preferencesService)
-                .withPersonId(userIdentifier)
-                .withPromotedPublications(List.of(randomUri()))
-                .build()
-                .upsert();
+        var personPreferences = new PersonPreferencesDao.Builder()
+            .withPersonId(userIdentifier)
+            .withPromotedPublications(List.of(randomUri()))
+            .build()
+            .upsert(preferencesService);
 
-        new PersonPreferences(userIdentifier, List.of(), null, preferencesService).fetch();
-        var persistedpersonPreferences = preferencesService.fetchPreferences(personPreferences);
+        var persistedpersonPreferences = new PersonPreferencesDao.Builder()
+            .withPersonId(userIdentifier)
+            .build()
+            .fetch(preferencesService);
         assertThat(persistedpersonPreferences, is(equalTo(personPreferences)));
     }
 
     @Test
     void shouldThrowExceptionWhenFetchingNonExistentPersonPreferences() {
-        var personPreferences = new PersonPreferences.Builder()
-                .withPersonId(randomUri())
-                .withPromotedPublications(List.of(randomUri()))
-                .build();
         assertThrows(NotFoundException.class,
-                () -> preferencesService.fetchPreferences(personPreferences));
+            () -> new PersonPreferencesDao.Builder()
+                .withPersonId(randomUri())
+                .build()
+                .fetch(preferencesService));
     }
 }

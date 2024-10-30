@@ -1,9 +1,12 @@
 package no.sikt.nva.person.preferences.commons.model;
 
-import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.document.ItemUtils;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import no.sikt.nva.person.preferences.commons.service.PersonService;
 import no.unit.nva.commons.json.JsonUtils;
+import nva.commons.apigateway.exceptions.NotFoundException;
 
 import java.net.URI;
 import java.time.Instant;
@@ -12,31 +15,42 @@ import java.util.Map;
 
 import static nva.commons.core.attempt.Try.attempt;
 
-public record PersonPreferencesDao(URI personId,
-                                   List<URI> promotedPublications,
-                                   Instant created,
-                                   Instant modified) {
+@JsonSerialize
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
+public record PersonPreferencesDao(
+    URI personId,
+    Instant created,
+    Instant modified,
+    List<URI> promotedPublications
+) implements Persistable<PersonPreferencesDao> {
 
-    public Map<String, AttributeValue> toDynamoFormat() {
-        var item = attempt(() -> Item.fromJSON(
-                JsonUtils.dynamoObjectMapper.writeValueAsString(this))).orElseThrow();
-        return ItemUtils.toAttributeValues(item);
-    }
-
-    public PersonPreferencesDao.Builder copy() {
+    @Override
+    public PersonPreferencesDao upsert(PersonService service) throws NotFoundException {
         return new PersonPreferencesDao.Builder()
-                .withPersonId(this.personId)
-                .withPromotedPublications(this.promotedPublications)
-                .withCreatedDate(this.created)
-                .withModifiedDate(this.modified);
+            .fromDynamoFormat(service.upsert(this));
     }
+
+    @Override
+    public PersonPreferencesDao fetch(PersonService service) throws NotFoundException {
+        return new PersonPreferencesDao.Builder()
+            .fromDynamoFormat(service.fetchResource(this));
+    }
+
+    @Override
+    public Map<String, AttributeValue> toDynamoFormat() {
+        return Persistable.toDynamoFormat(this);
+    }
+
+    public PersonPreferences toDto() {
+        return new PersonPreferences.Builder().fromDao(this);
+    }
+
 
     public static class Builder {
 
         private URI personId;
         private List<URI> promotedPublications;
-        private Instant created;
-        private Instant modified;
+
 
         public Builder withPersonId(URI personId) {
             this.personId = personId;
@@ -48,17 +62,6 @@ public record PersonPreferencesDao(URI personId,
             return this;
         }
 
-        public Builder withCreatedDate(Instant created) {
-            this.created = created;
-            return this;
-        }
-
-        public Builder withModifiedDate(Instant modified) {
-            this.modified = modified;
-            return this;
-        }
-
-
         public PersonPreferencesDao fromDynamoFormat(Map<String, AttributeValue> map) {
             return attempt(() -> JsonUtils.dynamoObjectMapper.readValue(ItemUtils.toItem(map).toJSON(),
                     PersonPreferencesDao.class))
@@ -66,11 +69,12 @@ public record PersonPreferencesDao(URI personId,
         }
 
         public PersonPreferencesDao build() {
+            var timestamp = Instant.now();
             return new PersonPreferencesDao(
-                    personId,
-                    promotedPublications,
-                    created,
-                    modified);
+                personId,
+                timestamp,
+                timestamp,
+                promotedPublications);
         }
     }
 }
