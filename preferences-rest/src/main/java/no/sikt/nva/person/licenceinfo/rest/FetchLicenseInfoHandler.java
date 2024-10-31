@@ -32,7 +32,7 @@ public class FetchLicenseInfoHandler extends ApiGatewayHandler<Void, LicenseInfo
 
     @Override
     protected void validateRequest(Void unused, RequestInfo requestInfo, Context context) throws ApiGatewayException {
-//        requestInfo.getCurrentCustomer();
+        //        requestInfo.getCurrentCustomer();
     }
 
     @Override

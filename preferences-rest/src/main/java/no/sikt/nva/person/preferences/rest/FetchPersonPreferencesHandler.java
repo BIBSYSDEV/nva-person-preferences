@@ -31,7 +31,7 @@ public class FetchPersonPreferencesHandler extends ApiGatewayHandler<Void, Perso
 
     @Override
     protected void validateRequest(Void unused, RequestInfo requestInfo, Context context) throws ApiGatewayException {
-//        requestInfo.getCurrentCustomer();
+        //        requestInfo.getCurrentCustomer();
     }
 
     @Override
