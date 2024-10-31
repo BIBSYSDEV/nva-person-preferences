@@ -33,7 +33,7 @@ public class UpsertPersonPreferencesHandler extends ApiGatewayHandler<Preference
 
     @Override
     protected void validateRequest(PreferencesRequest preferencesRequest, RequestInfo requestInfo, Context context)
-        throws ApiGatewayException {
+            throws ApiGatewayException {
         if (dontMatchCustomerAndPerson(requestInfo)) {
             throw new UnauthorizedException();
         }
@@ -41,14 +41,14 @@ public class UpsertPersonPreferencesHandler extends ApiGatewayHandler<Preference
 
     @Override
     protected PersonPreferences processInput(PreferencesRequest input, RequestInfo requestInfo, Context context)
-        throws UnauthorizedException, NotFoundException {
+            throws UnauthorizedException, NotFoundException {
 
         return new Builder()
-            .withPersonId(requestInfo.getPersonCristinId())
-            .withPromotedPublications(input.promotedPublications())
-            .build()
-            .upsert(personPreferencesService)
-            .toDto();
+                .withPersonId(requestInfo.getPersonCristinId())
+                .withPromotedPublications(input.promotedPublications())
+                .build()
+                .upsert(personPreferencesService)
+                .toDto();
     }
 
     @Override

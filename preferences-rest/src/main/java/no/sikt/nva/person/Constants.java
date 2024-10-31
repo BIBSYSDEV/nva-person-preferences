@@ -9,7 +9,7 @@ import java.net.URI;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 
-public class Constants {
+public final class Constants {
     public static final String CRISTIN_ID = "cristinId";
     public static final String TABLE_NAME = new Environment().readEnv("TABLE_NAME");
 

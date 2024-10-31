@@ -33,7 +33,7 @@ public class UpsertLicenseInfoHandler extends ApiGatewayHandler<LicenseInfo, Lic
 
     @Override
     protected void validateRequest(LicenseInfo licenseInfo, RequestInfo requestInfo, Context context)
-        throws ApiGatewayException {
+            throws ApiGatewayException {
         if (dontMatchCustomerAndPerson(requestInfo)) {
             throw new UnauthorizedException();
         }
@@ -42,13 +42,13 @@ public class UpsertLicenseInfoHandler extends ApiGatewayHandler<LicenseInfo, Lic
 
     @Override
     protected LicenseInfo processInput(LicenseInfo input, RequestInfo requestInfo, Context context)
-        throws ApiGatewayException {
+            throws ApiGatewayException {
         return new LicenseInfoDao.Builder()
-            .withPersonId(requestInfo.getPersonCristinId())
-            .withLicenseUri(input.licenseUri())
-            .build()
-            .upsert(dynamoDbService)
-            .toDto();
+                .withPersonId(requestInfo.getPersonCristinId())
+                .withLicenseUri(input.licenseUri())
+                .build()
+                .upsert(dynamoDbService)
+                .toDto();
     }
 
     @Override

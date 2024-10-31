@@ -37,13 +37,13 @@ public class FetchLicenseInfoHandler extends ApiGatewayHandler<Void, LicenseInfo
 
     @Override
     protected LicenseInfo processInput(Void input, RequestInfo requestInfo, Context context)
-        throws ApiGatewayException {
+            throws ApiGatewayException {
 
         return new LicenseInfoDao.Builder()
-            .withPersonId(getCristinId(requestInfo))
-            .build()
-            .fetch(dynamoDbService)
-            .toDto();
+                .withPersonId(getCristinId(requestInfo))
+                .build()
+                .fetch(dynamoDbService)
+                .toDto();
     }
 
     @Override

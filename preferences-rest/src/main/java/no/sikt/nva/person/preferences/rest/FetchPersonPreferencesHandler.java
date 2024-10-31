@@ -2,8 +2,6 @@ package no.sikt.nva.person.preferences.rest;
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.lambda.runtime.Context;
-import java.net.HttpURLConnection;
-
 import no.sikt.nva.person.preferences.commons.model.PersonPreferences;
 import no.sikt.nva.person.preferences.commons.model.PersonPreferencesDao;
 import no.sikt.nva.person.preferences.commons.service.PersonService;
@@ -11,6 +9,8 @@ import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.JacocoGenerated;
+
+import java.net.HttpURLConnection;
 
 import static no.sikt.nva.person.Constants.TABLE_NAME;
 import static no.sikt.nva.person.Constants.getCristinId;
@@ -36,13 +36,13 @@ public class FetchPersonPreferencesHandler extends ApiGatewayHandler<Void, Perso
 
     @Override
     protected PersonPreferences processInput(Void input, RequestInfo requestInfo, Context context)
-        throws ApiGatewayException {
+            throws ApiGatewayException {
 
         return new PersonPreferencesDao.Builder()
-            .withPersonId(getCristinId(requestInfo))
-            .build()
-            .fetch(dynamoDbService)
-            .toDto();
+                .withPersonId(getCristinId(requestInfo))
+                .build()
+                .fetch(dynamoDbService)
+                .toDto();
     }
 
     @Override
