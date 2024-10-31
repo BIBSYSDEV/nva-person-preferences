@@ -10,20 +10,16 @@ import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.apigateway.exceptions.UnauthorizedException;
-import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
 
 import java.net.HttpURLConnection;
-import java.net.URI;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 
 import static java.util.Objects.isNull;
+import static no.sikt.nva.person.Constants.TABLE_NAME;
+import static no.sikt.nva.person.Constants.getCristinId;
 
 public class UpsertPersonPreferencesHandler extends ApiGatewayHandler<PreferencesRequest, PersonPreferences> {
 
-    private static final String CRISTIN_ID = "cristinId";
-    private static final String TABLE_NAME = new Environment().readEnv("TABLE_NAME");
     private final PersonService personPreferencesService;
 
     @JacocoGenerated
@@ -39,7 +35,9 @@ public class UpsertPersonPreferencesHandler extends ApiGatewayHandler<Preference
     @Override
     protected void validateRequest(PreferencesRequest preferencesRequest, RequestInfo requestInfo, Context context)
         throws ApiGatewayException {
-        validateRequest(requestInfo);
+        if (isNotAuthenticated(requestInfo)) {
+            throw new UnauthorizedException();
+        }
     }
 
     @Override
@@ -59,18 +57,9 @@ public class UpsertPersonPreferencesHandler extends ApiGatewayHandler<Preference
         return HttpURLConnection.HTTP_OK;
     }
 
-    private static void validateRequest(RequestInfo requestInfo) throws UnauthorizedException {
-        if (isNotAuthenticated(requestInfo)) {
-            throw new UnauthorizedException();
-        }
-    }
-
     private static boolean isNotAuthenticated(RequestInfo requestInfo) throws UnauthorizedException {
         return isNull(requestInfo.getCurrentCustomer()) && isNull(requestInfo.getPersonCristinId())
             || !getCristinId(requestInfo).equals(requestInfo.getPersonCristinId());
     }
 
-    private static URI getCristinId(RequestInfo requestInfo) {
-        return URI.create(URLDecoder.decode(requestInfo.getPathParameters().get(CRISTIN_ID), StandardCharsets.UTF_8));
-    }
 }

@@ -3,9 +3,6 @@ package no.sikt.nva.person.preferences.rest;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.lambda.runtime.Context;
 import java.net.HttpURLConnection;
-import java.net.URI;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 
 import no.sikt.nva.person.preferences.commons.model.PersonPreferences;
 import no.sikt.nva.person.preferences.commons.model.PersonPreferencesDao;
@@ -13,13 +10,13 @@ import no.sikt.nva.person.preferences.commons.service.PersonService;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
-import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
+
+import static no.sikt.nva.person.Constants.TABLE_NAME;
+import static no.sikt.nva.person.Constants.getCristinId;
 
 public class FetchPersonPreferencesHandler extends ApiGatewayHandler<Void, PersonPreferences> {
 
-    private static final String TABLE_NAME = new Environment().readEnv("TABLE_NAME");
-    private static final String CRISTIN_ID = "cristinId";
     private final PersonService dynamoDbService;
 
     @JacocoGenerated
@@ -53,7 +50,4 @@ public class FetchPersonPreferencesHandler extends ApiGatewayHandler<Void, Perso
         return HttpURLConnection.HTTP_OK;
     }
 
-    private static URI getCristinId(RequestInfo requestInfo) {
-        return URI.create(URLDecoder.decode(requestInfo.getPathParameters().get(CRISTIN_ID), StandardCharsets.UTF_8));
-    }
 }

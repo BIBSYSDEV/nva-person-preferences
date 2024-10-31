@@ -9,20 +9,16 @@ import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.UnauthorizedException;
-import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
 
 import java.net.HttpURLConnection;
-import java.net.URI;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 
 import static java.util.Objects.isNull;
+import static no.sikt.nva.person.Constants.TABLE_NAME;
+import static no.sikt.nva.person.Constants.getCristinId;
 
 public class UpsertLicenseInfoHandler extends ApiGatewayHandler<LicenseInfo, LicenseInfo> {
 
-    private static final String CRISTIN_ID = "cristinId";
-    private static final String TABLE_NAME = new Environment().readEnv("TABLE_NAME");
     private final PersonService dynamoDbService;
 
     @JacocoGenerated
@@ -64,9 +60,4 @@ public class UpsertLicenseInfoHandler extends ApiGatewayHandler<LicenseInfo, Lic
         return isNull(requestInfo.getCurrentCustomer()) && isNull(requestInfo.getPersonCristinId())
             || !getCristinId(requestInfo).equals(requestInfo.getPersonCristinId());
     }
-
-    private static URI getCristinId(RequestInfo requestInfo) {
-        return URI.create(URLDecoder.decode(requestInfo.getPathParameters().get(CRISTIN_ID), StandardCharsets.UTF_8));
-    }
-
 }

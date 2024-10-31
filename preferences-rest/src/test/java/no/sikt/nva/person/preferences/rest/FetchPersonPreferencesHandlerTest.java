@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import static java.net.HttpURLConnection.HTTP_NOT_FOUND;
+import static no.sikt.nva.person.Constants.CRISTIN_ID;
 import static no.sikt.nva.person.preferences.commons.service.PersonService.RESOURCE_NOT_FOUND_MESSAGE;
 import static no.sikt.nva.person.preferences.rest.PersonPreferencesRestHandlersTestConfig.restApiMapper;
 import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
@@ -35,7 +36,6 @@ import static org.mockito.Mockito.mock;
 class FetchPersonPreferencesHandlerTest extends LocalPreferencesTestDatabase {
 
     public static final String TABLE_NAME = "nonExistentTableName";
-    public static final String CRISTIN_ID = "cristinId";
     private static final Context CONTEXT = mock(Context.class);
     private ByteArrayOutputStream output;
     private PersonService personPreferencesService;

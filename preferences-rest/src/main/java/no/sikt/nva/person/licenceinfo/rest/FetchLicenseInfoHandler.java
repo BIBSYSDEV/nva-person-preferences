@@ -8,14 +8,16 @@ import no.sikt.nva.person.preferences.commons.service.PersonService;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
-import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
 
 import java.net.HttpURLConnection;
 
+import static no.sikt.nva.person.Constants.TABLE_NAME;
+import static no.sikt.nva.person.Constants.getCristinId;
+
+
 public class FetchLicenseInfoHandler extends ApiGatewayHandler<Void, LicenseInfo> {
 
-    private static final String TABLE_NAME = new Environment().readEnv("TABLE_NAME");
     private final PersonService dynamoDbService;
 
     @JacocoGenerated
@@ -38,7 +40,7 @@ public class FetchLicenseInfoHandler extends ApiGatewayHandler<Void, LicenseInfo
         throws ApiGatewayException {
 
         return new LicenseInfoDao.Builder()
-            .withPersonId(requestInfo.getPersonCristinId())
+            .withPersonId(getCristinId(requestInfo))
             .build()
             .fetch(dynamoDbService)
             .toDto();
