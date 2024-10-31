@@ -23,7 +23,8 @@ import java.util.Map;
 import static java.net.HttpURLConnection.HTTP_NOT_FOUND;
 import static no.sikt.nva.person.Constants.CRISTIN_ID;
 import static no.sikt.nva.person.preferences.commons.service.PersonService.RESOURCE_NOT_FOUND_MESSAGE;
-import static no.sikt.nva.person.preferences.rest.PersonPreferencesRestHandlersTestConfig.restApiMapper;
+import static no.unit.nva.commons.json.JsonUtils.dtoObjectMapper;
+import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
 import static org.apache.http.HttpHeaders.ACCEPT;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -51,10 +52,13 @@ class FetchLicenseInfoHandlerTest extends LocalPreferencesTestDatabase {
     @Test
     void shouldFetchLicenseInfo() throws IOException, NotFoundException {
         var personPreferences = profileWithCristinIdentifier(randomUri())
-                .upsert(personPreferencesService).toDto();
+                .upsert(personPreferencesService)
+                .toDto();
+
         var request = createRequest(personPreferences.personId());
 
         handler.handleRequest(request, output, CONTEXT);
+
         var response = GatewayResponse.fromOutputStream(output, LicenseInfo.class);
 
         assertThat(personPreferences, is(equalTo(response.getBodyObject(LicenseInfo.class))));
@@ -70,7 +74,10 @@ class FetchLicenseInfoHandlerTest extends LocalPreferencesTestDatabase {
     private InputStream createRequest(URI identifier) throws JsonProcessingException {
         var pathParameters = Map.of(CRISTIN_ID, identifier.toString());
         var headers = Map.of(ACCEPT, ContentType.APPLICATION_JSON.getMimeType());
-        return new HandlerRequestBuilder<InputStream>(restApiMapper)
+        return new HandlerRequestBuilder<LicenseInfo>(dtoObjectMapper)
+                .withUserName(randomString())
+                .withPersonCristinId(identifier)
+                .withCurrentCustomer(randomUri())
                 .withHeaders(headers)
                 .withPathParameters(pathParameters)
                 .build();

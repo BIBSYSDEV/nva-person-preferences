@@ -14,9 +14,8 @@ import nva.commons.core.JacocoGenerated;
 
 import java.net.HttpURLConnection;
 
-import static java.util.Objects.isNull;
 import static no.sikt.nva.person.Constants.TABLE_NAME;
-import static no.sikt.nva.person.Constants.getCristinId;
+import static no.sikt.nva.person.Constants.dontMatchCustomerAndPerson;
 
 public class UpsertPersonPreferencesHandler extends ApiGatewayHandler<PreferencesRequest, PersonPreferences> {
 
@@ -35,7 +34,7 @@ public class UpsertPersonPreferencesHandler extends ApiGatewayHandler<Preference
     @Override
     protected void validateRequest(PreferencesRequest preferencesRequest, RequestInfo requestInfo, Context context)
         throws ApiGatewayException {
-        if (isNotAuthenticated(requestInfo)) {
+        if (dontMatchCustomerAndPerson(requestInfo)) {
             throw new UnauthorizedException();
         }
     }
@@ -55,11 +54,6 @@ public class UpsertPersonPreferencesHandler extends ApiGatewayHandler<Preference
     @Override
     protected Integer getSuccessStatusCode(PreferencesRequest input, PersonPreferences output) {
         return HttpURLConnection.HTTP_OK;
-    }
-
-    private static boolean isNotAuthenticated(RequestInfo requestInfo) throws UnauthorizedException {
-        return isNull(requestInfo.getCurrentCustomer()) && isNull(requestInfo.getPersonCristinId())
-            || !getCristinId(requestInfo).equals(requestInfo.getPersonCristinId());
     }
 
 }

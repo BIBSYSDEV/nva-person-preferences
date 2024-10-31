@@ -54,16 +54,13 @@ public class UpsertPersonPreferencesHandlerTest extends LocalPreferencesTestData
         assertThat(response.getStatusCode(), is(equalTo(HttpURLConnection.HTTP_OK)));
         assertThat(response.getBodyObject(PersonPreferences.class).personId(),
             is(equalTo(existingPersonPreferences.personId())));
-
-
     }
 
     private InputStream createRequest(PersonPreferences personPreferences) throws JsonProcessingException {
         return new HandlerRequestBuilder<PersonPreferences>(dtoObjectMapper)
             .withUserName(randomString())
-            .withCurrentCustomer(randomUri())
             .withPersonCristinId(personPreferences.personId())
-            .withCurrentCustomer(randomUri())
+            .withCurrentCustomer(personPreferences.personId())
             .withPathParameters(Map.of("cristinId", personPreferences.personId().toString()))
             .withBody(personPreferences)
             .build();
@@ -124,7 +121,6 @@ public class UpsertPersonPreferencesHandlerTest extends LocalPreferencesTestData
         throws JsonProcessingException {
         return new HandlerRequestBuilder<PersonPreferences>(dtoObjectMapper)
             .withUserName(randomString())
-            .withCurrentCustomer(randomUri())
             .withPersonCristinId(personPreferences.personId())
             .withCurrentCustomer(randomUri())
             .withPathParameters(Map.of("cristinId", randomString()))

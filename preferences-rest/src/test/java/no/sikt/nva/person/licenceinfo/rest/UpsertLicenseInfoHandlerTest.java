@@ -59,9 +59,8 @@ public class UpsertLicenseInfoHandlerTest extends LocalPreferencesTestDatabase {
     private InputStream createRequest(LicenseInfo personPreferences) throws JsonProcessingException {
         return new HandlerRequestBuilder<LicenseInfo>(dtoObjectMapper)
                 .withUserName(randomString())
-                .withCurrentCustomer(randomUri())
                 .withPersonCristinId(personPreferences.personId())
-                .withCurrentCustomer(randomUri())
+                .withCurrentCustomer(personPreferences.personId())
                 .withPathParameters(Map.of("cristinId", personPreferences.personId().toString()))
                 .withBody(personPreferences)
                 .build();
