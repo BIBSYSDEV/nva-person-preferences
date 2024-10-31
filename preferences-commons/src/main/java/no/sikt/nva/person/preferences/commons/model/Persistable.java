@@ -13,7 +13,7 @@ import java.util.Map;
 
 import static nva.commons.core.attempt.Try.attempt;
 
-public interface Persistable<Dao> {
+public interface Persistable<D> {
 
     URI personId();
 
@@ -21,9 +21,9 @@ public interface Persistable<Dao> {
 
     Instant modified();
 
-    Dao upsert(PersonService service) throws NotFoundException;
+    D upsert(PersonService service) throws NotFoundException;
 
-    Dao fetch(PersonService service) throws NotFoundException;
+    D fetch(PersonService service) throws NotFoundException;
 
     Map<String, AttributeValue> toDynamoFormat();
 

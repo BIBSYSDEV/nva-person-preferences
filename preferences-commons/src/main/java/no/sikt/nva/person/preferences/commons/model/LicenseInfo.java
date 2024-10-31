@@ -7,13 +7,9 @@ import java.time.Instant;
 
 @JsonSerialize
 public record LicenseInfo(
-    URI personId,
-    Instant signed,
-    URI licenseUri) {
-
-    private LicenseInfo(Builder builder) {
-        this(builder.personId, builder.licenseSignedDate, builder.licenseUri);
-    }
+        URI personId,
+        Instant signed,
+        URI licenseUri) {
 
     public static class Builder {
         private URI personId;
@@ -25,10 +21,10 @@ public record LicenseInfo(
 
         public LicenseInfo fromDao(LicenseInfoDao dao) {
             return new LicenseInfo.Builder()
-                .withPersonId(dao.personId())
-                .withLicenseSignedDate(dao.modified())
-                .withLicenseUri(dao.licenseUri())
-                .build();
+                    .withPersonId(dao.personId())
+                    .withLicenseSignedDate(dao.modified())
+                    .withLicenseUri(dao.licenseUri())
+                    .build();
         }
 
         public Builder withPersonId(URI personId) {
@@ -47,7 +43,7 @@ public record LicenseInfo(
         }
 
         public LicenseInfo build() {
-            return new LicenseInfo(this);
+            return new LicenseInfo(this.personId, this.licenseSignedDate, this.licenseUri);
         }
     }
 }
