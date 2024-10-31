@@ -19,17 +19,15 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class PersonPreferencesServiceTest extends LocalPreferencesTestDatabase {
+public class PersonServiceTest extends LocalPreferencesTestDatabase {
 
     public static final String TABLE_NAME = "nonExistentTableName";
     private PersonService preferencesService;
-    private PersonService theService;
 
     @BeforeEach
     void initialize() {
         super.init(TABLE_NAME);
         this.preferencesService = new PersonService(client, TABLE_NAME);
-        this.theService = new PersonService(client, TABLE_NAME);
     }
 
     @Test
@@ -76,14 +74,14 @@ public class PersonPreferencesServiceTest extends LocalPreferencesTestDatabase {
             .withPersonId(userIdentifier)
             .withPromotedPublications(List.of(randomUri()))
             .build()
-            .upsert(theService);
+            .upsert(preferencesService);
 
         assertThat(takeOne.promotedPublications(), hasSize(1));
 
         var takeTwo = new PersonPreferencesDao.Builder()
             .withPersonId(userIdentifier)
             .build()
-            .upsert(theService);
+            .upsert(preferencesService);
 
         assertNull(takeTwo.promotedPublications());
     }
@@ -91,13 +89,19 @@ public class PersonPreferencesServiceTest extends LocalPreferencesTestDatabase {
     @Test
     void shouldUpdateLicenseInfo() throws NotFoundException {
         var userIdentifier = randomUri();
-        var personPreferences = new LicenseInfoDao.Builder()
+        var licenseInfoDao = new LicenseInfoDao.Builder()
             .withPersonId(userIdentifier)
             .withLicenseUri(randomUri())
-            .build();
-        var licenseInfo = personPreferences.upsert(theService);
+            .build()
+            .upsert(preferencesService);
 
-        assertThat(licenseInfo, is(equalTo(licenseInfo)));
+        var licenseInfo = new LicenseInfoDao.Builder()
+                .withPersonId(userIdentifier)
+                .build()
+                .fetch(preferencesService);
+
+
+        assertThat(licenseInfoDao, is(equalTo(licenseInfo)));
     }
 
     @Test

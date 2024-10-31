@@ -20,9 +20,35 @@ public class PersonPreferencesTest {
         assertThat(personPreferences, is(equalTo(regeneratedObject)));
     }
 
+    @Test
+    void shouldMakeRoundTripWithoutLossOfInformationWhenPersonPreferencesIsCreatedFromDao() throws JsonProcessingException {
+        var personPreferencesDao = randomPersonPreferencesDao();
+        var objectAsString = JsonUtils.dtoObjectMapper.writeValueAsString(personPreferencesDao);
+        var regeneratedObject = JsonUtils.dtoObjectMapper.readValue(objectAsString, PersonPreferencesDao.class);
+        assertThat(personPreferencesDao, is(equalTo(regeneratedObject)));
+    }
+
+    @Test
+    void shouldMakeRoundTripWithoutLossOfInformationWhenPersonPreferencesIsCreatedFromDaoAndBack() throws JsonProcessingException {
+        var personPreferencesDao = randomPersonPreferencesDao();
+        var personPreferences = personPreferencesDao.toDto();
+        var objectAsString = JsonUtils.dtoObjectMapper.writeValueAsString(personPreferences);
+        var regeneratedObject = JsonUtils.dtoObjectMapper.readValue(objectAsString, PersonPreferences.class);
+        assertThat(personPreferences, is(equalTo(regeneratedObject)));
+        var regeneratedDao = personPreferences.toDao();
+        assertThat(personPreferencesDao.personId(), is(equalTo(regeneratedDao.personId())));
+        assertThat(personPreferencesDao.promotedPublications(), is(equalTo(regeneratedDao.promotedPublications())));
+    }
 
     private PersonPreferences randomPersonPreferences() {
         return new PersonPreferences.Builder()
+                   .withPersonId(randomUri())
+                   .withPromotedPublications(List.of(randomUri()))
+                   .build();
+    }
+
+    private PersonPreferencesDao randomPersonPreferencesDao() {
+        return new PersonPreferencesDao.Builder()
                    .withPersonId(randomUri())
                    .withPromotedPublications(List.of(randomUri()))
                    .build();
