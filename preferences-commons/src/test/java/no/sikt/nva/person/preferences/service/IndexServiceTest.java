@@ -232,4 +232,22 @@ public class IndexServiceTest {
                         .build()
                         .fetch(licenseInfoService));
     }
+
+    @Test
+    void shouldThrowExceptionWhenDeletingNonExistentPersonPreferences() {
+        var dao = PersonPreferencesDao.builder()
+                .withId(randomUri())
+                .build();
+        assertThrows(NotFoundException.class,
+                () -> personPreferenceService.delete(dao));
+    }
+
+    @Test
+    void shouldThrowExceptionWhenDeletingNonExistentLicenseInfo() {
+        var dao = LicenseInfoDao.builder()
+                .withId(randomUri())
+                .build();
+        assertThrows(NotFoundException.class,
+                () -> licenseInfoService.delete(dao));
+    }
 }
