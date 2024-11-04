@@ -23,11 +23,9 @@ public class IndexService<T extends DataAccessClass<T>> implements DataAccessSer
     }
 
     public IndexService(DynamoDbClient dynamoDbClient, String tableName, Class<T> tClass) {
-        enhancedClient = DynamoDbEnhancedClient.builder()
+        this.enhancedClient = DynamoDbEnhancedClient.builder()
                 .dynamoDbClient(dynamoDbClient)
                 .build();
-//        this.serviceWithTransactions = new ServiceWithTransactions(enhancedClient, tableName);
-
         this.table = enhancedClient.table(tableName, TableSchema.fromImmutableClass(tClass));
     }
 
@@ -61,8 +59,5 @@ public class IndexService<T extends DataAccessClass<T>> implements DataAccessSer
                 .orElseThrow(() -> new NotFoundException(RESOURCE_NOT_FOUND_MESSAGE));
 
     }
-
-
-
 }
 

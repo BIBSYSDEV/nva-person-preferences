@@ -12,10 +12,8 @@ import java.util.List;
 
 @DynamoDbImmutable(builder = PersonPreferencesDao.Builder.class)
 public record PersonPreferencesDao(
-        @DynamoDbPartitionKey
-        URI withId,
-        @DynamoDbSortKey
-        String withType,
+        @DynamoDbPartitionKey URI withId,
+        @DynamoDbSortKey String withType,
         Instant created,
         Instant modified,
         List<URI> promotedPublications
@@ -57,14 +55,13 @@ public record PersonPreferencesDao(
     public static class Builder {
         public static final String PROMOTED_PUBLICATIONS = "PromotedPublications";
         private URI id;
-        private String type; //= "PromotedPublications";
+        private String type;
         private List<URI> promotedIds;
         private Instant createdInstant;
         private Instant modifiedInstant;
 
         private Builder() {
         }
-
 
         public Builder withId(URI withId) {
             this.id = withId;

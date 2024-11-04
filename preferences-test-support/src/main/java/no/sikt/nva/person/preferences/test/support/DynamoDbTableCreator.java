@@ -9,9 +9,6 @@ public class DynamoDbTableCreator {
     public static final String SECONDARY_KEY = "withType";
     private final DynamoDbClient dynamoDbClient;
 
-    public DynamoDbTableCreator() {
-        this(DynamoDbTestClientProvider.geClient());
-    }
 
     public DynamoDbTableCreator(DynamoDbClient dynamoDbClient) {
         this.dynamoDbClient = dynamoDbClient;

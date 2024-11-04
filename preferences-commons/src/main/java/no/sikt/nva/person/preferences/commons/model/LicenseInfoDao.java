@@ -52,7 +52,7 @@ public record LicenseInfoDao(
     public static class Builder {
         public static final String TERMS_OF_USE = "TermsOfUse";
         private URI id;
-        private String type; //= "TermsOfUse";
+        private String type;
         private URI termsUri;
         private Instant createdInstant;
         private Instant modifiedInstant;
