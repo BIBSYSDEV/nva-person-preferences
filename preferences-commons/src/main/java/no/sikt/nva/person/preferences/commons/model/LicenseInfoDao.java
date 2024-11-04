@@ -8,9 +8,6 @@ import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSortK
 
 import java.net.URI;
 import java.time.Instant;
-import java.util.Optional;
-
-import static no.sikt.nva.person.preferences.commons.model.DataAccessService.RESOURCE_NOT_FOUND_MESSAGE;
 
 @DynamoDbImmutable(builder = LicenseInfoDao.Builder.class)
 public record LicenseInfoDao(
@@ -22,12 +19,16 @@ public record LicenseInfoDao(
 
     public LicenseInfoDao(Builder builder) {
         this(
-                builder.withId,
-                builder.withType,
-                builder.created,
-                builder.modified,
-                builder.licenseUri
+                builder.id,
+                builder.type,
+                builder.createdInstant,
+                builder.modifiedInstant,
+                builder.termsUri
         );
+    }
+
+    public static Builder builder() {
+        return new Builder();
     }
 
     @DynamoDbIgnore
@@ -45,57 +46,55 @@ public record LicenseInfoDao(
     @DynamoDbIgnore
     @Override
     public LicenseInfoDao fetch(DataAccessService<LicenseInfoDao> service) throws NotFoundException {
-        return Optional.ofNullable(service.fetch(this))
-                .orElseThrow(() -> new NotFoundException(RESOURCE_NOT_FOUND_MESSAGE));
-    }
-
-    public static Builder builder() {
-        return new Builder();
+        return service.fetch(this);
     }
 
     public static class Builder {
-        private URI withId;
-        private String withType; //= "TermsOfUse";
-        private URI licenseUri;
-        private Instant created;
-        private Instant modified;
+        public static final String TERMS_OF_USE = "TermsOfUse";
+        private URI id;
+        private String type; //= "TermsOfUse";
+        private URI termsUri;
+        private Instant createdInstant;
+        private Instant modifiedInstant;
 
-        private Builder() {}
+        private Builder() {
+        }
 
         public Builder withId(URI withId) {
-            this.withId = withId;
+            this.id = withId;
             return this;
         }
 
         public Builder withType(String withType) {
-            this.withType = withType;
+            this.type = withType;
             return this;
         }
 
         public Builder licenseUri(URI licenseUri) {
-            this.licenseUri = licenseUri;
+            this.termsUri = licenseUri;
             return this;
         }
 
         public Builder created(Instant created) {
-            this.created = created;
+            this.createdInstant = created;
             return this;
         }
 
         public Builder modified(Instant modified) {
-            this.modified = modified;
+            this.modifiedInstant = modified;
             return this;
         }
 
         public LicenseInfoDao build() {
-            if (created == null) {
-                created = Instant.now();
+            if (modifiedInstant == null) {
+                modified(Instant.now());
             }
-            if (modified == null) {
-                modified = created;
+
+            if (createdInstant == null) {
+                created(modifiedInstant);
             }
-            if (withType == null) {
-                withType = "TermsOfUse";
+            if (type == null) {
+                withType(TERMS_OF_USE);
             }
             return new LicenseInfoDao(this);
         }

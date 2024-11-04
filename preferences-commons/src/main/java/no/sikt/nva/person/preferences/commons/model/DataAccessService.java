@@ -7,7 +7,11 @@ public interface DataAccessService<T extends DataAccessClass<T>> {
     String RESOURCE_NOT_FOUND_MESSAGE = "Could not find person preferences";
     String WITH_TYPE = "withType";
 
-    void persist(T item) throws NotFoundException;
+    void persist(T item);
+
+    void transactionalPersist(T... items);
+
+    void delete(T item) throws NotFoundException;
 
     T fetch(T item) throws NotFoundException;
 

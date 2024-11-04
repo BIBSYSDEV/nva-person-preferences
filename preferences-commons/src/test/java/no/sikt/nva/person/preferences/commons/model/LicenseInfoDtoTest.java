@@ -5,6 +5,7 @@ import no.unit.nva.commons.json.JsonUtils;
 import org.junit.jupiter.api.Test;
 
 import static no.unit.nva.testutils.RandomDataGenerator.randomInstant;
+import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -29,7 +30,8 @@ public class LicenseInfoDtoTest {
     }
 
     @Test
-    void shouldMakeRoundTripWithoutLossOfInformationWhenLicenseInfoIsCreatedFromDaoAndBack() throws JsonProcessingException {
+    void shouldMakeRoundTripWithoutLossOfInformationWhenLicenseInfoIsCreatedFromDaoAndBack()
+            throws JsonProcessingException {
         var randomLicenseInfoDao = randomLicenseInfoDao();
         var licenseInfo = randomLicenseInfoDao.toDto();
         var objectAsString = JsonUtils.dtoObjectMapper.writeValueAsString(licenseInfo);
@@ -46,8 +48,12 @@ public class LicenseInfoDtoTest {
     }
 
     private LicenseInfoDao randomLicenseInfoDao() {
-        return  LicenseInfoDao.builder()
+        var lostInstant = randomInstant();
+        return LicenseInfoDao.builder()
                 .withId(randomUri())
+                .created(lostInstant)
+                .modified(lostInstant)
+                .withType(randomString())
                 .licenseUri(randomUri())
                 .build();
     }

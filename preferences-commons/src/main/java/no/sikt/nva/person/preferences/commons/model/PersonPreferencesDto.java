@@ -10,14 +10,14 @@ import static java.util.Objects.nonNull;
 
 @JsonSerialize
 public record PersonPreferencesDto(
-    URI personId,
-    List<URI> promotedPublications) {
+        URI personId,
+        List<URI> promotedPublications) {
 
     public PersonPreferencesDao toDao() {
         return PersonPreferencesDao.builder()
-            .withId(personId)
-            .promotedPublications(promotedPublications)
-            .build();
+                .withId(personId())
+                .promotedPublications(promotedPublications())
+                .build();
     }
 
     public static class Builder {
@@ -30,9 +30,9 @@ public record PersonPreferencesDto(
 
         public PersonPreferencesDto fromDao(PersonPreferencesDao dao) {
             return new PersonPreferencesDto.Builder()
-                .withPersonId(dao.withId())
-                .withPromotedPublications(dao.promotedPublications())
-                .build();
+                    .withPersonId(dao.withId())
+                    .withPromotedPublications(dao.promotedPublications())
+                    .build();
         }
 
         public Builder withPersonId(URI personId) {
@@ -47,8 +47,8 @@ public record PersonPreferencesDto(
 
         public PersonPreferencesDto build() {
             return new PersonPreferencesDto(
-                personId,
-                promotedPublications);
+                    personId,
+                    promotedPublications);
         }
     }
 }

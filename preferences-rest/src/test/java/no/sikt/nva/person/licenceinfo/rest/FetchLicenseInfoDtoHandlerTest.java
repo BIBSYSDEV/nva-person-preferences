@@ -2,8 +2,8 @@ package no.sikt.nva.person.licenceinfo.rest;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import no.sikt.nva.person.preferences.commons.model.LicenseInfoDto;
 import no.sikt.nva.person.preferences.commons.model.LicenseInfoDao;
+import no.sikt.nva.person.preferences.commons.model.LicenseInfoDto;
 import no.sikt.nva.person.preferences.commons.service.IndexService;
 import no.sikt.nva.person.preferences.test.support.LocalPreferencesTestDatabase;
 import no.unit.nva.testutils.HandlerRequestBuilder;
@@ -71,7 +71,7 @@ class FetchLicenseInfoDtoHandlerTest extends LocalPreferencesTestDatabase {
 
     private InputStream createRequest(URI identifier) throws JsonProcessingException {
         var pathParameters = Map.of(CRISTIN_ID, identifier.toString());
-       // var headers = Map.of(ACCEPT, ContentType.APPLICATION_JSON.getMimeType());
+        // var headers = Map.of(ACCEPT, ContentType.APPLICATION_JSON.getMimeType());
         return new HandlerRequestBuilder<LicenseInfoDto>(dtoObjectMapper)
                 .withUserName(randomString())
                 .withPersonCristinId(identifier)
@@ -82,9 +82,9 @@ class FetchLicenseInfoDtoHandlerTest extends LocalPreferencesTestDatabase {
 
     @Test
     void shouldReturnNotFoundWhenPersonIdentifierDoesNotExist() throws IOException, NotFoundException {
-        var personPreferences = profileWithCristinIdentifier(randomUri())
-                .upsert(personPreferencesService)
-                .toDto();
+        profileWithCristinIdentifier(randomUri())
+                .upsert(personPreferencesService);
+
         var request = createRequest(randomUri());
         handler.handleRequest(request, output, CONTEXT);
         var response = GatewayResponse.fromOutputStream(output, Problem.class);
