@@ -1,10 +1,9 @@
 package no.sikt.nva.person.licenceinfo.rest;
 
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.lambda.runtime.Context;
-import no.sikt.nva.person.preferences.commons.model.LicenseInfo;
+import no.sikt.nva.person.preferences.commons.model.LicenseInfoDto;
 import no.sikt.nva.person.preferences.commons.model.LicenseInfoDao;
-import no.sikt.nva.person.preferences.commons.service.PersonService;
+import no.sikt.nva.person.preferences.commons.service.IndexService;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
@@ -16,23 +15,23 @@ import java.net.HttpURLConnection;
 import static no.sikt.nva.person.Constants.TABLE_NAME;
 import static no.sikt.nva.person.Constants.dontMatchCustomerAndPerson;
 
-public class UpsertLicenseInfoHandler extends ApiGatewayHandler<LicenseInfo, LicenseInfo> {
+public class UpsertLicenseInfoHandler extends ApiGatewayHandler<LicenseInfoDto, LicenseInfoDto> {
 
-    private final PersonService dynamoDbService;
+    private final IndexService<LicenseInfoDao> dynamoDbService;
 
     @JacocoGenerated
     public UpsertLicenseInfoHandler() {
-        this(new PersonService(AmazonDynamoDBClientBuilder.defaultClient(), TABLE_NAME));
+        this(new IndexService<>( TABLE_NAME, LicenseInfoDao.class));
     }
 
-    public UpsertLicenseInfoHandler(PersonService personPreferencesService) {
-        super(LicenseInfo.class);
+    public UpsertLicenseInfoHandler(IndexService<LicenseInfoDao> personPreferencesService) {
+        super(LicenseInfoDto.class);
         this.dynamoDbService = personPreferencesService;
     }
 
 
     @Override
-    protected void validateRequest(LicenseInfo licenseInfo, RequestInfo requestInfo, Context context)
+    protected void validateRequest(LicenseInfoDto licenseInfoDto, RequestInfo requestInfo, Context context)
             throws ApiGatewayException {
         if (dontMatchCustomerAndPerson(requestInfo)) {
             throw new UnauthorizedException();
@@ -41,18 +40,18 @@ public class UpsertLicenseInfoHandler extends ApiGatewayHandler<LicenseInfo, Lic
 
 
     @Override
-    protected LicenseInfo processInput(LicenseInfo input, RequestInfo requestInfo, Context context)
+    protected LicenseInfoDto processInput(LicenseInfoDto input, RequestInfo requestInfo, Context context)
             throws ApiGatewayException {
-        return new LicenseInfoDao.Builder()
-                .withPersonId(requestInfo.getPersonCristinId())
-                .withLicenseUri(input.licenseUri())
+        return LicenseInfoDao.builder()
+                .withId(requestInfo.getPersonCristinId())
+                .licenseUri(input.licenseUri())
                 .build()
                 .upsert(dynamoDbService)
                 .toDto();
     }
 
     @Override
-    protected Integer getSuccessStatusCode(LicenseInfo licenseInfo, LicenseInfo o) {
+    protected Integer getSuccessStatusCode(LicenseInfoDto licenseInfoDto, LicenseInfoDto o) {
         return HttpURLConnection.HTTP_OK;
     }
 }

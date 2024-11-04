@@ -1,9 +1,10 @@
-package no.sikt.nva.person.preferences.rest;
+package no.sikt.nva.person.licenceinfo.rest;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import no.sikt.nva.person.preferences.commons.model.PersonPreferences;
-import no.sikt.nva.person.preferences.commons.service.PersonService;
+import no.sikt.nva.person.preferences.commons.model.LicenseInfoDto;
+import no.sikt.nva.person.preferences.commons.model.LicenseInfoDao;
+import no.sikt.nva.person.preferences.commons.service.IndexService;
 import no.sikt.nva.person.preferences.test.support.LocalPreferencesTestDatabase;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
@@ -17,7 +18,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
-import java.util.List;
 import java.util.Map;
 
 import static no.unit.nva.commons.json.JsonUtils.dtoObjectMapper;
@@ -28,36 +28,36 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
 
-public class UpsertPersonPreferencesHandlerTest extends LocalPreferencesTestDatabase {
+public class UpsertLicenseInfoDtoHandlerTest extends LocalPreferencesTestDatabase {
 
     public static final String TABLE_NAME = "nonExistentTableName";
     private static final Context CONTEXT = mock(Context.class);
     private ByteArrayOutputStream output;
-    private PersonService personPreferencesService;
-    private UpsertPersonPreferencesHandler handler;
+    private IndexService<LicenseInfoDao> personPreferencesService;
+    private UpsertLicenseInfoHandler handler;
 
     @BeforeEach
     public void init() {
         super.init(TABLE_NAME);
         output = new ByteArrayOutputStream();
-        personPreferencesService = new PersonService(client, TABLE_NAME);
-        handler = new UpsertPersonPreferencesHandler(personPreferencesService);
+        personPreferencesService = new IndexService<>(client, TABLE_NAME, LicenseInfoDao.class);
+        handler = new UpsertLicenseInfoHandler(personPreferencesService);
     }
 
     @Test
-    void shouldCreatePersonPreferencesWhenDoesNotExist() throws IOException {
-        var existingPersonPreferences = profileWithCristinIdentifier(randomUri());
+    void shouldCreateLicenseInfoWhenDoesNotExist() throws IOException {
+        var existingLicenseInfo = profileWithCristinIdentifier(randomUri());
 
-        handler.handleRequest(createRequest(existingPersonPreferences), output, CONTEXT);
+        handler.handleRequest(createRequest(existingLicenseInfo.toDto()), output, CONTEXT);
 
-        var response = GatewayResponse.fromOutputStream(output, PersonPreferences.class);
+        var response = GatewayResponse.fromOutputStream(output, LicenseInfoDto.class);
         assertThat(response.getStatusCode(), is(equalTo(HttpURLConnection.HTTP_OK)));
-        assertThat(response.getBodyObject(PersonPreferences.class).personId(),
-                is(equalTo(existingPersonPreferences.personId())));
+        assertThat(response.getBodyObject(LicenseInfoDto.class).personId(),
+                is(equalTo(existingLicenseInfo.withId())));
     }
 
-    private InputStream createRequest(PersonPreferences personPreferences) throws JsonProcessingException {
-        return new HandlerRequestBuilder<PersonPreferences>(dtoObjectMapper)
+    private InputStream createRequest(LicenseInfoDto personPreferences) throws JsonProcessingException {
+        return new HandlerRequestBuilder<LicenseInfoDto>(dtoObjectMapper)
                 .withUserName(randomString())
                 .withPersonCristinId(personPreferences.personId())
                 .withCurrentCustomer(personPreferences.personId())
@@ -66,43 +66,42 @@ public class UpsertPersonPreferencesHandlerTest extends LocalPreferencesTestData
                 .build();
     }
 
-    private PersonPreferences profileWithCristinIdentifier(URI cristinIdentifier) {
-        return new PersonPreferences.Builder()
-                .withPersonId(cristinIdentifier)
-                .withPromotedPublications(List.of(randomUri(), randomUri()))
+    private LicenseInfoDao profileWithCristinIdentifier(URI cristinIdentifier) {
+        return LicenseInfoDao.builder()
+                .withId(cristinIdentifier)
+                .licenseUri(randomUri())
                 .build();
     }
 
     @Test
-    void shouldUpdatePersonPreferencesWhenExist() throws IOException, NotFoundException {
-        var existingPersonPreferences = profileWithCristinIdentifier(randomUri())
-                .toDao().upsert(personPreferencesService);
+    void shouldUpdateLicenseInfoWhenExist() throws IOException, NotFoundException {
+        var existingLicenseInfo = profileWithCristinIdentifier(randomUri())
+                .upsert(personPreferencesService).toDto();
 
-        var updatePersonPreferences = new PersonPreferences.Builder()
-                .withPromotedPublications(List.of())
-                .withPersonId(existingPersonPreferences.personId())
+        var updateLicenseInfo = new LicenseInfoDto.Builder()
+                .withPersonId(existingLicenseInfo.personId())
                 .build();
 
-        handler.handleRequest(createRequest(updatePersonPreferences), output, CONTEXT);
+        handler.handleRequest(createRequest(updateLicenseInfo), output, CONTEXT);
 
-        var response = GatewayResponse.fromOutputStream(output, PersonPreferences.class);
-        var person = response.getBodyObject(PersonPreferences.class);
+        var response = GatewayResponse.fromOutputStream(output, LicenseInfoDto.class);
+        var person = response.getBodyObject(LicenseInfoDto.class);
         assertThat(response.getStatusCode(), is(equalTo(HttpURLConnection.HTTP_OK)));
 
-        assertThat(person.personId(), is(equalTo(updatePersonPreferences.personId())));
+        assertThat(person.personId(), is(equalTo(updateLicenseInfo.personId())));
     }
 
     @Test
     void shouldReturnUnauthorizedWhenNonAuthorized() throws IOException {
-        var profile = profileWithCristinIdentifier(randomUri());
+        var profile = profileWithCristinIdentifier(randomUri()).toDto();
         handler.handleRequest(createUnauthorizedRequest(profile), output, CONTEXT);
         var response = GatewayResponse.fromOutputStream(output, Problem.class);
 
         assertThat(response.getStatusCode(), is(equalTo(HttpURLConnection.HTTP_UNAUTHORIZED)));
     }
 
-    private InputStream createUnauthorizedRequest(PersonPreferences personPreferences) throws JsonProcessingException {
-        return new HandlerRequestBuilder<PersonPreferences>(dtoObjectMapper)
+    private InputStream createUnauthorizedRequest(LicenseInfoDto personPreferences) throws JsonProcessingException {
+        return new HandlerRequestBuilder<LicenseInfoDto>(dtoObjectMapper)
                 .withUserName(randomString())
                 .withBody(personPreferences)
                 .build();
@@ -110,17 +109,18 @@ public class UpsertPersonPreferencesHandlerTest extends LocalPreferencesTestData
 
     @Test
     void shouldReturnUnauthorizedWhenProvidedCristinIdDoesNotMatch() throws IOException {
-        var profile = profileWithCristinIdentifier(randomUri());
+        var profile = profileWithCristinIdentifier(randomUri()).toDto();
         handler.handleRequest(createRequestWithNotMatchingCristinIds(profile), output, CONTEXT);
         var response = GatewayResponse.fromOutputStream(output, Problem.class);
 
         assertThat(response.getStatusCode(), is(equalTo(HttpURLConnection.HTTP_UNAUTHORIZED)));
     }
 
-    private InputStream createRequestWithNotMatchingCristinIds(PersonPreferences personPreferences)
+    private InputStream createRequestWithNotMatchingCristinIds(LicenseInfoDto personPreferences)
             throws JsonProcessingException {
-        return new HandlerRequestBuilder<PersonPreferences>(dtoObjectMapper)
+        return new HandlerRequestBuilder<LicenseInfoDto>(dtoObjectMapper)
                 .withUserName(randomString())
+                .withCurrentCustomer(randomUri())
                 .withPersonCristinId(personPreferences.personId())
                 .withCurrentCustomer(randomUri())
                 .withPathParameters(Map.of("cristinId", randomString()))

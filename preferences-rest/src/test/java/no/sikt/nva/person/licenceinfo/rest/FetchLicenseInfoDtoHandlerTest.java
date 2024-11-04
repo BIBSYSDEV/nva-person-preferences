@@ -2,14 +2,13 @@ package no.sikt.nva.person.licenceinfo.rest;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import no.sikt.nva.person.preferences.commons.model.LicenseInfo;
+import no.sikt.nva.person.preferences.commons.model.LicenseInfoDto;
 import no.sikt.nva.person.preferences.commons.model.LicenseInfoDao;
-import no.sikt.nva.person.preferences.commons.service.PersonService;
+import no.sikt.nva.person.preferences.commons.service.IndexService;
 import no.sikt.nva.person.preferences.test.support.LocalPreferencesTestDatabase;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.apigateway.exceptions.NotFoundException;
-import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.zalando.problem.Problem;
@@ -22,30 +21,29 @@ import java.util.Map;
 
 import static java.net.HttpURLConnection.HTTP_NOT_FOUND;
 import static no.sikt.nva.person.Constants.CRISTIN_ID;
-import static no.sikt.nva.person.preferences.commons.service.PersonService.RESOURCE_NOT_FOUND_MESSAGE;
+import static no.sikt.nva.person.preferences.commons.model.DataAccessService.RESOURCE_NOT_FOUND_MESSAGE;
 import static no.unit.nva.commons.json.JsonUtils.dtoObjectMapper;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
-import static org.apache.http.HttpHeaders.ACCEPT;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
 
-class FetchLicenseInfoHandlerTest extends LocalPreferencesTestDatabase {
+class FetchLicenseInfoDtoHandlerTest extends LocalPreferencesTestDatabase {
 
     public static final String TABLE_NAME = "nonExistentTableName";
     private static final Context CONTEXT = mock(Context.class);
     private ByteArrayOutputStream output;
-    private PersonService personPreferencesService;
+    private IndexService<LicenseInfoDao> personPreferencesService;
     private FetchLicenseInfoHandler handler;
 
     @BeforeEach
     public void init() {
         super.init(TABLE_NAME);
         output = new ByteArrayOutputStream();
-        personPreferencesService = new PersonService(client, TABLE_NAME);
+        personPreferencesService = new IndexService<>(client, TABLE_NAME, LicenseInfoDao.class);
         handler = new FetchLicenseInfoHandler(personPreferencesService);
     }
 
@@ -59,32 +57,34 @@ class FetchLicenseInfoHandlerTest extends LocalPreferencesTestDatabase {
 
         handler.handleRequest(request, output, CONTEXT);
 
-        var response = GatewayResponse.fromOutputStream(output, LicenseInfo.class);
+        var response = GatewayResponse.fromOutputStream(output, LicenseInfoDto.class);
 
-        assertThat(personPreferences, is(equalTo(response.getBodyObject(LicenseInfo.class))));
+        assertThat(personPreferences, is(equalTo(response.getBodyObject(LicenseInfoDto.class))));
     }
 
     private LicenseInfoDao profileWithCristinIdentifier(URI cristinIdentifier) {
-        return new LicenseInfoDao.Builder()
-                .withPersonId(cristinIdentifier)
-                .withLicenseUri(randomUri())
+        return LicenseInfoDao.builder()
+                .withId(cristinIdentifier)
+                .licenseUri(randomUri())
                 .build();
     }
 
     private InputStream createRequest(URI identifier) throws JsonProcessingException {
         var pathParameters = Map.of(CRISTIN_ID, identifier.toString());
-        var headers = Map.of(ACCEPT, ContentType.APPLICATION_JSON.getMimeType());
-        return new HandlerRequestBuilder<LicenseInfo>(dtoObjectMapper)
+       // var headers = Map.of(ACCEPT, ContentType.APPLICATION_JSON.getMimeType());
+        return new HandlerRequestBuilder<LicenseInfoDto>(dtoObjectMapper)
                 .withUserName(randomString())
                 .withPersonCristinId(identifier)
                 .withCurrentCustomer(randomUri())
-                .withHeaders(headers)
                 .withPathParameters(pathParameters)
                 .build();
     }
 
     @Test
-    void shouldReturnNotFoundWhenPersonIdentifierDoesNotExist() throws IOException {
+    void shouldReturnNotFoundWhenPersonIdentifierDoesNotExist() throws IOException, NotFoundException {
+        var personPreferences = profileWithCristinIdentifier(randomUri())
+                .upsert(personPreferencesService)
+                .toDto();
         var request = createRequest(randomUri());
         handler.handleRequest(request, output, CONTEXT);
         var response = GatewayResponse.fromOutputStream(output, Problem.class);

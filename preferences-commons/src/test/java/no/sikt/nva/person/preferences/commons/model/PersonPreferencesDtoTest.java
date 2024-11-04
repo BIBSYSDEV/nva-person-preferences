@@ -10,13 +10,13 @@ import java.util.List;
 import no.unit.nva.commons.json.JsonUtils;
 import org.junit.jupiter.api.Test;
 
-public class PersonPreferencesTest {
+public class PersonPreferencesDtoTest {
 
     @Test
     void shouldMakeRoundTripWithoutLossOfInformation() throws JsonProcessingException {
         var personPreferences = randomPersonPreferences();
         var objectAsString = JsonUtils.dtoObjectMapper.writeValueAsString(personPreferences);
-        var regeneratedObject = JsonUtils.dtoObjectMapper.readValue(objectAsString, PersonPreferences.class);
+        var regeneratedObject = JsonUtils.dtoObjectMapper.readValue(objectAsString, PersonPreferencesDto.class);
         assertThat(personPreferences, is(equalTo(regeneratedObject)));
     }
 
@@ -33,24 +33,24 @@ public class PersonPreferencesTest {
         var personPreferencesDao = randomPersonPreferencesDao();
         var personPreferences = personPreferencesDao.toDto();
         var objectAsString = JsonUtils.dtoObjectMapper.writeValueAsString(personPreferences);
-        var regeneratedObject = JsonUtils.dtoObjectMapper.readValue(objectAsString, PersonPreferences.class);
+        var regeneratedObject = JsonUtils.dtoObjectMapper.readValue(objectAsString, PersonPreferencesDto.class);
         assertThat(personPreferences, is(equalTo(regeneratedObject)));
         var regeneratedDao = personPreferences.toDao();
-        assertThat(personPreferencesDao.personId(), is(equalTo(regeneratedDao.personId())));
+        assertThat(personPreferencesDao.withId(), is(equalTo(regeneratedDao.withId())));
         assertThat(personPreferencesDao.promotedPublications(), is(equalTo(regeneratedDao.promotedPublications())));
     }
 
-    private PersonPreferences randomPersonPreferences() {
-        return new PersonPreferences.Builder()
+    private PersonPreferencesDto randomPersonPreferences() {
+        return new PersonPreferencesDto.Builder()
                    .withPersonId(randomUri())
                    .withPromotedPublications(List.of(randomUri()))
                    .build();
     }
 
     private PersonPreferencesDao randomPersonPreferencesDao() {
-        return new PersonPreferencesDao.Builder()
-                   .withPersonId(randomUri())
-                   .withPromotedPublications(List.of(randomUri()))
+        return PersonPreferencesDao.builder()
+                   .withId(randomUri())
+                   .promotedPublications(List.of(randomUri()))
                    .build();
     }
 }

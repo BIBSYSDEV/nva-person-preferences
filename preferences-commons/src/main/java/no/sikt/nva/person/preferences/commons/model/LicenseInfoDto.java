@@ -1,12 +1,13 @@
 package no.sikt.nva.person.preferences.commons.model;
 
+
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import java.net.URI;
 import java.time.Instant;
 
 @JsonSerialize
-public record LicenseInfo(
+public record LicenseInfoDto(
         URI personId,
         Instant signed,
         URI licenseUri) {
@@ -19,9 +20,9 @@ public record LicenseInfo(
         public Builder() {
         }
 
-        public LicenseInfo fromDao(LicenseInfoDao dao) {
-            return new LicenseInfo.Builder()
-                    .withPersonId(dao.personId())
+        public LicenseInfoDto fromDao(LicenseInfoDao dao) {
+            return new LicenseInfoDto.Builder()
+                    .withPersonId(dao.withId())
                     .withLicenseSignedDate(dao.modified())
                     .withLicenseUri(dao.licenseUri())
                     .build();
@@ -42,8 +43,8 @@ public record LicenseInfo(
             return this;
         }
 
-        public LicenseInfo build() {
-            return new LicenseInfo(this.personId, this.licenseSignedDate, this.licenseUri);
+        public LicenseInfoDto build() {
+            return new LicenseInfoDto(this.personId, this.licenseSignedDate, this.licenseUri);
         }
     }
 }

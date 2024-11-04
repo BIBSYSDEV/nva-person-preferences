@@ -10,13 +10,13 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 
-public class LicenseInfoTest {
+public class LicenseInfoDtoTest {
 
     @Test
     void shouldMakeRoundTripWithoutLossOfInformation() throws JsonProcessingException {
         var randomLicenseInfo = randomLicenseInfo();
         var objectAsString = JsonUtils.dtoObjectMapper.writeValueAsString(randomLicenseInfo);
-        var regeneratedObject = JsonUtils.dtoObjectMapper.readValue(objectAsString, LicenseInfo.class);
+        var regeneratedObject = JsonUtils.dtoObjectMapper.readValue(objectAsString, LicenseInfoDto.class);
         assertThat(randomLicenseInfo, is(equalTo(regeneratedObject)));
     }
 
@@ -33,12 +33,12 @@ public class LicenseInfoTest {
         var randomLicenseInfoDao = randomLicenseInfoDao();
         var licenseInfo = randomLicenseInfoDao.toDto();
         var objectAsString = JsonUtils.dtoObjectMapper.writeValueAsString(licenseInfo);
-        var regeneratedObject = JsonUtils.dtoObjectMapper.readValue(objectAsString, LicenseInfo.class);
+        var regeneratedObject = JsonUtils.dtoObjectMapper.readValue(objectAsString, LicenseInfoDto.class);
         assertThat(licenseInfo, is(equalTo(regeneratedObject)));
     }
 
-    private LicenseInfo randomLicenseInfo() {
-        return new LicenseInfo.Builder()
+    private LicenseInfoDto randomLicenseInfo() {
+        return new LicenseInfoDto.Builder()
                 .withPersonId(randomUri())
                 .withLicenseSignedDate(randomInstant())
                 .withLicenseUri(randomUri())
@@ -46,9 +46,9 @@ public class LicenseInfoTest {
     }
 
     private LicenseInfoDao randomLicenseInfoDao() {
-        return new LicenseInfoDao.Builder()
-                .withPersonId(randomUri())
-                .withLicenseUri(randomUri())
+        return  LicenseInfoDao.builder()
+                .withId(randomUri())
+                .licenseUri(randomUri())
                 .build();
     }
 }

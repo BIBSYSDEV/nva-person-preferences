@@ -1,6 +1,5 @@
 package no.sikt.nva.person.preferences.commons.model;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import java.net.URI;
@@ -9,19 +8,17 @@ import java.util.List;
 
 import static java.util.Objects.nonNull;
 
-@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 @JsonSerialize
-public record PersonPreferences(
+public record PersonPreferencesDto(
     URI personId,
     List<URI> promotedPublications) {
 
     public PersonPreferencesDao toDao() {
-        return new PersonPreferencesDao.Builder()
-            .withPersonId(personId)
-            .withPromotedPublications(promotedPublications)
+        return PersonPreferencesDao.builder()
+            .withId(personId)
+            .promotedPublications(promotedPublications)
             .build();
     }
-
 
     public static class Builder {
 
@@ -31,9 +28,9 @@ public record PersonPreferences(
         public Builder() {
         }
 
-        public PersonPreferences fromDao(PersonPreferencesDao dao) {
-            return new PersonPreferences.Builder()
-                .withPersonId(dao.personId())
+        public PersonPreferencesDto fromDao(PersonPreferencesDao dao) {
+            return new PersonPreferencesDto.Builder()
+                .withPersonId(dao.withId())
                 .withPromotedPublications(dao.promotedPublications())
                 .build();
         }
@@ -48,8 +45,8 @@ public record PersonPreferences(
             return this;
         }
 
-        public PersonPreferences build() {
-            return new PersonPreferences(
+        public PersonPreferencesDto build() {
+            return new PersonPreferencesDto(
                 personId,
                 promotedPublications);
         }

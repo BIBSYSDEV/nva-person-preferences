@@ -1,77 +1,105 @@
 package no.sikt.nva.person.preferences.commons.model;
 
-import com.amazonaws.services.dynamodbv2.document.ItemUtils;
-import com.amazonaws.services.dynamodbv2.model.AttributeValue;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import no.sikt.nva.person.preferences.commons.service.PersonService;
-import no.unit.nva.commons.json.JsonUtils;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import nva.commons.apigateway.exceptions.NotFoundException;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbIgnore;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbImmutable;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSortKey;
 
 import java.net.URI;
 import java.time.Instant;
-import java.util.Map;
+import java.util.Optional;
 
-import static nva.commons.core.attempt.Try.attempt;
+import static no.sikt.nva.person.preferences.commons.model.DataAccessService.RESOURCE_NOT_FOUND_MESSAGE;
 
-@JsonSerialize
+@DynamoDbImmutable(builder = LicenseInfoDao.Builder.class)
 public record LicenseInfoDao(
-    URI personId,
-    Instant created,
-    Instant modified,
-    URI licenseUri
-) implements Persistable<LicenseInfoDao> {
+        @DynamoDbPartitionKey URI withId,
+        @DynamoDbSortKey String withType,
+        Instant created,
+        Instant modified,
+        URI licenseUri) implements DataAccessClass<LicenseInfoDao> {
 
-    @Override
-    public LicenseInfoDao upsert(PersonService service) throws NotFoundException {
-        return new Builder()
-            .fromDynamoFormat(service.upsert(this));
+    public LicenseInfoDao(Builder builder) {
+        this(
+                builder.withId,
+                builder.withType,
+                builder.created,
+                builder.modified,
+                builder.licenseUri
+        );
     }
 
-    @Override
-    public LicenseInfoDao fetch(PersonService service) throws NotFoundException {
-        return new Builder()
-            .fromDynamoFormat(service.fetchResource(this));
+    @DynamoDbIgnore
+    public LicenseInfoDto toDto() {
+        return new LicenseInfoDto.Builder().fromDao(this);
     }
 
+    @DynamoDbIgnore
     @Override
-    public Map<String, AttributeValue> toDynamoFormat() {
-        return Persistable.toDynamoFormat(this);
-
+    public LicenseInfoDao upsert(DataAccessService<LicenseInfoDao> service) throws NotFoundException {
+        service.persist(this);
+        return fetch(service);
     }
 
-    public LicenseInfo toDto() {
-        return new LicenseInfo.Builder()
-            .fromDao(this);
+    @DynamoDbIgnore
+    @Override
+    public LicenseInfoDao fetch(DataAccessService<LicenseInfoDao> service) throws NotFoundException {
+        return Optional.ofNullable(service.fetch(this))
+                .orElseThrow(() -> new NotFoundException(RESOURCE_NOT_FOUND_MESSAGE));
+    }
+
+    public static Builder builder() {
+        return new Builder();
     }
 
     public static class Builder {
-        private URI personId;
+        private URI withId;
+        private String withType; //= "TermsOfUse";
         private URI licenseUri;
+        private Instant created;
+        private Instant modified;
 
-        public Builder withPersonId(URI personId) {
-            this.personId = personId;
+        private Builder() {}
+
+        public Builder withId(URI withId) {
+            this.withId = withId;
             return this;
         }
 
+        public Builder withType(String withType) {
+            this.withType = withType;
+            return this;
+        }
 
-        public Builder withLicenseUri(URI licenseUri) {
+        public Builder licenseUri(URI licenseUri) {
             this.licenseUri = licenseUri;
             return this;
         }
 
-        public LicenseInfoDao fromDynamoFormat(Map<String, AttributeValue> dynamoDbMap) {
-            return attempt(() -> JsonUtils.dynamoObjectMapper.readValue(ItemUtils.toItem(dynamoDbMap).toJSON(),
-                LicenseInfoDao.class))
-                .orElseThrow();
+        public Builder created(Instant created) {
+            this.created = created;
+            return this;
+        }
+
+        public Builder modified(Instant modified) {
+            this.modified = modified;
+            return this;
         }
 
         public LicenseInfoDao build() {
-            var timestamp = Instant.now();
-            return new LicenseInfoDao(
-                personId,
-                timestamp,
-                timestamp,
-                licenseUri);
+            if (created == null) {
+                created = Instant.now();
+            }
+            if (modified == null) {
+                modified = created;
+            }
+            if (withType == null) {
+                withType = "TermsOfUse";
+            }
+            return new LicenseInfoDao(this);
         }
     }
 

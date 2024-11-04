@@ -1,10 +1,10 @@
 package no.sikt.nva.person.preferences.rest;
 
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.lambda.runtime.Context;
-import no.sikt.nva.person.preferences.commons.model.PersonPreferences;
+import no.sikt.nva.person.preferences.commons.model.PersonPreferencesDao;
+import no.sikt.nva.person.preferences.commons.model.PersonPreferencesDto;
 import no.sikt.nva.person.preferences.commons.model.PersonPreferencesDao.Builder;
-import no.sikt.nva.person.preferences.commons.service.PersonService;
+import no.sikt.nva.person.preferences.commons.service.IndexService;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
@@ -17,16 +17,16 @@ import java.net.HttpURLConnection;
 import static no.sikt.nva.person.Constants.TABLE_NAME;
 import static no.sikt.nva.person.Constants.dontMatchCustomerAndPerson;
 
-public class UpsertPersonPreferencesHandler extends ApiGatewayHandler<PreferencesRequest, PersonPreferences> {
+public class UpsertPersonPreferencesHandler extends ApiGatewayHandler<PreferencesRequest, PersonPreferencesDto> {
 
-    private final PersonService personPreferencesService;
+    private final IndexService<PersonPreferencesDao> personPreferencesService;
 
     @JacocoGenerated
     public UpsertPersonPreferencesHandler() {
-        this(new PersonService(AmazonDynamoDBClientBuilder.defaultClient(), TABLE_NAME));
+        this(new IndexService<>( TABLE_NAME, PersonPreferencesDao.class));
     }
 
-    public UpsertPersonPreferencesHandler(PersonService personPreferencesService) {
+    public UpsertPersonPreferencesHandler(IndexService<PersonPreferencesDao> personPreferencesService) {
         super(PreferencesRequest.class);
         this.personPreferencesService = personPreferencesService;
     }
@@ -40,19 +40,19 @@ public class UpsertPersonPreferencesHandler extends ApiGatewayHandler<Preference
     }
 
     @Override
-    protected PersonPreferences processInput(PreferencesRequest input, RequestInfo requestInfo, Context context)
+    protected PersonPreferencesDto processInput(PreferencesRequest input, RequestInfo requestInfo, Context context)
             throws UnauthorizedException, NotFoundException {
 
-        return new Builder()
-                .withPersonId(requestInfo.getPersonCristinId())
-                .withPromotedPublications(input.promotedPublications())
+        return PersonPreferencesDao.builder()
+                .withId(requestInfo.getPersonCristinId())
+                .promotedPublications(input.promotedPublications())
                 .build()
                 .upsert(personPreferencesService)
                 .toDto();
     }
 
     @Override
-    protected Integer getSuccessStatusCode(PreferencesRequest input, PersonPreferences output) {
+    protected Integer getSuccessStatusCode(PreferencesRequest input, PersonPreferencesDto output) {
         return HttpURLConnection.HTTP_OK;
     }
 
