@@ -8,12 +8,14 @@ import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
 import software.amazon.awssdk.enhanced.dynamodb.Key;
 import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
+import software.amazon.awssdk.enhanced.dynamodb.model.TransactWriteItemsEnhancedRequest;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 
 import java.util.Optional;
 
 public class IndexService<T extends DataAccessClass<T>> implements DataAccessService<T> {
     private final DynamoDbTable<T> table;
+    private final DynamoDbEnhancedClient enhancedClient;
 
     @JacocoGenerated
     public IndexService(String tableName, Class<T> tClass) {
@@ -21,7 +23,7 @@ public class IndexService<T extends DataAccessClass<T>> implements DataAccessSer
     }
 
     public IndexService(DynamoDbClient dynamoDbClient, String tableName, Class<T> tClass) {
-        var enhancedClient = DynamoDbEnhancedClient.builder()
+        enhancedClient = DynamoDbEnhancedClient.builder()
                 .dynamoDbClient(dynamoDbClient)
                 .build();
 //        this.serviceWithTransactions = new ServiceWithTransactions(enhancedClient, tableName);
@@ -37,9 +39,13 @@ public class IndexService<T extends DataAccessClass<T>> implements DataAccessSer
     @SafeVarargs
     @Override
     public final void transactionalPersist(T... items) {
+        var transBuilder   =
+                TransactWriteItemsEnhancedRequest.builder();
         for (T item : items) {
-            persist(item);
+            transBuilder.addPutItem(table, item);
         }
+        enhancedClient.transactWriteItems(transBuilder.build());
+
     }
 
     @Override
@@ -55,5 +61,8 @@ public class IndexService<T extends DataAccessClass<T>> implements DataAccessSer
                 .orElseThrow(() -> new NotFoundException(RESOURCE_NOT_FOUND_MESSAGE));
 
     }
+
+
+
 }
 
