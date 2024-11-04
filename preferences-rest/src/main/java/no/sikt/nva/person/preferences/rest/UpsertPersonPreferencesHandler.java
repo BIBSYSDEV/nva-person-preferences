@@ -3,7 +3,6 @@ package no.sikt.nva.person.preferences.rest;
 import com.amazonaws.services.lambda.runtime.Context;
 import no.sikt.nva.person.preferences.commons.model.PersonPreferencesDao;
 import no.sikt.nva.person.preferences.commons.model.PersonPreferencesDto;
-import no.sikt.nva.person.preferences.commons.model.PersonPreferencesDao.Builder;
 import no.sikt.nva.person.preferences.commons.service.IndexService;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
