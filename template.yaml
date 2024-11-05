@@ -61,9 +61,13 @@ Resources:
       AttributeDefinitions:
         - AttributeName: personId
           AttributeType: S
+        - AttributeName: withType
+          AttributeType: S
       KeySchema:
         - AttributeName: personId
           KeyType: HASH
+        - AttributeName: withType
+          KeyType: RANGE
       StreamSpecification:
         StreamViewType: NEW_AND_OLD_IMAGES
       PointInTimeRecoverySpecification:
@@ -182,6 +186,54 @@ Resources:
       Description: 'Fetches preferences for person'
       CodeUri: preferences-rest
       Handler: no.sikt.nva.person.preferences.rest.FetchPersonPreferencesHandler::handleRequest
+      Role: !GetAtt PreferencesLambdaRole.Arn
+      MemorySize: 1536
+      AutoPublishAlias: live
+      SnapStart:
+        ApplyOn: PublishedVersions
+      Environment:
+        Variables:
+          ALLOWED_ORIGIN: !Ref AllowedOrigins
+          TABLE_NAME: !Ref NvaPersonPreferencesTable2
+      Events:
+        GetEvent:
+          Type: Api
+          Properties:
+            Path: /{cristinId+}
+            Method: get
+            RestApiId: !Ref PersonPreferencesApi
+
+  UpsertTermsConditionsHandler:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: 'Creates/Updates Terms & Conditions for person'
+      CodeUri: preferences-rest
+      Handler: no.sikt.nva.person.termsconditions.rest.UpsertTermsConditionsHandler.java::handleRequest
+      Role: !GetAtt PreferencesLambdaRole.Arn
+      MemorySize: 1536
+      AutoPublishAlias: live
+      SnapStart:
+        ApplyOn: PublishedVersions
+      Environment:
+        Variables:
+          ALLOWED_ORIGIN: !Ref AllowedOrigins
+          API_HOST: !Ref ApiDomain
+          TABLE_NAME: !Ref NvaPersonPreferencesTable2
+          COGNITO_HOST: !Ref CognitoAuthorizationUri
+      Events:
+        GetEvent:
+          Type: Api
+          Properties:
+            Path: /{cristinId+}
+            Method: put
+            RestApiId: !Ref PersonPreferencesApi
+
+  FetchTermsConditionsHandler:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: 'Fetches Terms & Conditions for person'
+      CodeUri: preferences-rest
+      Handler: no.sikt.nva.person.termsconditions.rest.FetchTermsConditionsHandler::handleRequest
       Role: !GetAtt PreferencesLambdaRole.Arn
       MemorySize: 1536
       AutoPublishAlias: live

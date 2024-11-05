@@ -1,9 +1,9 @@
-package no.sikt.nva.person.licenceinfo.rest;
+package no.sikt.nva.person.termsconditions.rest;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import no.sikt.nva.person.preferences.commons.model.LicenseInfoDao;
-import no.sikt.nva.person.preferences.commons.model.LicenseInfoDto;
+import no.sikt.nva.person.preferences.commons.model.TermsConditionsDao;
+import no.sikt.nva.person.preferences.commons.model.TermsConditionsDto;
 import no.sikt.nva.person.preferences.commons.service.IndexService;
 import no.sikt.nva.person.preferences.test.support.LocalPreferencesTestDatabase;
 import no.unit.nva.testutils.HandlerRequestBuilder;
@@ -31,20 +31,20 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
 
-class FetchLicenseInfoDtoHandlerTest extends LocalPreferencesTestDatabase {
+class FetchTermsConditionsDtoHandlerTest extends LocalPreferencesTestDatabase {
 
     public static final String TABLE_NAME = "nonExistentTableName";
     private static final Context CONTEXT = mock(Context.class);
     private ByteArrayOutputStream output;
-    private IndexService<LicenseInfoDao> personPreferencesService;
-    private FetchLicenseInfoHandler handler;
+    private IndexService<TermsConditionsDao> personPreferencesService;
+    private FetchTermsConditionsHandler handler;
 
     @BeforeEach
     public void init() {
         super.init(TABLE_NAME);
         output = new ByteArrayOutputStream();
-        personPreferencesService = new IndexService<>(client, TABLE_NAME, LicenseInfoDao.class);
-        handler = new FetchLicenseInfoHandler(personPreferencesService);
+        personPreferencesService = new IndexService<>(client, TABLE_NAME, TermsConditionsDao.class);
+        handler = new FetchTermsConditionsHandler(personPreferencesService);
     }
 
     @Test
@@ -57,14 +57,14 @@ class FetchLicenseInfoDtoHandlerTest extends LocalPreferencesTestDatabase {
 
         handler.handleRequest(request, output, CONTEXT);
 
-        var response = GatewayResponse.fromOutputStream(output, LicenseInfoDto.class);
+        var response = GatewayResponse.fromOutputStream(output, TermsConditionsDto.class);
 
-        assertThat(personPreferences, is(equalTo(response.getBodyObject(LicenseInfoDto.class))));
+        assertThat(personPreferences, is(equalTo(response.getBodyObject(TermsConditionsDto.class))));
     }
 
-    private LicenseInfoDao profileWithCristinIdentifier(URI cristinIdentifier) {
-        return LicenseInfoDao.builder()
-                .withId(cristinIdentifier)
+    private TermsConditionsDao profileWithCristinIdentifier(URI cristinIdentifier) {
+        return TermsConditionsDao.builder()
+                .personId(cristinIdentifier)
                 .licenseUri(randomUri())
                 .build();
     }
@@ -72,7 +72,7 @@ class FetchLicenseInfoDtoHandlerTest extends LocalPreferencesTestDatabase {
     private InputStream createRequest(URI identifier) throws JsonProcessingException {
         var pathParameters = Map.of(CRISTIN_ID, identifier.toString());
         // var headers = Map.of(ACCEPT, ContentType.APPLICATION_JSON.getMimeType());
-        return new HandlerRequestBuilder<LicenseInfoDto>(dtoObjectMapper)
+        return new HandlerRequestBuilder<TermsConditionsDto>(dtoObjectMapper)
                 .withUserName(randomString())
                 .withPersonCristinId(identifier)
                 .withCurrentCustomer(randomUri())

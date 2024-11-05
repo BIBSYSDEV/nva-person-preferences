@@ -15,7 +15,7 @@ public record PersonPreferencesDto(
 
     public PersonPreferencesDao toDao() {
         return PersonPreferencesDao.builder()
-                .withId(personId())
+                .personId(personId())
                 .promotedPublications(promotedPublications())
                 .build();
     }
@@ -30,7 +30,7 @@ public record PersonPreferencesDto(
 
         public PersonPreferencesDto fromDao(PersonPreferencesDao dao) {
             return new PersonPreferencesDto.Builder()
-                    .withPersonId(dao.withId())
+                    .withPersonId(dao.personId())
                     .withPromotedPublications(dao.promotedPublications())
                     .build();
         }

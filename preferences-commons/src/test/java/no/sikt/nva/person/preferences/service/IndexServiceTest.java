@@ -1,6 +1,6 @@
 package no.sikt.nva.person.preferences.service;
 
-import no.sikt.nva.person.preferences.commons.model.LicenseInfoDao;
+import no.sikt.nva.person.preferences.commons.model.TermsConditionsDao;
 import no.sikt.nva.person.preferences.commons.model.PersonPreferencesDao;
 import no.sikt.nva.person.preferences.commons.service.IndexService;
 import no.sikt.nva.person.preferences.test.support.DynamoDbTableCreator;
@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class IndexServiceTest {
 
     public static final String TABLE_NAME = "nonExistentTableName";
-    private static IndexService<LicenseInfoDao> licenseInfoService;
+    private static IndexService<TermsConditionsDao> termsConditionsService;
     private static IndexService<PersonPreferencesDao> personPreferenceService;
 
 
@@ -35,20 +35,20 @@ public class IndexServiceTest {
         new DynamoDbTableCreator(client)
                 .createTable(TABLE_NAME);
 
-        licenseInfoService = new IndexService<>(client, TABLE_NAME, LicenseInfoDao.class);
+        termsConditionsService = new IndexService<>(client, TABLE_NAME, TermsConditionsDao.class);
         personPreferenceService = new IndexService<>(client, TABLE_NAME, PersonPreferencesDao.class);
     }
 
     @Test
     void shouldPersistUserPreferences() throws NotFoundException {
         var personPreferences = PersonPreferencesDao.builder()
-                .withId(randomUri())
+                .personId(randomUri())
                 .promotedPublications(List.of(randomUri()))
                 .build()
                 .upsert(personPreferenceService);
 
         var fetched = PersonPreferencesDao.builder()
-                .withId(personPreferences.withId())
+                .personId(personPreferences.personId())
                 .build()
                 .fetch(personPreferenceService);
         assertThat(fetched, is(equalTo(personPreferences)));
@@ -58,16 +58,16 @@ public class IndexServiceTest {
     void shouldTransactionalPersistPreferences() throws NotFoundException {
 
         var pref1 = PersonPreferencesDao.builder()
-                .withId(randomUri())
+                .personId(randomUri())
                 .promotedPublications(List.of(randomUri()))
                 .build();
 
         var pref2 = PersonPreferencesDao.builder()
-                .withId(randomUri())
+                .personId(randomUri())
                 .promotedPublications(List.of(randomUri()))
                 .build();
         var pref3 = PersonPreferencesDao.builder()
-                .withId(randomUri())
+                .personId(randomUri())
                 .promotedPublications(List.of(randomUri()))
                 .build();
 
@@ -90,26 +90,26 @@ public class IndexServiceTest {
     @Test
     void shouldPersistPreferencesAndLicense() throws NotFoundException {
         var persistedPreferences = PersonPreferencesDao.builder()
-                .withId(randomUri())
+                .personId(randomUri())
                 .promotedPublications(List.of(randomUri()))
                 .build()
                 .upsert(personPreferenceService);
 
-        var persistedLicenseInfo = LicenseInfoDao.builder()
-                .withId(persistedPreferences.withId())
+        var persistedTermsConditions = TermsConditionsDao.builder()
+                .personId(persistedPreferences.personId())
                 .licenseUri(randomUri())
                 .build()
-                .upsert(licenseInfoService);
+                .upsert(termsConditionsService);
 
-        assertThat(persistedLicenseInfo.withId(), is(equalTo(persistedPreferences.withId())));
+        assertThat(persistedTermsConditions.personId(), is(equalTo(persistedPreferences.personId())));
 
         var fetchedPreferences = persistedPreferences
                 .fetch(personPreferenceService);
-        var fetchedLicenseInfo = persistedLicenseInfo
-                .fetch(licenseInfoService);
+        var fetchedTermsConditions = persistedTermsConditions
+                .fetch(termsConditionsService);
 
         assertThat(fetchedPreferences, is(equalTo(persistedPreferences)));
-        assertThat(fetchedLicenseInfo, is(equalTo(persistedLicenseInfo)));
+        assertThat(fetchedTermsConditions, is(equalTo(persistedTermsConditions)));
 
     }
 
@@ -119,7 +119,7 @@ public class IndexServiceTest {
         var userIdentifier = randomUri();
         var personPreferences = PersonPreferencesDao
                 .builder()
-                .withId(userIdentifier)
+                .personId(userIdentifier)
                 .promotedPublications(List.of(randomUri()))
                 .build()
                 .upsert(personPreferenceService);
@@ -128,7 +128,7 @@ public class IndexServiceTest {
 
         var persistedPreferences = PersonPreferencesDao
                 .builder()
-                .withId(userIdentifier)
+                .personId(userIdentifier)
                 .build()
                 .upsert(personPreferenceService).toDto();
 
@@ -140,7 +140,7 @@ public class IndexServiceTest {
         var userIdentifier = randomUri();
         var takeOne = PersonPreferencesDao
                 .builder()
-                .withId(userIdentifier)
+                .personId(userIdentifier)
                 .promotedPublications(List.of(randomUri()))
                 .build()
                 .upsert(personPreferenceService);
@@ -148,7 +148,7 @@ public class IndexServiceTest {
         assertThat(takeOne.promotedPublications(), hasSize(1));
 
         var takeTwo = PersonPreferencesDao.builder()
-                .withId(userIdentifier)
+                .personId(userIdentifier)
                 .build()
                 .upsert(personPreferenceService);
 
@@ -156,34 +156,34 @@ public class IndexServiceTest {
     }
 
     @Test
-    void shouldUpdateLicenseInfo() throws NotFoundException {
+    void shouldUpdateTermsConditions() throws NotFoundException {
         var userIdentifier = randomUri();
-        var licenseInfoDao = LicenseInfoDao.builder()
-                .withId(userIdentifier)
+        var termsConditionsDao = TermsConditionsDao.builder()
+                .personId(userIdentifier)
                 .licenseUri(randomUri())
                 .build()
-                .upsert(licenseInfoService);
+                .upsert(termsConditionsService);
 
-        var licenseInfo = LicenseInfoDao.builder()
-                .withId(userIdentifier)
+        var termsConditions = TermsConditionsDao.builder()
+                .personId(userIdentifier)
                 .build()
-                .fetch(licenseInfoService);
+                .fetch(termsConditionsService);
 
 
-        assertThat(licenseInfoDao, is(equalTo(licenseInfo)));
+        assertThat(termsConditionsDao, is(equalTo(termsConditions)));
     }
 
     @Test
     void shouldFetchUserPreferences() throws nva.commons.apigateway.exceptions.NotFoundException {
         var userIdentifier = randomUri();
         var personPreferences = PersonPreferencesDao.builder()
-                .withId(userIdentifier)
+                .personId(userIdentifier)
                 .promotedPublications(List.of(randomUri()))
                 .build()
                 .upsert(personPreferenceService);
 
         var persistedpersonPreferences = PersonPreferencesDao.builder()
-                .withId(userIdentifier)
+                .personId(userIdentifier)
                 .build()
                 .fetch(personPreferenceService);
         assertThat(persistedpersonPreferences, is(equalTo(personPreferences)));
@@ -193,7 +193,7 @@ public class IndexServiceTest {
     void shouldDeleteUserPreferences() throws NotFoundException {
         var userIdentifier = randomUri();
         var personPreferences = PersonPreferencesDao.builder()
-                .withId(userIdentifier)
+                .personId(userIdentifier)
                 .promotedPublications(List.of(randomUri()))
                 .build()
                 .upsert(personPreferenceService);
@@ -202,62 +202,62 @@ public class IndexServiceTest {
 
         assertThrows(NotFoundException.class,
                 () -> PersonPreferencesDao.builder()
-                        .withId(userIdentifier)
+                        .personId(userIdentifier)
                         .build()
                         .fetch(personPreferenceService));
     }
 
     @Test
-    void shouldDeleteLicenseInfo() throws NotFoundException {
+    void shouldDeleteTermsConditions() throws NotFoundException {
         var userIdentifier = randomUri();
-        var licenseInfo = LicenseInfoDao.builder()
-                .withId(userIdentifier)
+        var termsConditions = TermsConditionsDao.builder()
+                .personId(userIdentifier)
                 .licenseUri(randomUri())
                 .build()
-                .upsert(licenseInfoService);
+                .upsert(termsConditionsService);
 
-        licenseInfoService.delete(licenseInfo);
+        termsConditionsService.delete(termsConditions);
 
         assertThrows(NotFoundException.class,
-                () -> LicenseInfoDao.builder()
-                        .withId(userIdentifier)
+                () -> TermsConditionsDao.builder()
+                        .personId(userIdentifier)
                         .build()
-                        .fetch(licenseInfoService));
+                        .fetch(termsConditionsService));
     }
 
     @Test
     void shouldThrowExceptionWhenFetchingNonExistentPersonPreferences() {
         assertThrows(NotFoundException.class,
                 () -> PersonPreferencesDao.builder()
-                        .withId(randomUri())
+                        .personId(randomUri())
                         .build()
                         .fetch(personPreferenceService));
     }
 
     @Test
-    void shouldThrowExceptionWhenFetchingNonExistentLicenseInfo() {
+    void shouldThrowExceptionWhenFetchingNonExistentTermsConditions() {
         assertThrows(NotFoundException.class,
-                () -> LicenseInfoDao.builder()
-                        .withId(randomUri())
+                () -> TermsConditionsDao.builder()
+                        .personId(randomUri())
                         .build()
-                        .fetch(licenseInfoService));
+                        .fetch(termsConditionsService));
     }
 
     @Test
     void shouldThrowExceptionWhenDeletingNonExistentPersonPreferences() {
         var dao = PersonPreferencesDao.builder()
-                .withId(randomUri())
+                .personId(randomUri())
                 .build();
         assertThrows(NotFoundException.class,
                 () -> personPreferenceService.delete(dao));
     }
 
     @Test
-    void shouldThrowExceptionWhenDeletingNonExistentLicenseInfo() {
-        var dao = LicenseInfoDao.builder()
-                .withId(randomUri())
+    void shouldThrowExceptionWhenDeletingNonExistentTermsConditions() {
+        var dao = TermsConditionsDao.builder()
+                .personId(randomUri())
                 .build();
         assertThrows(NotFoundException.class,
-                () -> licenseInfoService.delete(dao));
+                () -> termsConditionsService.delete(dao));
     }
 }

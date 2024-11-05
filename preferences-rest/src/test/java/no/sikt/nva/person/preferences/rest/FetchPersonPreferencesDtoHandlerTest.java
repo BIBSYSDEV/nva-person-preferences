@@ -61,7 +61,7 @@ class FetchPersonPreferencesDtoHandlerTest extends LocalPreferencesTestDatabase 
 
     private PersonPreferencesDao profileWithCristinIdentifier(URI cristinIdentifier) {
         return PersonPreferencesDao.builder()
-                .withId(cristinIdentifier)
+                .personId(cristinIdentifier)
                 .promotedPublications(List.of(randomUri(), randomUri()))
                 .build();
     }

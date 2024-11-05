@@ -1,8 +1,8 @@
-package no.sikt.nva.person.licenceinfo.rest;
+package no.sikt.nva.person.termsconditions.rest;
 
 import com.amazonaws.services.lambda.runtime.Context;
-import no.sikt.nva.person.preferences.commons.model.LicenseInfoDto;
-import no.sikt.nva.person.preferences.commons.model.LicenseInfoDao;
+import no.sikt.nva.person.preferences.commons.model.TermsConditionsDto;
+import no.sikt.nva.person.preferences.commons.model.TermsConditionsDao;
 import no.sikt.nva.person.preferences.commons.service.IndexService;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
@@ -15,23 +15,23 @@ import java.net.HttpURLConnection;
 import static no.sikt.nva.person.Constants.TABLE_NAME;
 import static no.sikt.nva.person.Constants.dontMatchCustomerAndPerson;
 
-public class UpsertLicenseInfoHandler extends ApiGatewayHandler<LicenseInfoDto, LicenseInfoDto> {
+public class UpsertTermsConditionsHandler extends ApiGatewayHandler<TermsConditionsDto, TermsConditionsDto> {
 
-    private final IndexService<LicenseInfoDao> dynamoDbService;
+    private final IndexService<TermsConditionsDao> dynamoDbService;
 
     @JacocoGenerated
-    public UpsertLicenseInfoHandler() {
-        this(new IndexService<>( TABLE_NAME, LicenseInfoDao.class));
+    public UpsertTermsConditionsHandler() {
+        this(new IndexService<>( TABLE_NAME, TermsConditionsDao.class));
     }
 
-    public UpsertLicenseInfoHandler(IndexService<LicenseInfoDao> personPreferencesService) {
-        super(LicenseInfoDto.class);
+    public UpsertTermsConditionsHandler(IndexService<TermsConditionsDao> personPreferencesService) {
+        super(TermsConditionsDto.class);
         this.dynamoDbService = personPreferencesService;
     }
 
 
     @Override
-    protected void validateRequest(LicenseInfoDto licenseInfoDto, RequestInfo requestInfo, Context context)
+    protected void validateRequest(TermsConditionsDto termsConditionsDto, RequestInfo requestInfo, Context context)
             throws ApiGatewayException {
         if (dontMatchCustomerAndPerson(requestInfo)) {
             throw new UnauthorizedException();
@@ -40,10 +40,10 @@ public class UpsertLicenseInfoHandler extends ApiGatewayHandler<LicenseInfoDto, 
 
 
     @Override
-    protected LicenseInfoDto processInput(LicenseInfoDto input, RequestInfo requestInfo, Context context)
+    protected TermsConditionsDto processInput(TermsConditionsDto input, RequestInfo requestInfo, Context context)
             throws ApiGatewayException {
-        return LicenseInfoDao.builder()
-                .withId(requestInfo.getPersonCristinId())
+        return TermsConditionsDao.builder()
+                .personId(requestInfo.getPersonCristinId())
                 .licenseUri(input.licenseUri())
                 .build()
                 .upsert(dynamoDbService)
@@ -51,7 +51,7 @@ public class UpsertLicenseInfoHandler extends ApiGatewayHandler<LicenseInfoDto, 
     }
 
     @Override
-    protected Integer getSuccessStatusCode(LicenseInfoDto licenseInfoDto, LicenseInfoDto o) {
+    protected Integer getSuccessStatusCode(TermsConditionsDto termsConditionsDto, TermsConditionsDto o) {
         return HttpURLConnection.HTTP_OK;
     }
 }

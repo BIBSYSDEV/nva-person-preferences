@@ -43,7 +43,7 @@ public class UpsertPersonPreferencesHandler extends ApiGatewayHandler<Preference
             throws UnauthorizedException, NotFoundException {
 
         return PersonPreferencesDao.builder()
-                .withId(requestInfo.getPersonCristinId())
+                .personId(requestInfo.getPersonCristinId())
                 .promotedPublications(input.promotedPublications())
                 .build()
                 .upsert(personPreferencesService)

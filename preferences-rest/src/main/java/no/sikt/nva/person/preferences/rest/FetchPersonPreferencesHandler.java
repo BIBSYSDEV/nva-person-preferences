@@ -38,7 +38,7 @@ public class FetchPersonPreferencesHandler extends ApiGatewayHandler<Void, Perso
             throws ApiGatewayException {
 
         return PersonPreferencesDao.builder()
-                .withId(getCristinId(requestInfo))
+                .personId(getCristinId(requestInfo))
                 .build()
                 .fetch(dynamoDbService)
                 .toDto();

@@ -1,8 +1,8 @@
-package no.sikt.nva.person.licenceinfo.rest;
+package no.sikt.nva.person.termsconditions.rest;
 
 import com.amazonaws.services.lambda.runtime.Context;
-import no.sikt.nva.person.preferences.commons.model.LicenseInfoDto;
-import no.sikt.nva.person.preferences.commons.model.LicenseInfoDao;
+import no.sikt.nva.person.preferences.commons.model.TermsConditionsDto;
+import no.sikt.nva.person.preferences.commons.model.TermsConditionsDao;
 import no.sikt.nva.person.preferences.commons.service.IndexService;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
@@ -15,16 +15,16 @@ import static no.sikt.nva.person.Constants.TABLE_NAME;
 import static no.sikt.nva.person.Constants.getCristinId;
 
 
-public class FetchLicenseInfoHandler extends ApiGatewayHandler<Void, LicenseInfoDto> {
+public class FetchTermsConditionsHandler extends ApiGatewayHandler<Void, TermsConditionsDto> {
 
-    private final IndexService<LicenseInfoDao> indexService;
+    private final IndexService<TermsConditionsDao> indexService;
 
     @JacocoGenerated
-    public FetchLicenseInfoHandler() {
-        this(new IndexService<>(TABLE_NAME, LicenseInfoDao.class));
+    public FetchTermsConditionsHandler() {
+        this(new IndexService<>(TABLE_NAME, TermsConditionsDao.class));
     }
 
-    public FetchLicenseInfoHandler(IndexService<LicenseInfoDao> daoIndexService) {
+    public FetchTermsConditionsHandler(IndexService<TermsConditionsDao> daoIndexService) {
         super(Void.class);
         this.indexService = daoIndexService;
     }
@@ -35,18 +35,18 @@ public class FetchLicenseInfoHandler extends ApiGatewayHandler<Void, LicenseInfo
     }
 
     @Override
-    protected LicenseInfoDto processInput(Void input, RequestInfo requestInfo, Context context)
+    protected TermsConditionsDto processInput(Void input, RequestInfo requestInfo, Context context)
             throws ApiGatewayException {
 
-        return LicenseInfoDao.builder()
-                .withId(getCristinId(requestInfo))
+        return TermsConditionsDao.builder()
+                .personId(getCristinId(requestInfo))
                 .build()
                 .fetch(indexService)
                 .toDto();
     }
 
     @Override
-    protected Integer getSuccessStatusCode(Void input, LicenseInfoDto output) {
+    protected Integer getSuccessStatusCode(Void input, TermsConditionsDto output) {
         return HttpURLConnection.HTTP_OK;
     }
 

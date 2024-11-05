@@ -1,9 +1,9 @@
-package no.sikt.nva.person.licenceinfo.rest;
+package no.sikt.nva.person.termsconditions.rest;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import no.sikt.nva.person.preferences.commons.model.LicenseInfoDto;
-import no.sikt.nva.person.preferences.commons.model.LicenseInfoDao;
+import no.sikt.nva.person.preferences.commons.model.TermsConditionsDto;
+import no.sikt.nva.person.preferences.commons.model.TermsConditionsDao;
 import no.sikt.nva.person.preferences.commons.service.IndexService;
 import no.sikt.nva.person.preferences.test.support.LocalPreferencesTestDatabase;
 import no.unit.nva.testutils.HandlerRequestBuilder;
@@ -28,20 +28,20 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
 
-public class UpsertLicenseInfoDtoHandlerTest extends LocalPreferencesTestDatabase {
+public class UpsertTermsConditionsDtoHandlerTest extends LocalPreferencesTestDatabase {
 
     public static final String TABLE_NAME = "nonExistentTableName";
     private static final Context CONTEXT = mock(Context.class);
     private ByteArrayOutputStream output;
-    private IndexService<LicenseInfoDao> personPreferencesService;
-    private UpsertLicenseInfoHandler handler;
+    private IndexService<TermsConditionsDao> personPreferencesService;
+    private UpsertTermsConditionsHandler handler;
 
     @BeforeEach
     public void init() {
         super.init(TABLE_NAME);
         output = new ByteArrayOutputStream();
-        personPreferencesService = new IndexService<>(client, TABLE_NAME, LicenseInfoDao.class);
-        handler = new UpsertLicenseInfoHandler(personPreferencesService);
+        personPreferencesService = new IndexService<>(client, TABLE_NAME, TermsConditionsDao.class);
+        handler = new UpsertTermsConditionsHandler(personPreferencesService);
     }
 
     @Test
@@ -50,14 +50,14 @@ public class UpsertLicenseInfoDtoHandlerTest extends LocalPreferencesTestDatabas
 
         handler.handleRequest(createRequest(existingLicenseInfo.toDto()), output, CONTEXT);
 
-        var response = GatewayResponse.fromOutputStream(output, LicenseInfoDto.class);
+        var response = GatewayResponse.fromOutputStream(output, TermsConditionsDto.class);
         assertThat(response.getStatusCode(), is(equalTo(HttpURLConnection.HTTP_OK)));
-        assertThat(response.getBodyObject(LicenseInfoDto.class).personId(),
-                is(equalTo(existingLicenseInfo.withId())));
+        assertThat(response.getBodyObject(TermsConditionsDto.class).personId(),
+                is(equalTo(existingLicenseInfo.personId())));
     }
 
-    private InputStream createRequest(LicenseInfoDto personPreferences) throws JsonProcessingException {
-        return new HandlerRequestBuilder<LicenseInfoDto>(dtoObjectMapper)
+    private InputStream createRequest(TermsConditionsDto personPreferences) throws JsonProcessingException {
+        return new HandlerRequestBuilder<TermsConditionsDto>(dtoObjectMapper)
                 .withUserName(randomString())
                 .withPersonCristinId(personPreferences.personId())
                 .withCurrentCustomer(personPreferences.personId())
@@ -66,9 +66,9 @@ public class UpsertLicenseInfoDtoHandlerTest extends LocalPreferencesTestDatabas
                 .build();
     }
 
-    private LicenseInfoDao profileWithCristinIdentifier(URI cristinIdentifier) {
-        return LicenseInfoDao.builder()
-                .withId(cristinIdentifier)
+    private TermsConditionsDao profileWithCristinIdentifier(URI cristinIdentifier) {
+        return TermsConditionsDao.builder()
+                .personId(cristinIdentifier)
                 .licenseUri(randomUri())
                 .build();
     }
@@ -78,14 +78,14 @@ public class UpsertLicenseInfoDtoHandlerTest extends LocalPreferencesTestDatabas
         var existingLicenseInfo = profileWithCristinIdentifier(randomUri())
                 .upsert(personPreferencesService).toDto();
 
-        var updateLicenseInfo = new LicenseInfoDto.Builder()
+        var updateLicenseInfo = new TermsConditionsDto.Builder()
                 .withPersonId(existingLicenseInfo.personId())
                 .build();
 
         handler.handleRequest(createRequest(updateLicenseInfo), output, CONTEXT);
 
-        var response = GatewayResponse.fromOutputStream(output, LicenseInfoDto.class);
-        var person = response.getBodyObject(LicenseInfoDto.class);
+        var response = GatewayResponse.fromOutputStream(output, TermsConditionsDto.class);
+        var person = response.getBodyObject(TermsConditionsDto.class);
         assertThat(response.getStatusCode(), is(equalTo(HttpURLConnection.HTTP_OK)));
 
         assertThat(person.personId(), is(equalTo(updateLicenseInfo.personId())));
@@ -100,8 +100,8 @@ public class UpsertLicenseInfoDtoHandlerTest extends LocalPreferencesTestDatabas
         assertThat(response.getStatusCode(), is(equalTo(HttpURLConnection.HTTP_UNAUTHORIZED)));
     }
 
-    private InputStream createUnauthorizedRequest(LicenseInfoDto personPreferences) throws JsonProcessingException {
-        return new HandlerRequestBuilder<LicenseInfoDto>(dtoObjectMapper)
+    private InputStream createUnauthorizedRequest(TermsConditionsDto personPreferences) throws JsonProcessingException {
+        return new HandlerRequestBuilder<TermsConditionsDto>(dtoObjectMapper)
                 .withUserName(randomString())
                 .withBody(personPreferences)
                 .build();
@@ -116,9 +116,9 @@ public class UpsertLicenseInfoDtoHandlerTest extends LocalPreferencesTestDatabas
         assertThat(response.getStatusCode(), is(equalTo(HttpURLConnection.HTTP_UNAUTHORIZED)));
     }
 
-    private InputStream createRequestWithNotMatchingCristinIds(LicenseInfoDto personPreferences)
+    private InputStream createRequestWithNotMatchingCristinIds(TermsConditionsDto personPreferences)
             throws JsonProcessingException {
-        return new HandlerRequestBuilder<LicenseInfoDto>(dtoObjectMapper)
+        return new HandlerRequestBuilder<TermsConditionsDto>(dtoObjectMapper)
                 .withUserName(randomString())
                 .withCurrentCustomer(randomUri())
                 .withPersonCristinId(personPreferences.personId())

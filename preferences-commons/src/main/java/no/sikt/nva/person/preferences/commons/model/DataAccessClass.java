@@ -7,7 +7,7 @@ import java.time.Instant;
 
 public interface DataAccessClass<T extends DataAccessClass<T>> {
 
-    URI withId();
+    URI personId();
 
     String withType();
 

@@ -55,7 +55,7 @@ public class IndexService<T extends DataAccessClass<T>> implements DataAccessSer
 
     @Override
     public T fetch(T item) throws NotFoundException {
-        Key key = Key.builder().partitionValue(item.withId().toString()).sortValue(item.withType()).build();
+        Key key = Key.builder().partitionValue(item.personId().toString()).sortValue(item.withType()).build();
         return Optional.ofNullable(table.getItem(r -> r.key(key)))
                 .orElseThrow(() -> new NotFoundException(RESOURCE_NOT_FOUND_MESSAGE));
 

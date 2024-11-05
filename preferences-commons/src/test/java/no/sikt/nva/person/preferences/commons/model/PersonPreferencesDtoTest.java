@@ -41,7 +41,7 @@ public class PersonPreferencesDtoTest {
         var regeneratedObject = JsonUtils.dtoObjectMapper.readValue(objectAsString, PersonPreferencesDto.class);
         assertThat(personPreferences, is(equalTo(regeneratedObject)));
         var regeneratedDao = personPreferences.toDao();
-        assertThat(personPreferencesDao.withId(), is(equalTo(regeneratedDao.withId())));
+        assertThat(personPreferencesDao.personId(), is(equalTo(regeneratedDao.personId())));
         assertThat(personPreferencesDao.promotedPublications(), is(equalTo(regeneratedDao.promotedPublications())));
     }
 
@@ -55,7 +55,7 @@ public class PersonPreferencesDtoTest {
     private PersonPreferencesDao randomPersonPreferencesDao() {
         var lostInstant = randomInstant();
         return PersonPreferencesDao.builder()
-                .withId(randomUri())
+                .personId(randomUri())
                 .promotedPublications(List.of(randomUri()))
                 .created(lostInstant)
                 .modified(lostInstant)

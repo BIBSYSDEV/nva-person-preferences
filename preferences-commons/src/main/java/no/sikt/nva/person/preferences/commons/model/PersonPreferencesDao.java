@@ -14,7 +14,7 @@ import static java.util.Objects.isNull;
 
 @DynamoDbImmutable(builder = PersonPreferencesDao.Builder.class)
 public record PersonPreferencesDao(
-        @DynamoDbPartitionKey URI withId,
+        @DynamoDbPartitionKey URI personId,
         @DynamoDbSortKey String withType,
         Instant created,
         Instant modified,
@@ -41,6 +41,7 @@ public record PersonPreferencesDao(
         return new PersonPreferencesDto.Builder().fromDao(this);
     }
 
+
     @DynamoDbIgnore
     @Override
     public PersonPreferencesDao upsert(DataAccessService<PersonPreferencesDao> service) throws NotFoundException {
@@ -65,7 +66,7 @@ public record PersonPreferencesDao(
         private Builder() {
         }
 
-        public Builder withId(URI withId) {
+        public Builder personId(URI withId) {
             this.id = withId;
             return this;
         }

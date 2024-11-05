@@ -11,15 +11,15 @@ import java.time.Instant;
 
 import static java.util.Objects.isNull;
 
-@DynamoDbImmutable(builder = LicenseInfoDao.Builder.class)
-public record LicenseInfoDao(
-        @DynamoDbPartitionKey URI withId,
+@DynamoDbImmutable(builder = TermsConditionsDao.Builder.class)
+public record TermsConditionsDao(
+        @DynamoDbPartitionKey URI personId,
         @DynamoDbSortKey String withType,
         Instant created,
         Instant modified,
-        URI licenseUri) implements DataAccessClass<LicenseInfoDao> {
+        URI licenseUri) implements DataAccessClass<TermsConditionsDao> {
 
-    private LicenseInfoDao(Builder builder) {
+    private TermsConditionsDao(Builder builder) {
         this(
                 builder.id,
                 builder.type,
@@ -34,25 +34,25 @@ public record LicenseInfoDao(
     }
 
     @DynamoDbIgnore
-    public LicenseInfoDto toDto() {
-        return new LicenseInfoDto.Builder().fromDao(this);
+    public TermsConditionsDto toDto() {
+        return new TermsConditionsDto.Builder().fromDao(this);
     }
 
     @DynamoDbIgnore
     @Override
-    public LicenseInfoDao upsert(DataAccessService<LicenseInfoDao> service) throws NotFoundException {
+    public TermsConditionsDao upsert(DataAccessService<TermsConditionsDao> service) throws NotFoundException {
         service.persist(this);
         return fetch(service);
     }
 
     @DynamoDbIgnore
     @Override
-    public LicenseInfoDao fetch(DataAccessService<LicenseInfoDao> service) throws NotFoundException {
+    public TermsConditionsDao fetch(DataAccessService<TermsConditionsDao> service) throws NotFoundException {
         return service.fetch(this);
     }
 
     public static class Builder {
-        public static final String TERMS_OF_USE = "TermsOfUse";
+        public static final String TERMS_OF_USE = "TermsConditions";
         private URI id;
         private String type;
         private URI termsUri;
@@ -62,7 +62,7 @@ public record LicenseInfoDao(
         private Builder() {
         }
 
-        public Builder withId(URI withId) {
+        public Builder personId(URI withId) {
             this.id = withId;
             return this;
         }
@@ -87,7 +87,7 @@ public record LicenseInfoDao(
             return this;
         }
 
-        public LicenseInfoDao build() {
+        public TermsConditionsDao build() {
             if (isNull(modifiedInstant)) {
                 modified(Instant.now());
             }
@@ -97,7 +97,7 @@ public record LicenseInfoDao(
             if (isNull(type)) {
                 withType(TERMS_OF_USE);
             }
-            return new LicenseInfoDao(this);
+            return new TermsConditionsDao(this);
         }
     }
 

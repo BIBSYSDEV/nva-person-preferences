@@ -81,7 +81,7 @@ public class UpsertPersonPreferencesDtoHandlerTest extends LocalPreferencesTestD
 
         var updatePersonPreferences = new PersonPreferencesDto.Builder()
                 .withPromotedPublications(List.of())
-                .withPersonId(existingPersonPreferences.withId())
+                .withPersonId(existingPersonPreferences.personId())
                 .build();
 
         handler.handleRequest(createRequest(updatePersonPreferences), output, CONTEXT);
