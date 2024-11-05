@@ -12,6 +12,7 @@ import software.amazon.awssdk.enhanced.dynamodb.model.TransactWriteItemsEnhanced
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 
 import java.util.Optional;
+import java.util.stream.Stream;
 
 public class IndexService<T extends DataAccessClass<T>> implements DataAccessService<T> {
     private final DynamoDbTable<T> table;
@@ -37,11 +38,11 @@ public class IndexService<T extends DataAccessClass<T>> implements DataAccessSer
     @SafeVarargs
     @Override
     public final void transactionalPersist(T... items) {
-        var transBuilder   =
+        var transBuilder =
                 TransactWriteItemsEnhancedRequest.builder();
-        for (T item : items) {
-            transBuilder.addPutItem(table, item);
-        }
+        Stream.ofNullable(items)
+                .flatMap(Stream::of)
+                .forEach(item -> transBuilder.addPutItem(table, item));
         enhancedClient.transactWriteItems(transBuilder.build());
 
     }

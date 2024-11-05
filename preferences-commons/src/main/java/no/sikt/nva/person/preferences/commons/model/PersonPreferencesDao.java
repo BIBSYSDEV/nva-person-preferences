@@ -10,6 +10,8 @@ import java.net.URI;
 import java.time.Instant;
 import java.util.List;
 
+import static java.util.Objects.isNull;
+
 @DynamoDbImmutable(builder = PersonPreferencesDao.Builder.class)
 public record PersonPreferencesDao(
         @DynamoDbPartitionKey URI withId,
@@ -89,15 +91,13 @@ public record PersonPreferencesDao(
         }
 
         public PersonPreferencesDao build() {
-            if (modifiedInstant == null) {
+            if (isNull(modifiedInstant)) {
                 modified(Instant.now());
             }
-
-            if (createdInstant == null) {
+            if (isNull(createdInstant)) {
                 created(modifiedInstant);
             }
-
-            if (type == null) {
+            if (isNull(type)) {
                 withType(PROMOTED_PUBLICATIONS);
             }
             return new PersonPreferencesDao(this);

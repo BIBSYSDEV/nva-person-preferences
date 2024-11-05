@@ -9,6 +9,8 @@ import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSortK
 import java.net.URI;
 import java.time.Instant;
 
+import static java.util.Objects.isNull;
+
 @DynamoDbImmutable(builder = LicenseInfoDao.Builder.class)
 public record LicenseInfoDao(
         @DynamoDbPartitionKey URI withId,
@@ -17,7 +19,7 @@ public record LicenseInfoDao(
         Instant modified,
         URI licenseUri) implements DataAccessClass<LicenseInfoDao> {
 
-    public LicenseInfoDao(Builder builder) {
+    private LicenseInfoDao(Builder builder) {
         this(
                 builder.id,
                 builder.type,
@@ -86,14 +88,13 @@ public record LicenseInfoDao(
         }
 
         public LicenseInfoDao build() {
-            if (modifiedInstant == null) {
+            if (isNull(modifiedInstant)) {
                 modified(Instant.now());
             }
-
-            if (createdInstant == null) {
+            if (isNull(createdInstant)) {
                 created(modifiedInstant);
             }
-            if (type == null) {
+            if (isNull(type)) {
                 withType(TERMS_OF_USE);
             }
             return new LicenseInfoDao(this);

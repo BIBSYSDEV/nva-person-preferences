@@ -8,6 +8,7 @@ import no.sikt.nva.person.preferences.test.support.DynamoDbTestClientProvider;
 import nva.commons.apigateway.exceptions.NotFoundException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import software.amazon.awssdk.awscore.exception.AwsServiceException;
 
 import java.util.List;
 
@@ -75,6 +76,15 @@ public class IndexServiceTest {
         var fetched = pref2
                 .fetch(personPreferenceService);
         assertThat(fetched, is(equalTo(pref2)));
+    }
+
+
+    @Test
+    void shouldTransactionalPersistEmptyPreferences() {
+        assertThrows(AwsServiceException.class,
+                ()-> personPreferenceService.transactionalPersist());
+        assertThrows(AwsServiceException.class,
+                ()-> personPreferenceService.transactionalPersist(null));
     }
 
     @Test
