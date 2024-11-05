@@ -8,6 +8,6 @@ public final class PersonPreferencesRestHandlersTestConfig {
     public static final ObjectMapper restApiMapper = JsonUtils.dtoObjectMapper;
 
     private PersonPreferencesRestHandlersTestConfig() {
-    
+
     }
 }

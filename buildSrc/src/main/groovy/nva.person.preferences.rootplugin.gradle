@@ -1,4 +1,4 @@
-plugins{
+plugins {
     id 'jacoco-report-aggregation'
     id 'base'
     id 'java-library'
