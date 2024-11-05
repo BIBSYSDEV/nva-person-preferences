@@ -3,7 +3,7 @@ package no.sikt.nva.person.termsconditions.rest;
 import com.amazonaws.services.lambda.runtime.Context;
 import no.sikt.nva.person.preferences.commons.model.TermsConditionsDto;
 import no.sikt.nva.person.preferences.commons.model.TermsConditionsDao;
-import no.sikt.nva.person.preferences.commons.service.IndexService;
+import no.sikt.nva.person.preferences.commons.service.DynamoCrudService;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
@@ -17,16 +17,16 @@ import static no.sikt.nva.person.Constants.getCristinId;
 
 public class FetchTermsConditionsHandler extends ApiGatewayHandler<Void, TermsConditionsDto> {
 
-    private final IndexService<TermsConditionsDao> indexService;
+    private final DynamoCrudService<TermsConditionsDao> crudTermsConditionsService;
 
     @JacocoGenerated
     public FetchTermsConditionsHandler() {
-        this(new IndexService<>(TABLE_NAME, TermsConditionsDao.class));
+        this(new DynamoCrudService<>(TABLE_NAME, TermsConditionsDao.class));
     }
 
-    public FetchTermsConditionsHandler(IndexService<TermsConditionsDao> daoIndexService) {
+    public FetchTermsConditionsHandler(DynamoCrudService<TermsConditionsDao> termsConditionsService) {
         super(Void.class);
-        this.indexService = daoIndexService;
+        this.crudTermsConditionsService = termsConditionsService;
     }
 
     @Override
@@ -41,7 +41,7 @@ public class FetchTermsConditionsHandler extends ApiGatewayHandler<Void, TermsCo
         return TermsConditionsDao.builder()
                 .personId(getCristinId(requestInfo))
                 .build()
-                .fetch(indexService)
+                .fetch(crudTermsConditionsService)
                 .toDto();
     }
 

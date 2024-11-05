@@ -4,7 +4,7 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import no.sikt.nva.person.preferences.commons.model.TermsConditionsDao;
 import no.sikt.nva.person.preferences.commons.model.TermsConditionsDto;
-import no.sikt.nva.person.preferences.commons.service.IndexService;
+import no.sikt.nva.person.preferences.commons.service.DynamoCrudService;
 import no.sikt.nva.person.preferences.test.support.LocalPreferencesTestDatabase;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
@@ -36,14 +36,14 @@ class FetchTermsConditionsDtoHandlerTest extends LocalPreferencesTestDatabase {
     public static final String TABLE_NAME = "nonExistentTableName";
     private static final Context CONTEXT = mock(Context.class);
     private ByteArrayOutputStream output;
-    private IndexService<TermsConditionsDao> personPreferencesService;
+    private DynamoCrudService<TermsConditionsDao> personPreferencesService;
     private FetchTermsConditionsHandler handler;
 
     @BeforeEach
     public void init() {
         super.init(TABLE_NAME);
         output = new ByteArrayOutputStream();
-        personPreferencesService = new IndexService<>(client, TABLE_NAME, TermsConditionsDao.class);
+        personPreferencesService = new DynamoCrudService<>(client, TABLE_NAME, TermsConditionsDao.class);
         handler = new FetchTermsConditionsHandler(personPreferencesService);
     }
 
@@ -71,7 +71,6 @@ class FetchTermsConditionsDtoHandlerTest extends LocalPreferencesTestDatabase {
 
     private InputStream createRequest(URI identifier) throws JsonProcessingException {
         var pathParameters = Map.of(CRISTIN_ID, identifier.toString());
-        // var headers = Map.of(ACCEPT, ContentType.APPLICATION_JSON.getMimeType());
         return new HandlerRequestBuilder<TermsConditionsDto>(dtoObjectMapper)
                 .withUserName(randomString())
                 .withPersonCristinId(identifier)

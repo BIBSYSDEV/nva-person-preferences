@@ -3,7 +3,7 @@ package no.sikt.nva.person.preferences.rest;
 import com.amazonaws.services.lambda.runtime.Context;
 import no.sikt.nva.person.preferences.commons.model.PersonPreferencesDao;
 import no.sikt.nva.person.preferences.commons.model.PersonPreferencesDto;
-import no.sikt.nva.person.preferences.commons.service.IndexService;
+import no.sikt.nva.person.preferences.commons.service.DynamoCrudService;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
@@ -18,16 +18,16 @@ import static no.sikt.nva.person.Constants.dontMatchCustomerAndPerson;
 
 public class UpsertPersonPreferencesHandler extends ApiGatewayHandler<PreferencesRequest, PersonPreferencesDto> {
 
-    private final IndexService<PersonPreferencesDao> personPreferencesService;
+    private final DynamoCrudService<PersonPreferencesDao> crudPreferenceService;
 
     @JacocoGenerated
     public UpsertPersonPreferencesHandler() {
-        this(new IndexService<>( TABLE_NAME, PersonPreferencesDao.class));
+        this(new DynamoCrudService<>( TABLE_NAME, PersonPreferencesDao.class));
     }
 
-    public UpsertPersonPreferencesHandler(IndexService<PersonPreferencesDao> personPreferencesService) {
+    public UpsertPersonPreferencesHandler(DynamoCrudService<PersonPreferencesDao> preferenceService) {
         super(PreferencesRequest.class);
-        this.personPreferencesService = personPreferencesService;
+        this.crudPreferenceService = preferenceService;
     }
 
     @Override
@@ -46,7 +46,7 @@ public class UpsertPersonPreferencesHandler extends ApiGatewayHandler<Preference
                 .personId(requestInfo.getPersonCristinId())
                 .promotedPublications(input.promotedPublications())
                 .build()
-                .upsert(personPreferencesService)
+                .upsert(crudPreferenceService)
                 .toDto();
     }
 

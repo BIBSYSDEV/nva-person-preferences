@@ -3,7 +3,7 @@ package no.sikt.nva.person.termsconditions.rest;
 import com.amazonaws.services.lambda.runtime.Context;
 import no.sikt.nva.person.preferences.commons.model.TermsConditionsDto;
 import no.sikt.nva.person.preferences.commons.model.TermsConditionsDao;
-import no.sikt.nva.person.preferences.commons.service.IndexService;
+import no.sikt.nva.person.preferences.commons.service.DynamoCrudService;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
@@ -17,16 +17,16 @@ import static no.sikt.nva.person.Constants.dontMatchCustomerAndPerson;
 
 public class UpsertTermsConditionsHandler extends ApiGatewayHandler<TermsConditionsDto, TermsConditionsDto> {
 
-    private final IndexService<TermsConditionsDao> dynamoDbService;
+    private final DynamoCrudService<TermsConditionsDao> crudTermsConditionsService;
 
     @JacocoGenerated
     public UpsertTermsConditionsHandler() {
-        this(new IndexService<>( TABLE_NAME, TermsConditionsDao.class));
+        this(new DynamoCrudService<>( TABLE_NAME, TermsConditionsDao.class));
     }
 
-    public UpsertTermsConditionsHandler(IndexService<TermsConditionsDao> personPreferencesService) {
+    public UpsertTermsConditionsHandler(DynamoCrudService<TermsConditionsDao> termsConditionsService) {
         super(TermsConditionsDto.class);
-        this.dynamoDbService = personPreferencesService;
+        this.crudTermsConditionsService = termsConditionsService;
     }
 
 
@@ -46,7 +46,7 @@ public class UpsertTermsConditionsHandler extends ApiGatewayHandler<TermsConditi
                 .personId(requestInfo.getPersonCristinId())
                 .termsConditionsUri(input.termsConditionsUrl())
                 .build()
-                .upsert(dynamoDbService)
+                .upsert(crudTermsConditionsService)
                 .toDto();
     }
 

@@ -14,16 +14,16 @@ import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-public class IndexService<T extends DataAccessClass<T>> implements DataAccessService<T> {
+public class DynamoCrudService<T extends DataAccessClass<T>> implements DataAccessService<T> {
     private final DynamoDbTable<T> table;
     private final DynamoDbEnhancedClient enhancedClient;
 
     @JacocoGenerated
-    public IndexService(String tableName, Class<T> tClass) {
+    public DynamoCrudService(String tableName, Class<T> tClass) {
         this(DynamoDbClient.create(), tableName, tClass);
     }
 
-    public IndexService(DynamoDbClient dynamoDbClient, String tableName, Class<T> tClass) {
+    public DynamoCrudService(DynamoDbClient dynamoDbClient, String tableName, Class<T> tClass) {
         this.enhancedClient = DynamoDbEnhancedClient.builder()
                 .dynamoDbClient(dynamoDbClient)
                 .build();
@@ -58,7 +58,6 @@ public class IndexService<T extends DataAccessClass<T>> implements DataAccessSer
         Key key = Key.builder().partitionValue(item.personId().toString()).sortValue(item.withType()).build();
         return Optional.ofNullable(table.getItem(r -> r.key(key)))
                 .orElseThrow(() -> new NotFoundException(RESOURCE_NOT_FOUND_MESSAGE));
-
     }
 }
 

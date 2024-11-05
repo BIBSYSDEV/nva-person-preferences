@@ -2,7 +2,7 @@ package no.sikt.nva.person.preferences.service;
 
 import no.sikt.nva.person.preferences.commons.model.TermsConditionsDao;
 import no.sikt.nva.person.preferences.commons.model.PersonPreferencesDao;
-import no.sikt.nva.person.preferences.commons.service.IndexService;
+import no.sikt.nva.person.preferences.commons.service.DynamoCrudService;
 import no.sikt.nva.person.preferences.test.support.DynamoDbTableCreator;
 import no.sikt.nva.person.preferences.test.support.DynamoDbTestClientProvider;
 import nva.commons.apigateway.exceptions.NotFoundException;
@@ -21,11 +21,11 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class IndexServiceTest {
+public class DynamoCrudServiceTest {
 
     public static final String TABLE_NAME = "nonExistentTableName";
-    private static IndexService<TermsConditionsDao> termsConditionsService;
-    private static IndexService<PersonPreferencesDao> personPreferenceService;
+    private static DynamoCrudService<TermsConditionsDao> termsConditionsService;
+    private static DynamoCrudService<PersonPreferencesDao> personPreferenceService;
 
 
     @BeforeAll
@@ -35,8 +35,8 @@ public class IndexServiceTest {
         new DynamoDbTableCreator(client)
                 .createTable(TABLE_NAME);
 
-        termsConditionsService = new IndexService<>(client, TABLE_NAME, TermsConditionsDao.class);
-        personPreferenceService = new IndexService<>(client, TABLE_NAME, PersonPreferencesDao.class);
+        termsConditionsService = new DynamoCrudService<>(client, TABLE_NAME, TermsConditionsDao.class);
+        personPreferenceService = new DynamoCrudService<>(client, TABLE_NAME, PersonPreferencesDao.class);
     }
 
     @Test

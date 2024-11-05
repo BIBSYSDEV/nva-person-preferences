@@ -4,7 +4,7 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import no.sikt.nva.person.preferences.commons.model.PersonPreferencesDao;
 import no.sikt.nva.person.preferences.commons.model.PersonPreferencesDto;
-import no.sikt.nva.person.preferences.commons.service.IndexService;
+import no.sikt.nva.person.preferences.commons.service.DynamoCrudService;
 import no.sikt.nva.person.preferences.test.support.LocalPreferencesTestDatabase;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
@@ -34,14 +34,14 @@ public class UpsertPersonPreferencesDtoHandlerTest extends LocalPreferencesTestD
     public static final String TABLE_NAME = "nonExistentTableName";
     private static final Context CONTEXT = mock(Context.class);
     private ByteArrayOutputStream output;
-    private IndexService<PersonPreferencesDao> personPreferencesService;
+    private DynamoCrudService<PersonPreferencesDao> personPreferencesService;
     private UpsertPersonPreferencesHandler handler;
 
     @BeforeEach
     public void init() {
         super.init(TABLE_NAME);
         output = new ByteArrayOutputStream();
-        personPreferencesService = new IndexService<>(client,  TABLE_NAME, PersonPreferencesDao.class);
+        personPreferencesService = new DynamoCrudService<>(client,  TABLE_NAME, PersonPreferencesDao.class);
         handler = new UpsertPersonPreferencesHandler(personPreferencesService);
     }
 
