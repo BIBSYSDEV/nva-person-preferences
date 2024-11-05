@@ -1,23 +1,7 @@
 package no.sikt.nva.person.preferences.rest;
 
-import static java.net.HttpURLConnection.HTTP_NOT_FOUND;
-import static no.sikt.nva.person.preferences.commons.service.PersonPreferencesService.RESOURCE_NOT_FOUND_MESSAGE;
-import static no.sikt.nva.person.preferences.rest.PersonPreferencesRestHandlersTestConfig.restApiMapper;
-import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
-import static org.apache.http.HttpHeaders.ACCEPT;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.mock;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.util.List;
-import java.util.Map;
 import no.sikt.nva.person.preferences.commons.model.PersonPreferences;
 import no.sikt.nva.person.preferences.commons.service.PersonPreferencesService;
 import no.sikt.nva.person.preferences.test.support.LocalPreferencesTestDatabase;
@@ -28,6 +12,24 @@ import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.zalando.problem.Problem;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.util.List;
+import java.util.Map;
+
+import static java.net.HttpURLConnection.HTTP_NOT_FOUND;
+import static no.sikt.nva.person.preferences.commons.service.PersonPreferencesService.RESOURCE_NOT_FOUND_MESSAGE;
+import static no.sikt.nva.person.preferences.rest.PersonPreferencesRestHandlersTestConfig.restApiMapper;
+import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
+import static org.apache.http.HttpHeaders.ACCEPT;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.mock;
 
 class FetchPersonPreferencesHandlerTest extends LocalPreferencesTestDatabase {
 
@@ -55,7 +57,7 @@ class FetchPersonPreferencesHandlerTest extends LocalPreferencesTestDatabase {
         var response = GatewayResponse.fromOutputStream(output, PersonPreferences.class);
 
         assertThat(personPreferencesService.fetchPreferences(personPreferences),
-                   is(equalTo(response.getBodyObject(PersonPreferences.class))));
+                is(equalTo(response.getBodyObject(PersonPreferences.class))));
     }
 
     @Test
@@ -71,17 +73,17 @@ class FetchPersonPreferencesHandlerTest extends LocalPreferencesTestDatabase {
 
     private PersonPreferences profileWithCristinIdentifier(URI cristinIdentifier) {
         return new PersonPreferences.Builder(personPreferencesService)
-            .withPersonId(cristinIdentifier)
-            .withPromotedPublications(List.of(randomUri(), randomUri()))
-            .build();
+                .withPersonId(cristinIdentifier)
+                .withPromotedPublications(List.of(randomUri(), randomUri()))
+                .build();
     }
 
     private InputStream createRequest(URI identifier) throws JsonProcessingException {
         var pathParameters = Map.of(CRISTIN_ID, identifier.toString());
         var headers = Map.of(ACCEPT, ContentType.APPLICATION_JSON.getMimeType());
         return new HandlerRequestBuilder<InputStream>(restApiMapper)
-            .withHeaders(headers)
-            .withPathParameters(pathParameters)
-            .build();
+                .withHeaders(headers)
+                .withPathParameters(pathParameters)
+                .build();
     }
 }

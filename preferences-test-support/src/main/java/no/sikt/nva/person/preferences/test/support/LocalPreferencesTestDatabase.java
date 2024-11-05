@@ -1,6 +1,5 @@
 package no.sikt.nva.person.preferences.test.support;
 
-import static no.sikt.nva.person.preferences.storage.PersonPreferencesTransactionConstants.PRIMARY_PARTITION_KEY;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.local.embedded.DynamoDBEmbedded;
 import com.amazonaws.services.dynamodbv2.model.AttributeDefinition;
@@ -9,10 +8,13 @@ import com.amazonaws.services.dynamodbv2.model.CreateTableRequest;
 import com.amazonaws.services.dynamodbv2.model.KeySchemaElement;
 import com.amazonaws.services.dynamodbv2.model.KeyType;
 import com.amazonaws.services.dynamodbv2.model.ScalarAttributeType;
+import org.junit.jupiter.api.AfterEach;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import org.junit.jupiter.api.AfterEach;
+
+import static no.sikt.nva.person.preferences.storage.PersonPreferencesTransactionConstants.PRIMARY_PARTITION_KEY;
 
 public class LocalPreferencesTestDatabase {
 
@@ -31,10 +33,10 @@ public class LocalPreferencesTestDatabase {
 
     private CreateTableRequest createTableRequest(String tableName) {
         return new CreateTableRequest()
-                   .withTableName(tableName)
-                   .withAttributeDefinitions(attributeDefinitions())
-                   .withKeySchema(primaryKeySchema())
-                   .withBillingMode(BillingMode.PAY_PER_REQUEST);
+                .withTableName(tableName)
+                .withAttributeDefinitions(attributeDefinitions())
+                .withKeySchema(primaryKeySchema())
+                .withBillingMode(BillingMode.PAY_PER_REQUEST);
     }
 
     private AttributeDefinition[] attributeDefinitions() {
@@ -55,13 +57,13 @@ public class LocalPreferencesTestDatabase {
 
     private KeySchemaElement newKeyElement() {
         return new KeySchemaElement()
-                   .withAttributeName(PRIMARY_PARTITION_KEY)
-                   .withKeyType(KeyType.HASH);
+                .withAttributeName(PRIMARY_PARTITION_KEY)
+                .withKeyType(KeyType.HASH);
     }
 
     private AttributeDefinition newAttribute() {
         return new AttributeDefinition()
-                   .withAttributeName(PRIMARY_PARTITION_KEY)
-                   .withAttributeType(ScalarAttributeType.S);
+                .withAttributeName(PRIMARY_PARTITION_KEY)
+                .withAttributeType(ScalarAttributeType.S);
     }
 }

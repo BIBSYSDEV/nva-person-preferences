@@ -1,21 +1,7 @@
 package no.sikt.nva.person.preferences.rest;
 
-import static no.unit.nva.commons.json.JsonUtils.dtoObjectMapper;
-import static no.unit.nva.testutils.RandomDataGenerator.randomString;
-import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.mock;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URI;
-import java.util.List;
-import java.util.Map;
 import no.sikt.nva.person.preferences.commons.model.PersonPreferences;
 import no.sikt.nva.person.preferences.commons.service.PersonPreferencesService;
 import no.sikt.nva.person.preferences.test.support.LocalPreferencesTestDatabase;
@@ -25,6 +11,22 @@ import nva.commons.apigateway.exceptions.NotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.zalando.problem.Problem;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.util.List;
+import java.util.Map;
+
+import static no.unit.nva.commons.json.JsonUtils.dtoObjectMapper;
+import static no.unit.nva.testutils.RandomDataGenerator.randomString;
+import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.mock;
 
 public class UpsertPersonPreferencesHandlerTest extends LocalPreferencesTestDatabase {
 
@@ -46,24 +48,24 @@ public class UpsertPersonPreferencesHandlerTest extends LocalPreferencesTestData
     void shouldCreatePersonPreferencesWhenDoesNotExist() throws IOException, NotFoundException {
         var existingPersonPreferences = profileWithCristinIdentifier(randomUri());
         var updatePersonPreferences = existingPersonPreferences.copy()
-                                          .withPromotedPublications(List.of())
-                                          .build();
+                .withPromotedPublications(List.of())
+                .build();
         handler.handleRequest(createRequest(updatePersonPreferences), output, CONTEXT);
 
         assertThat(personPreferencesService.fetchPreferences(existingPersonPreferences).personId(),
-                   is(equalTo(updatePersonPreferences.personId())));
+                is(equalTo(updatePersonPreferences.personId())));
     }
 
     @Test
     void shouldUpdatePersonPreferencesWhenExist() throws IOException, NotFoundException {
         var existingPersonPreferences = profileWithCristinIdentifier(randomUri()).upsert();
         var updatePersonPreferences = existingPersonPreferences.copy()
-                                          .withPromotedPublications(List.of())
-                                          .build();
+                .withPromotedPublications(List.of())
+                .build();
         handler.handleRequest(createRequest(updatePersonPreferences), output, CONTEXT);
 
         assertThat(personPreferencesService.fetchPreferences(existingPersonPreferences).personId(),
-                   is(equalTo(updatePersonPreferences.personId())));
+                is(equalTo(updatePersonPreferences.personId())));
     }
 
     @Test
@@ -86,38 +88,38 @@ public class UpsertPersonPreferencesHandlerTest extends LocalPreferencesTestData
 
     private InputStream createUnauthorizedRequest(PersonPreferences personPreferences) throws JsonProcessingException {
         return new HandlerRequestBuilder<PersonPreferences>(dtoObjectMapper)
-                   .withUserName(randomString())
-                   .withBody(personPreferences)
-                   .build();
+                .withUserName(randomString())
+                .withBody(personPreferences)
+                .build();
     }
 
     private InputStream createRequestWithNotMatchingCristinIds(PersonPreferences personPreferences)
-        throws JsonProcessingException {
+            throws JsonProcessingException {
         return new HandlerRequestBuilder<PersonPreferences>(dtoObjectMapper)
-                   .withUserName(randomString())
-                   .withCurrentCustomer(randomUri())
-                   .withPersonCristinId(personPreferences.personId())
-                   .withCurrentCustomer(randomUri())
-                   .withPathParameters(Map.of("cristinId", randomString()))
-                   .withBody(personPreferences)
-                   .build();
+                .withUserName(randomString())
+                .withCurrentCustomer(randomUri())
+                .withPersonCristinId(personPreferences.personId())
+                .withCurrentCustomer(randomUri())
+                .withPathParameters(Map.of("cristinId", randomString()))
+                .withBody(personPreferences)
+                .build();
     }
 
     private InputStream createRequest(PersonPreferences personPreferences) throws JsonProcessingException {
         return new HandlerRequestBuilder<PersonPreferences>(dtoObjectMapper)
-                   .withUserName(randomString())
-                   .withCurrentCustomer(randomUri())
-                   .withPersonCristinId(personPreferences.personId())
-                   .withCurrentCustomer(randomUri())
-                   .withPathParameters(Map.of("cristinId", personPreferences.personId().toString()))
-                   .withBody(personPreferences)
-                   .build();
+                .withUserName(randomString())
+                .withCurrentCustomer(randomUri())
+                .withPersonCristinId(personPreferences.personId())
+                .withCurrentCustomer(randomUri())
+                .withPathParameters(Map.of("cristinId", personPreferences.personId().toString()))
+                .withBody(personPreferences)
+                .build();
     }
 
     private PersonPreferences profileWithCristinIdentifier(URI cristinIdentifier) {
         return new PersonPreferences.Builder(personPreferencesService)
-                   .withPersonId(cristinIdentifier)
-                   .withPromotedPublications(List.of(randomUri(), randomUri()))
-                   .build();
+                .withPersonId(cristinIdentifier)
+                .withPromotedPublications(List.of(randomUri(), randomUri()))
+                .build();
     }
 }
