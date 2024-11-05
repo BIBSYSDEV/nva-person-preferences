@@ -1,14 +1,16 @@
 package no.sikt.nva.person.preferences.commons.model;
 
-import static nva.commons.core.attempt.Try.attempt;
 import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.document.ItemUtils;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
+import no.unit.nva.commons.json.JsonUtils;
+
 import java.net.URI;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
-import no.unit.nva.commons.json.JsonUtils;
+
+import static nva.commons.core.attempt.Try.attempt;
 
 public record PersonPreferencesDao(URI personId,
                                    List<URI> promotedPublications,
@@ -17,16 +19,16 @@ public record PersonPreferencesDao(URI personId,
 
     public Map<String, AttributeValue> toDynamoFormat() {
         var item = attempt(() -> Item.fromJSON(
-            JsonUtils.dynamoObjectMapper.writeValueAsString(this))).orElseThrow();
+                JsonUtils.dynamoObjectMapper.writeValueAsString(this))).orElseThrow();
         return ItemUtils.toAttributeValues(item);
     }
 
     public PersonPreferencesDao.Builder copy() {
         return new PersonPreferencesDao.Builder()
-                   .withPersonId(this.personId)
-                   .withPromotedPublications(this.promotedPublications)
-                   .withCreatedDate(this.created)
-                   .withModifiedDate(this.modified);
+                .withPersonId(this.personId)
+                .withPromotedPublications(this.promotedPublications)
+                .withCreatedDate(this.created)
+                .withModifiedDate(this.modified);
     }
 
     public static class Builder {
@@ -58,8 +60,8 @@ public record PersonPreferencesDao(URI personId,
 
         public PersonPreferencesDao fromDynamoFormat(Map<String, AttributeValue> map) {
             return attempt(() -> JsonUtils.dynamoObjectMapper.readValue(ItemUtils.toItem(map).toJSON(),
-                                                                        PersonPreferencesDao.class))
-                       .orElseThrow();
+                    PersonPreferencesDao.class))
+                    .orElseThrow();
         }
 
         public PersonPreferencesDao build() {

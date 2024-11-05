@@ -1,18 +1,20 @@
 package no.sikt.nva.person.preferences.service;
 
-import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.emptyIterable;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import java.util.List;
 import no.sikt.nva.person.preferences.commons.model.PersonPreferences;
 import no.sikt.nva.person.preferences.commons.service.PersonPreferencesService;
 import no.sikt.nva.person.preferences.test.support.LocalPreferencesTestDatabase;
 import nva.commons.apigateway.exceptions.NotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
+
+import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.emptyIterable;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class PersonPreferencesServiceTest extends LocalPreferencesTestDatabase {
 
@@ -28,12 +30,12 @@ public class PersonPreferencesServiceTest extends LocalPreferencesTestDatabase {
     @Test
     void shouldPersistUserPreferences() throws NotFoundException {
         var personPreferences = new PersonPreferences.Builder(preferencesService)
-            .withPersonId(randomUri())
-            .withPromotedPublications(List.of(randomUri()))
-            .build()
-            .upsert();
+                .withPersonId(randomUri())
+                .withPromotedPublications(List.of(randomUri()))
+                .build()
+                .upsert();
         var persistedpersonPreferences = preferencesService
-            .fetchPreferences(personPreferences);
+                .fetchPreferences(personPreferences);
         assertThat(persistedpersonPreferences, is(equalTo(personPreferences)));
     }
 
@@ -41,10 +43,10 @@ public class PersonPreferencesServiceTest extends LocalPreferencesTestDatabase {
     void shouldUpdateExistingUserPreferences() throws NotFoundException {
         var userIdentifier = randomUri();
         var personPreferences = new PersonPreferences.Builder(preferencesService)
-            .withPersonId(userIdentifier)
-            .withPromotedPublications(List.of(randomUri()))
-            .build()
-            .upsert();
+                .withPersonId(userIdentifier)
+                .withPromotedPublications(List.of(randomUri()))
+                .build()
+                .upsert();
 
         new PersonPreferences(userIdentifier, List.of(), preferencesService).upsert();
 
@@ -56,10 +58,10 @@ public class PersonPreferencesServiceTest extends LocalPreferencesTestDatabase {
     void shouldFetchUserPreferences() throws nva.commons.apigateway.exceptions.NotFoundException {
         var userIdentifier = randomUri();
         var personPreferences = new PersonPreferences.Builder(preferencesService)
-            .withPersonId(userIdentifier)
-            .withPromotedPublications(List.of(randomUri()))
-            .build()
-            .upsert();
+                .withPersonId(userIdentifier)
+                .withPromotedPublications(List.of(randomUri()))
+                .build()
+                .upsert();
 
         new PersonPreferences(userIdentifier, List.of(), preferencesService).fetch();
         var persistedpersonPreferences = preferencesService.fetchPreferences(personPreferences);
@@ -69,10 +71,10 @@ public class PersonPreferencesServiceTest extends LocalPreferencesTestDatabase {
     @Test
     void shouldThrowExceptionWhenFetchingNonExistentPersonPreferences() {
         var personPreferences = new PersonPreferences.Builder()
-            .withPersonId(randomUri())
-            .withPromotedPublications(List.of(randomUri()))
-            .build();
+                .withPersonId(randomUri())
+                .withPromotedPublications(List.of(randomUri()))
+                .build();
         assertThrows(NotFoundException.class,
-                     () -> preferencesService.fetchPreferences(personPreferences));
+                () -> preferencesService.fetchPreferences(personPreferences));
     }
 }
