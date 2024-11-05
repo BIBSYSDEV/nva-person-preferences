@@ -44,7 +44,7 @@ public class UpsertTermsConditionsHandler extends ApiGatewayHandler<TermsConditi
             throws ApiGatewayException {
         return TermsConditionsDao.builder()
                 .personId(requestInfo.getPersonCristinId())
-                .licenseUri(input.licenseUri())
+                .termsConditionsUri(input.termsConditionsUrl())
                 .build()
                 .upsert(dynamoDbService)
                 .toDto();

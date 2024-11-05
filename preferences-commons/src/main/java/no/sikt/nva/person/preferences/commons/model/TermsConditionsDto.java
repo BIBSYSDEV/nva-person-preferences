@@ -10,7 +10,7 @@ import java.time.Instant;
 public record TermsConditionsDto(
         URI personId,
         Instant signed,
-        URI licenseUri) {
+        URI termsConditionsUrl) {
 
     public static class Builder {
         private URI personId;
@@ -24,7 +24,7 @@ public record TermsConditionsDto(
             return new TermsConditionsDto.Builder()
                     .withPersonId(dao.personId())
                     .withLicenseSignedDate(dao.modified())
-                    .withLicenseUri(dao.licenseUri())
+                    .withLicenseUri(dao.termsConditionsUri())
                     .build();
         }
 
@@ -38,8 +38,8 @@ public record TermsConditionsDto(
             return this;
         }
 
-        public Builder withLicenseUri(URI licenseUri) {
-            this.licenseUri = licenseUri;
+        public Builder withLicenseUri(URI termsConditionsUrl) {
+            this.licenseUri = termsConditionsUrl;
             return this;
         }
 

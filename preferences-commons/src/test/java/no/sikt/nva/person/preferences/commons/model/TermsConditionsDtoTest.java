@@ -54,7 +54,7 @@ public class TermsConditionsDtoTest {
                 .created(lostInstant)
                 .modified(lostInstant)
                 .withType(randomString())
-                .licenseUri(randomUri())
+                .termsConditionsUri(randomUri())
                 .build();
     }
 }

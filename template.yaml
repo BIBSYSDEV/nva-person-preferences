@@ -224,7 +224,7 @@ Resources:
         GetEvent:
           Type: Api
           Properties:
-            Path: /{cristinId+}
+            Path: /users-roles/users/mine/accepted-terms
             Method: put
             RestApiId: !Ref PersonPreferencesApi
 
@@ -247,6 +247,6 @@ Resources:
         GetEvent:
           Type: Api
           Properties:
-            Path: /{cristinId+}
+            Path: /users-roles/users/mine/accepted-terms
             Method: get
             RestApiId: !Ref PersonPreferencesApi

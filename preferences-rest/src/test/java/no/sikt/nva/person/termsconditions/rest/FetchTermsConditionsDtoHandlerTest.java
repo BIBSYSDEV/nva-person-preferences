@@ -65,7 +65,7 @@ class FetchTermsConditionsDtoHandlerTest extends LocalPreferencesTestDatabase {
     private TermsConditionsDao profileWithCristinIdentifier(URI cristinIdentifier) {
         return TermsConditionsDao.builder()
                 .personId(cristinIdentifier)
-                .licenseUri(randomUri())
+                .termsConditionsUri(randomUri())
                 .build();
     }
 

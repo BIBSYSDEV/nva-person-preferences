@@ -17,7 +17,7 @@ public record TermsConditionsDao(
         @DynamoDbSortKey String withType,
         Instant created,
         Instant modified,
-        URI licenseUri) implements DataAccessClass<TermsConditionsDao> {
+        URI termsConditionsUri) implements DataAccessClass<TermsConditionsDao> {
 
     private TermsConditionsDao(Builder builder) {
         this(
@@ -72,7 +72,7 @@ public record TermsConditionsDao(
             return this;
         }
 
-        public Builder licenseUri(URI licenseUri) {
+        public Builder termsConditionsUri(URI licenseUri) {
             this.termsUri = licenseUri;
             return this;
         }

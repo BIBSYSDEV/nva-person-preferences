@@ -69,7 +69,7 @@ public class UpsertTermsConditionsDtoHandlerTest extends LocalPreferencesTestDat
     private TermsConditionsDao profileWithCristinIdentifier(URI cristinIdentifier) {
         return TermsConditionsDao.builder()
                 .personId(cristinIdentifier)
-                .licenseUri(randomUri())
+                .termsConditionsUri(randomUri())
                 .build();
     }
 

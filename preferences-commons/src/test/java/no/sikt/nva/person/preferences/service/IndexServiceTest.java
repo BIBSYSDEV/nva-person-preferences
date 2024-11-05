@@ -97,7 +97,7 @@ public class IndexServiceTest {
 
         var persistedTermsConditions = TermsConditionsDao.builder()
                 .personId(persistedPreferences.personId())
-                .licenseUri(randomUri())
+                .termsConditionsUri(randomUri())
                 .build()
                 .upsert(termsConditionsService);
 
@@ -160,7 +160,7 @@ public class IndexServiceTest {
         var userIdentifier = randomUri();
         var termsConditionsDao = TermsConditionsDao.builder()
                 .personId(userIdentifier)
-                .licenseUri(randomUri())
+                .termsConditionsUri(randomUri())
                 .build()
                 .upsert(termsConditionsService);
 
@@ -212,7 +212,7 @@ public class IndexServiceTest {
         var userIdentifier = randomUri();
         var termsConditions = TermsConditionsDao.builder()
                 .personId(userIdentifier)
-                .licenseUri(randomUri())
+                .termsConditionsUri(randomUri())
                 .build()
                 .upsert(termsConditionsService);
 
