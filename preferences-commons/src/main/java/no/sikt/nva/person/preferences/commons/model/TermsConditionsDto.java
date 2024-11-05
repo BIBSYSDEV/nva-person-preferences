@@ -9,7 +9,7 @@ import java.time.Instant;
 @JsonSerialize
 public record TermsConditionsDto(
         URI personId,
-        Instant signed,
+        Instant signedDate,
         URI termsConditionsUrl) {
 
     public static class Builder {
@@ -23,8 +23,8 @@ public record TermsConditionsDto(
         public TermsConditionsDto fromDao(TermsConditionsDao dao) {
             return new TermsConditionsDto.Builder()
                     .withPersonId(dao.personId())
-                    .withLicenseSignedDate(dao.modified())
-                    .withLicenseUri(dao.termsConditionsUri())
+                    .withSignedDate(dao.modified())
+                    .withTermsConditionsUri(dao.termsConditionsUri())
                     .build();
         }
 
@@ -33,12 +33,12 @@ public record TermsConditionsDto(
             return this;
         }
 
-        public Builder withLicenseSignedDate(Instant licenseSignedDate) {
+        public Builder withSignedDate(Instant licenseSignedDate) {
             this.licenseSignedDate = licenseSignedDate;
             return this;
         }
 
-        public Builder withLicenseUri(URI termsConditionsUrl) {
+        public Builder withTermsConditionsUri(URI termsConditionsUrl) {
             this.licenseUri = termsConditionsUrl;
             return this;
         }

@@ -42,8 +42,8 @@ public class TermsConditionsDtoTest {
     private TermsConditionsDto randomLicenseInfo() {
         return new TermsConditionsDto.Builder()
                 .withPersonId(randomUri())
-                .withLicenseSignedDate(randomInstant())
-                .withLicenseUri(randomUri())
+                .withSignedDate(randomInstant())
+                .withTermsConditionsUri(randomUri())
                 .build();
     }
 
