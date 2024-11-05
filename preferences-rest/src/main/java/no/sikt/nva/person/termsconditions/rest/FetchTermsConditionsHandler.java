@@ -1,8 +1,8 @@
-package no.sikt.nva.person.preferences.rest;
+package no.sikt.nva.person.termsconditions.rest;
 
 import com.amazonaws.services.lambda.runtime.Context;
-import no.sikt.nva.person.preferences.commons.model.PersonPreferencesDao;
-import no.sikt.nva.person.preferences.commons.model.PersonPreferencesDto;
+import no.sikt.nva.person.preferences.commons.model.TermsConditionsDto;
+import no.sikt.nva.person.preferences.commons.model.TermsConditionsDao;
 import no.sikt.nva.person.preferences.commons.service.DynamoCrudService;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
@@ -14,18 +14,19 @@ import java.net.HttpURLConnection;
 import static no.sikt.nva.person.Constants.TABLE_NAME;
 import static no.sikt.nva.person.Constants.getCristinId;
 
-public class FetchPersonPreferencesHandler extends ApiGatewayHandler<Void, PersonPreferencesDto> {
 
-    private final DynamoCrudService<PersonPreferencesDao> crudPreferenceService;
+public class FetchTermsConditionsHandler extends ApiGatewayHandler<Void, TermsConditionsDto> {
+
+    private final DynamoCrudService<TermsConditionsDao> crudTermsConditionsService;
 
     @JacocoGenerated
-    public FetchPersonPreferencesHandler() {
-        this(new DynamoCrudService<>(TABLE_NAME, PersonPreferencesDao.class));
+    public FetchTermsConditionsHandler() {
+        this(new DynamoCrudService<>(TABLE_NAME, TermsConditionsDao.class));
     }
 
-    public FetchPersonPreferencesHandler(DynamoCrudService<PersonPreferencesDao> crudPreferenceService) {
+    public FetchTermsConditionsHandler(DynamoCrudService<TermsConditionsDao> termsConditionsService) {
         super(Void.class);
-        this.crudPreferenceService = crudPreferenceService;
+        this.crudTermsConditionsService = termsConditionsService;
     }
 
     @Override
@@ -34,18 +35,18 @@ public class FetchPersonPreferencesHandler extends ApiGatewayHandler<Void, Perso
     }
 
     @Override
-    protected PersonPreferencesDto processInput(Void input, RequestInfo requestInfo, Context context)
+    protected TermsConditionsDto processInput(Void input, RequestInfo requestInfo, Context context)
             throws ApiGatewayException {
 
-        return PersonPreferencesDao.builder()
+        return TermsConditionsDao.builder()
                 .personId(getCristinId(requestInfo))
                 .build()
-                .fetch(crudPreferenceService)
+                .fetch(crudTermsConditionsService)
                 .toDto();
     }
 
     @Override
-    protected Integer getSuccessStatusCode(Void input, PersonPreferencesDto output) {
+    protected Integer getSuccessStatusCode(Void input, TermsConditionsDto output) {
         return HttpURLConnection.HTTP_OK;
     }
 

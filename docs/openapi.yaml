@@ -74,6 +74,70 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Problem"
+
+  /users-roles/users/mine/accepted-terms:
+    get:
+      description: Fetches Terms & Conditions for person
+      summary: Fetches Terms & Conditions for person
+      operationId: getTermsConditions
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${FetchTermsConditionsHandler.Arn}:live/invocations
+        responses: { }
+        httpMethod: POST
+        type: AWS_PROXY
+      responses:
+        '200':
+          description: "Successfully fetched"
+        '404':
+          description: "Terms & Conditions not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+        '500':
+          description: "Internal server error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+    put:
+      description: Creates/Updates Terms & Conditions for person
+      summary: Set person Terms & Conditions
+      operationId: setTermsConditions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TermsConditions'
+      security:
+        - CognitoUserPool: [
+          'https://api.nva.unit.no/scopes/backend',
+          'https://api.nva.unit.no/scopes/frontend',
+          'aws.cognito.signin.user.admin',
+        ]
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UpsertTermsConditionsHandler.Arn}:live/invocations
+        responses: { }
+        httpMethod: POST
+        type: AWS_PROXY
+      responses:
+        '200':
+          description: "Successfully created/updated"
+        '401':
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+        '500':
+          description: "Internal server error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Problem"
 components:
   schemas:
     Preferences:
@@ -83,6 +147,15 @@ components:
         promotedPublications:
           type: array
           description: Array containing publication identifiers
+          items:
+            type: string
+    TermsConditions:
+      type: object
+      description: Object containing TermsConditions
+      properties:
+        termsConditionsUrl:
+          type: string
+          description: path to terms and conditions that user has accepted
           items:
             type: string
     Problem:

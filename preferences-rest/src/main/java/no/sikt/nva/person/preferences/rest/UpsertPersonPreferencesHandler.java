@@ -1,75 +1,58 @@
 package no.sikt.nva.person.preferences.rest;
 
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.lambda.runtime.Context;
-import no.sikt.nva.person.preferences.commons.model.PersonPreferences;
-import no.sikt.nva.person.preferences.commons.model.PersonPreferences.Builder;
-import no.sikt.nva.person.preferences.commons.service.PersonPreferencesService;
+import no.sikt.nva.person.preferences.commons.model.PersonPreferencesDao;
+import no.sikt.nva.person.preferences.commons.model.PersonPreferencesDto;
+import no.sikt.nva.person.preferences.commons.service.DynamoCrudService;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.apigateway.exceptions.UnauthorizedException;
-import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
 
 import java.net.HttpURLConnection;
-import java.net.URI;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 
-import static java.util.Objects.isNull;
+import static no.sikt.nva.person.Constants.TABLE_NAME;
+import static no.sikt.nva.person.Constants.dontMatchCustomerAndPerson;
 
-public class UpsertPersonPreferencesHandler extends ApiGatewayHandler<PreferencesRequest, PersonPreferences> {
+public class UpsertPersonPreferencesHandler extends ApiGatewayHandler<PreferencesRequest, PersonPreferencesDto> {
 
-    private static final String CRISTIN_ID = "cristinId";
-    private static final String TABLE_NAME = new Environment().readEnv("TABLE_NAME");
-    private final PersonPreferencesService personPreferencesService;
+    private final DynamoCrudService<PersonPreferencesDao> crudPreferenceService;
 
     @JacocoGenerated
     public UpsertPersonPreferencesHandler() {
-        this(new PersonPreferencesService(AmazonDynamoDBClientBuilder.defaultClient(), TABLE_NAME));
+        this(new DynamoCrudService<>( TABLE_NAME, PersonPreferencesDao.class));
     }
 
-    public UpsertPersonPreferencesHandler(PersonPreferencesService personPreferencesService) {
+    public UpsertPersonPreferencesHandler(DynamoCrudService<PersonPreferencesDao> preferenceService) {
         super(PreferencesRequest.class);
-        this.personPreferencesService = personPreferencesService;
-    }
-
-    private static void validateRequest(RequestInfo requestInfo) throws UnauthorizedException {
-        if (isNotAuthenticated(requestInfo)) {
-            throw new UnauthorizedException();
-        }
-    }
-
-    private static boolean isNotAuthenticated(RequestInfo requestInfo) throws UnauthorizedException {
-        return isNull(requestInfo.getCurrentCustomer()) && isNull(requestInfo.getPersonCristinId())
-                || !getCristinId(requestInfo).equals(requestInfo.getPersonCristinId());
-    }
-
-    private static URI getCristinId(RequestInfo requestInfo) {
-        return URI.create(URLDecoder.decode(requestInfo.getPathParameters().get(CRISTIN_ID), StandardCharsets.UTF_8));
+        this.crudPreferenceService = preferenceService;
     }
 
     @Override
     protected void validateRequest(PreferencesRequest preferencesRequest, RequestInfo requestInfo, Context context)
             throws ApiGatewayException {
-        validateRequest(requestInfo);
+        if (dontMatchCustomerAndPerson(requestInfo)) {
+            throw new UnauthorizedException();
+        }
     }
 
     @Override
-    protected PersonPreferences processInput(PreferencesRequest input, RequestInfo requestInfo, Context context)
+    protected PersonPreferencesDto processInput(PreferencesRequest input, RequestInfo requestInfo, Context context)
             throws UnauthorizedException, NotFoundException {
 
-        return new Builder(personPreferencesService)
-                .withPersonId(requestInfo.getPersonCristinId())
-                .withPromotedPublications(input.promotedPublications())
+        return PersonPreferencesDao.builder()
+                .personId(requestInfo.getPersonCristinId())
+                .promotedPublications(input.promotedPublications())
                 .build()
-                .upsert();
+                .upsert(crudPreferenceService)
+                .toDto();
     }
 
     @Override
-    protected Integer getSuccessStatusCode(PreferencesRequest input, PersonPreferences output) {
+    protected Integer getSuccessStatusCode(PreferencesRequest input, PersonPreferencesDto output) {
         return HttpURLConnection.HTTP_OK;
     }
+
 }

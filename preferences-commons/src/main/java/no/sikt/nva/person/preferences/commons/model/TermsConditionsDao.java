@@ -8,58 +8,54 @@ import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSortK
 
 import java.net.URI;
 import java.time.Instant;
-import java.util.List;
 
 import static java.util.Objects.isNull;
 
-@DynamoDbImmutable(builder = PersonPreferencesDao.Builder.class)
-public record PersonPreferencesDao(
+@DynamoDbImmutable(builder = TermsConditionsDao.Builder.class)
+public record TermsConditionsDao(
         @DynamoDbPartitionKey URI personId,
         @DynamoDbSortKey String withType,
         Instant created,
         Instant modified,
-        List<URI> promotedPublications
-) implements DataAccessClass<PersonPreferencesDao> {
+        URI termsConditionsUri) implements DataAccessClass<TermsConditionsDao> {
 
-
-    private PersonPreferencesDao(Builder builder) {
+    private TermsConditionsDao(Builder builder) {
         this(
                 builder.id,
                 builder.type,
                 builder.createdInstant,
                 builder.modifiedInstant,
-                builder.promotedIds
+                builder.termsUri
         );
     }
 
     public static Builder builder() {
-        return new PersonPreferencesDao.Builder();
+        return new Builder();
     }
 
     @DynamoDbIgnore
-    public PersonPreferencesDto toDto() {
-        return new PersonPreferencesDto.Builder().fromDao(this);
+    public TermsConditionsDto toDto() {
+        return new TermsConditionsDto.Builder().fromDao(this);
     }
-
 
     @DynamoDbIgnore
     @Override
-    public PersonPreferencesDao upsert(DataAccessService<PersonPreferencesDao> service) throws NotFoundException {
+    public TermsConditionsDao upsert(DataAccessService<TermsConditionsDao> service) throws NotFoundException {
         service.persist(this);
         return fetch(service);
     }
 
     @DynamoDbIgnore
     @Override
-    public PersonPreferencesDao fetch(DataAccessService<PersonPreferencesDao> service) throws NotFoundException {
+    public TermsConditionsDao fetch(DataAccessService<TermsConditionsDao> service) throws NotFoundException {
         return service.fetch(this);
     }
 
     public static class Builder {
-        public static final String PROMOTED_PUBLICATIONS = "PromotedPublications";
+        public static final String TERMS_OF_USE = "TermsConditions";
         private URI id;
         private String type;
-        private List<URI> promotedIds;
+        private URI termsUri;
         private Instant createdInstant;
         private Instant modifiedInstant;
 
@@ -76,8 +72,8 @@ public record PersonPreferencesDao(
             return this;
         }
 
-        public Builder promotedPublications(List<URI> promotedPublications) {
-            this.promotedIds = promotedPublications;
+        public Builder termsConditionsUri(URI licenseUri) {
+            this.termsUri = licenseUri;
             return this;
         }
 
@@ -91,7 +87,7 @@ public record PersonPreferencesDao(
             return this;
         }
 
-        public PersonPreferencesDao build() {
+        public TermsConditionsDao build() {
             if (isNull(modifiedInstant)) {
                 modified(Instant.now());
             }
@@ -99,10 +95,10 @@ public record PersonPreferencesDao(
                 created(modifiedInstant);
             }
             if (isNull(type)) {
-                withType(PROMOTED_PUBLICATIONS);
+                withType(TERMS_OF_USE);
             }
-            return new PersonPreferencesDao(this);
+            return new TermsConditionsDao(this);
         }
-
     }
+
 }

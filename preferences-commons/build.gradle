@@ -9,10 +9,15 @@ dependencies {
     implementation libs.nva.commons.apigateway
 
 
-    implementation libs.aws.sdk.dynamodb
+//    implementation libs.aws.sdk.dynamodb
+    implementation libs.aws.sdk2.dynamodb
+    implementation libs.aws.sdk2.dynamodb.enhanced
 
-    testImplementation project(":preferences-test-support")
+    implementation libs.jackson.annotations
+    implementation libs.jackson.databind
+
     testImplementation libs.bundles.testing
+    testImplementation project(":preferences-test-support")
     testImplementation project(path: ':preferences-test-support')
 }
 

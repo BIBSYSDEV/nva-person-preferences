@@ -8,7 +8,8 @@ repositories {
 
 dependencies {
     implementation project(":preferences-storage")
-    implementation libs.aws.sdk.dynamodb
+    implementation libs.aws.sdk2.dynamodb
+    implementation libs.aws.sdk2.dynamodb.enhanced
     implementation libs.junit.jupiter.api
 
     implementation(libs.dynamodDbLocal) {
