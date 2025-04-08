@@ -8,7 +8,7 @@ Description: >
 Globals:
   Function:
     Timeout: 20
-    Runtime: java17
+    Runtime: java21
     MemorySize: 1536
   Api:
     Cors:
