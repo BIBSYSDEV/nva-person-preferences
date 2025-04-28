@@ -8,6 +8,7 @@ import no.sikt.nva.person.preferences.test.support.LocalPreferencesTestDatabase;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.apigateway.exceptions.NotFoundException;
+import nva.commons.core.Environment;
 import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,7 +46,7 @@ class FetchPersonPreferencesHandlerTest extends LocalPreferencesTestDatabase {
         super.init(TABLE_NAME);
         output = new ByteArrayOutputStream();
         personPreferencesService = new PersonPreferencesService(client, TABLE_NAME);
-        handler = new FetchPersonPreferencesHandler(personPreferencesService);
+        handler = new FetchPersonPreferencesHandler(personPreferencesService, new Environment());
     }
 
     @Test

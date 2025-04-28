@@ -8,6 +8,7 @@ import no.sikt.nva.person.preferences.test.support.LocalPreferencesTestDatabase;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.apigateway.exceptions.NotFoundException;
+import nva.commons.core.Environment;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.zalando.problem.Problem;
@@ -41,7 +42,7 @@ public class UpsertPersonPreferencesHandlerTest extends LocalPreferencesTestData
         super.init(TABLE_NAME);
         output = new ByteArrayOutputStream();
         personPreferencesService = new PersonPreferencesService(client, TABLE_NAME);
-        handler = new UpsertPersonPreferencesHandler(personPreferencesService);
+        handler = new UpsertPersonPreferencesHandler(personPreferencesService, new Environment());
     }
 
     @Test

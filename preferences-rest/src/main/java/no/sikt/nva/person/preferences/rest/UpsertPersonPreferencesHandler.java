@@ -28,11 +28,12 @@ public class UpsertPersonPreferencesHandler extends ApiGatewayHandler<Preference
 
     @JacocoGenerated
     public UpsertPersonPreferencesHandler() {
-        this(new PersonPreferencesService(AmazonDynamoDBClientBuilder.defaultClient(), TABLE_NAME));
+        this(new PersonPreferencesService(AmazonDynamoDBClientBuilder.defaultClient(), TABLE_NAME),
+                new Environment());
     }
 
-    public UpsertPersonPreferencesHandler(PersonPreferencesService personPreferencesService) {
-        super(PreferencesRequest.class);
+    public UpsertPersonPreferencesHandler(PersonPreferencesService personPreferencesService, Environment environment) {
+        super(PreferencesRequest.class, environment);
         this.personPreferencesService = personPreferencesService;
     }
 
