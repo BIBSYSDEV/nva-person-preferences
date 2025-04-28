@@ -23,11 +23,11 @@ public class FetchPersonPreferencesHandler extends ApiGatewayHandler<Void, Perso
 
     @JacocoGenerated
     public FetchPersonPreferencesHandler() {
-        this(new PersonPreferencesService(AmazonDynamoDBClientBuilder.defaultClient(), TABLE_NAME));
+        this(new PersonPreferencesService(AmazonDynamoDBClientBuilder.defaultClient(), TABLE_NAME), new Environment());
     }
 
-    public FetchPersonPreferencesHandler(PersonPreferencesService personPreferencesService) {
-        super(Void.class);
+    public FetchPersonPreferencesHandler(PersonPreferencesService personPreferencesService, Environment environment) {
+        super(Void.class, environment);
         this.personPreferencesService = personPreferencesService;
     }
 
