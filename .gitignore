@@ -308,5 +308,8 @@ gradle-app.setting
 /sampackaged_raw.yaml
 /.aws-sam/build.toml
 
+# Other local files
+**/dynamodb-local-metadata.json
+
 # Ignore Gradle build output directory
 build
