@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import static java.net.HttpURLConnection.HTTP_NOT_FOUND;
+import static java.net.HttpURLConnection.HTTP_OK;
 import static no.sikt.nva.person.preferences.commons.service.PersonPreferencesService.RESOURCE_NOT_FOUND_MESSAGE;
 import static no.sikt.nva.person.preferences.rest.PersonPreferencesRestHandlersTestConfig.restApiMapper;
 import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
@@ -30,6 +31,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 class FetchPersonPreferencesHandlerTest extends LocalPreferencesTestDatabase {
@@ -62,14 +64,14 @@ class FetchPersonPreferencesHandlerTest extends LocalPreferencesTestDatabase {
     }
 
     @Test
-    void shouldReturnNotFoundWhenPersonIdentifierDoesNotExist() throws IOException {
+    void shouldReturnEmptyPersonPreferenceWhenNoPreferencesForRequestedPerson() throws IOException {
         var request = createRequest(randomUri());
         handler.handleRequest(request, output, CONTEXT);
-        var response = GatewayResponse.fromOutputStream(output, Problem.class);
-        var detail = response.getBodyObject(Problem.class).getDetail();
+        var response = GatewayResponse.fromOutputStream(output, PersonPreferences.class);
+        var personPreferences = response.getBodyObject(PersonPreferences.class);
 
-        assertThat(response.getStatusCode(), is(equalTo(HTTP_NOT_FOUND)));
-        assertThat(detail, containsString(RESOURCE_NOT_FOUND_MESSAGE));
+        assertThat(response.getStatusCode(), is(equalTo(HTTP_OK)));
+        assertTrue(personPreferences.promotedPublications().isEmpty());
     }
 
     private PersonPreferences profileWithCristinIdentifier(URI cristinIdentifier) {

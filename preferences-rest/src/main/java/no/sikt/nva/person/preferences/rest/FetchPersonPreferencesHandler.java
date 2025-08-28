@@ -2,18 +2,19 @@ package no.sikt.nva.person.preferences.rest;
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.lambda.runtime.Context;
-import no.sikt.nva.person.preferences.commons.model.PersonPreferences;
-import no.sikt.nva.person.preferences.commons.service.PersonPreferencesService;
-import nva.commons.apigateway.ApiGatewayHandler;
-import nva.commons.apigateway.RequestInfo;
-import nva.commons.apigateway.exceptions.ApiGatewayException;
-import nva.commons.core.Environment;
-import nva.commons.core.JacocoGenerated;
-
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
+import no.sikt.nva.person.preferences.commons.model.PersonPreferences;
+import no.sikt.nva.person.preferences.commons.model.PersonPreferences.Builder;
+import no.sikt.nva.person.preferences.commons.service.PersonPreferencesService;
+import nva.commons.apigateway.ApiGatewayHandler;
+import nva.commons.apigateway.RequestInfo;
+import nva.commons.apigateway.exceptions.NotFoundException;
+import nva.commons.core.Environment;
+import nva.commons.core.JacocoGenerated;
 
 public class FetchPersonPreferencesHandler extends ApiGatewayHandler<Void, PersonPreferences> {
 
@@ -36,18 +37,30 @@ public class FetchPersonPreferencesHandler extends ApiGatewayHandler<Void, Perso
     }
 
     @Override
-    protected void validateRequest(Void unused, RequestInfo requestInfo, Context context) throws ApiGatewayException {
+    protected void validateRequest(Void unused, RequestInfo requestInfo, Context context) {
         //Do nothing
     }
 
     @Override
-    protected PersonPreferences processInput(Void input, RequestInfo requestInfo, Context context)
-            throws ApiGatewayException {
+    protected PersonPreferences processInput(Void input, RequestInfo requestInfo, Context context) {
+        var cristinId = getCristinId(requestInfo);
+        PersonPreferences personPreferences;
+        try {
+            personPreferences = fetchPersonPreferences(cristinId);
+        } catch (NotFoundException e) {
+            personPreferences = new Builder()
+                       .withPersonId(cristinId)
+                       .withPromotedPublications(List.of())
+                       .build();
+        }
+        return personPreferences;
+    }
 
+    private PersonPreferences fetchPersonPreferences(URI cristinId) throws NotFoundException {
         return new PersonPreferences.Builder(personPreferencesService)
-                .withPersonId(getCristinId(requestInfo))
-                .build()
-                .fetch();
+                   .withPersonId(cristinId)
+                   .build()
+                   .fetch();
     }
 
     @Override
