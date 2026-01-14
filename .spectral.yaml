@@ -4,4 +4,5 @@ extends:
 rules:
   # Disabled because we use non-standard AWS extensions
   oas3-operation-security-defined: off
+  # WS API Gateway extension uses greedy path parameters like {cristinId+} which isn't standard OpenAPI
   path-params: off
