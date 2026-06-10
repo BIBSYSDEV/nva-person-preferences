@@ -1,6 +1,5 @@
 plugins {
     id 'nva.person.preferences.java-conventions'
-    id 'nva.person.preferences.dynamo-db'
 }
 dependencies {
     implementation project(":preferences-storage")
