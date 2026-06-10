@@ -1,7 +1,7 @@
 package no.sikt.nva.person.preferences.rest;
 
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.lambda.runtime.Context;
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URLDecoder;
@@ -24,7 +24,7 @@ public class FetchPersonPreferencesHandler extends ApiGatewayHandler<Void, Perso
 
     @JacocoGenerated
     public FetchPersonPreferencesHandler() {
-        this(new PersonPreferencesService(AmazonDynamoDBClientBuilder.defaultClient(), TABLE_NAME), new Environment());
+        this(new PersonPreferencesService(DynamoDbClient.create(), TABLE_NAME), new Environment());
     }
 
     public FetchPersonPreferencesHandler(PersonPreferencesService personPreferencesService, Environment environment) {
