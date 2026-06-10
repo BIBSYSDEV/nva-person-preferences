@@ -38,5 +38,3 @@ dependencyResolutionManagement {
 rootProject.name = 'nva-person-preferences'
 include 'preferences-commons'
 include 'preferences-rest'
-include 'preferences-test-support'
-include 'preferences-storage'

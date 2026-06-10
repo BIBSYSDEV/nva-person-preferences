@@ -1,5 +1,6 @@
 plugins {
     id 'nva.person.preferences.java-conventions'
+    id 'java-test-fixtures'
 }
 
 dependencies {
@@ -9,11 +10,11 @@ dependencies {
     api(nvaLibs.apigateway)
     implementation(nvaLibs.core)
     implementation(nvaLibs.json)
-    implementation(project(":preferences-storage"))
+    testFixturesApi(nvaCatalog.aws.sdk.dynamo)
+    testFixturesApi(nvaCatalog.junit.jupiter.api)
+    testFixturesImplementation(nvaCatalog.aws.dynamodb.local)
     testImplementation(nvaCatalog.hamcrest)
     testImplementation(nvaCatalog.jackson.core)
     testImplementation(nvaCatalog.junit.jupiter.api)
     testImplementation(nvaLibs.testutils)
-    testImplementation(project(":preferences-test-support"))
-    testImplementation(project(':preferences-test-support'))
 }

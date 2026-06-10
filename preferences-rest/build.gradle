@@ -18,5 +18,5 @@ dependencies {
     testImplementation(nvaCatalog.zalando)
     testImplementation(nvaLibs.json)
     testImplementation(nvaLibs.testutils)
-    testImplementation(project(":preferences-test-support"))
+    testImplementation(testFixtures(project(":preferences-commons")))
 }
