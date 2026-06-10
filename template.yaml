@@ -8,6 +8,8 @@ Description: >
 Globals:
   Function:
     Timeout: 20
+    Architectures:
+      - arm64
     Runtime: java21
     MemorySize: 1536
     AutoPublishAlias: live
