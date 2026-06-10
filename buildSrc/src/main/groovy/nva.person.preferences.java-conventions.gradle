@@ -15,8 +15,10 @@ nva {
 }
 
 test {
+    environment("ALLOWED_ORIGIN", "*")
     environment("API_HOST", "api.fake.nva.aws.unit.no")
     environment("COGNITO_AUTHORIZER_URLS", "http://localhost:3000")
-    environment("LOG_LEVEL", "info")
     environment("LOG4J_CONFIGURATION_FILE", "classpath:nva-log4j2.xml")
+    environment("LOG_LEVEL", "info")
+    environment("TABLE_NAME", "nonExistentTable")
 }

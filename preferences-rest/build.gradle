@@ -20,10 +20,3 @@ dependencies {
     testImplementation(nvaLibs.testutils)
     testImplementation(project(":preferences-test-support"))
 }
-
-test {
-    environment "ALLOWED_ORIGIN", "*"
-    environment "TABLE_NAME", "nonExistentTable"
-    environment "API_HOST", "localhost"
-    environment "COGNITO_AUTHORIZER_URLS", "http://localhost:3000"
-}

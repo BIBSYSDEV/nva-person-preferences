@@ -17,8 +17,3 @@ dependencies {
     testImplementation(project(":preferences-test-support"))
     testImplementation(project(':preferences-test-support'))
 }
-
-test {
-    environment "ALLOWED_ORIGIN", "*"
-    environment "TABLE_NAME", "nonExistentTable"
-}
