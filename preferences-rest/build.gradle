@@ -1,28 +1,29 @@
 plugins {
     id 'nva.person.preferences.java-conventions'
 }
+
 dependencies {
-    implementation project(":preferences-commons")
-    implementation libs.nva.core
-    implementation libs.nva.json
+    api(nvaCatalog.aws.lambda.core)
+    api(nvaCatalog.jackson.annotations)
+    api(nvaCatalog.jackson.databind)
+    api(nvaLibs.apigateway)
+    api(nvaLibs.core)
+    api(project(":preferences-commons"))
+    implementation(nvaCatalog.aws.sdk.dynamo)
+    testImplementation(nvaCatalog.hamcrest)
+    testImplementation(nvaCatalog.httpcore4)
+    testImplementation(nvaCatalog.jackson.core)
+    testImplementation(nvaCatalog.junit.jupiter.api)
+    testImplementation(nvaCatalog.mockito.core)
+    testImplementation(nvaCatalog.zalando)
+    testImplementation(nvaLibs.json)
+    testImplementation(nvaLibs.testutils)
+    testImplementation(project(":preferences-test-support"))
+}
 
-    implementation libs.nva.commons.apigateway
-    implementation libs.aws.lambda.java.core
-    implementation libs.aws.sdk.dynamodb
-    implementation libs.bundles.logging
-
-
-    testImplementation project(":preferences-test-support")
-    testImplementation libs.junit.jupiter.api
-    testImplementation libs.junit.jupiter.engine
-    testImplementation libs.mockito.core
-
-
-    test {
-        useJUnitPlatform()
-        environment "ALLOWED_ORIGIN", "*"
-        environment "TABLE_NAME", "nonExistentTable"
-        environment "API_HOST", "localhost"
-        environment "COGNITO_AUTHORIZER_URLS", "http://localhost:3000"
-    }
+test {
+    environment "ALLOWED_ORIGIN", "*"
+    environment "TABLE_NAME", "nonExistentTable"
+    environment "API_HOST", "localhost"
+    environment "COGNITO_AUTHORIZER_URLS", "http://localhost:3000"
 }

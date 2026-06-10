@@ -1,15 +1,32 @@
 version: 0.2
 
+env:
+  variables:
+    GRADLE_USER_HOME: "/root/.gradle"
+    GRADLE_OPTS: "-Dorg.gradle.configuration-cache=false"
+    SAM_CLI_TELEMETRY: "0"
+
+cache:
+  paths:
+    - "/root/.gradle/caches/**/*"
+
 phases:
   install:
     runtime-versions:
       java: corretto21
     commands:
-      - pip install wheel # Temp workaround: https://github.com/aws/aws-cli/issues/8036
-      - pip install "Cython<3.0" "pyyaml<6" --no-build-isolation  # Temp workaround: https://github.com/aws/aws-cli/issues/8036
-      - pip3 install aws-sam-cli
+      - echo "Checking if AWS SAM CLI is installed"
+      - |
+        if command -v sam >/dev/null 2>&1; then
+          echo "AWS SAM CLI is already installed";
+          sam --version;
+        else
+          echo "AWS SAM CLI is not installed, installing now";
+          pip3 install aws-sam-cli
+        fi
   build:
     commands:
+      - ./gradlew test
       - sam build
       - sam package --s3-bucket $S3_BUCKET --output-template-file packaged.yaml
 artifacts:

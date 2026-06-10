@@ -1,18 +1,9 @@
 plugins {
-    id 'java'
-}
-
-group = 'no.sikt.nva.person.preferences.storage'
-version = 'unspecified'
-
-repositories {
-    mavenCentral()
+    id 'nva.person.preferences.java-conventions'
 }
 
 dependencies {
-
-}
-
-test {
-    useJUnitPlatform()
+    testRuntimeOnly(nvaCatalog.datafaker)
+    testRuntimeOnly(nvaCatalog.jackson.core)
+    testRuntimeOnly(nvaCatalog.jackson.databind)
 }

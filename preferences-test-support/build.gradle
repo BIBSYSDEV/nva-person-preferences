@@ -1,22 +1,11 @@
 plugins {
-    id 'java'
-}
-
-repositories {
-    mavenCentral()
+    id 'nva.person.preferences.java-conventions'
 }
 
 dependencies {
-    implementation project(":preferences-storage")
-    implementation libs.aws.sdk.dynamodb
-    implementation libs.junit.jupiter.api
-
-    implementation(libs.dynamodDbLocal) {
-        exclude group: 'com.amazonaws', module: 'aws-java-sdk-dynamodb'
-        exclude group: 'com.amazonaws', module: 'aws-java-sdk-core'
-    }
-}
-
-test {
-    useJUnitPlatform()
+    api(nvaCatalog.aws.sdk.dynamo)
+    api(nvaCatalog.junit.jupiter.api)
+    implementation(nvaCatalog.aws.dynamodb.local)
+    implementation(project(":preferences-storage"))
+    runtimeOnly(nvaCatalog.datafaker)
 }
