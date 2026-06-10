@@ -1,4 +1,4 @@
-package no.sikt.nva.person.preferences.test.support;
+package no.sikt.nva.person.preferences.commons;
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.local.embedded.DynamoDBEmbedded;
@@ -14,7 +14,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import static no.sikt.nva.person.preferences.storage.PersonPreferencesTransactionConstants.PRIMARY_PARTITION_KEY;
+import static no.sikt.nva.person.preferences.commons.PersonPreferencesTransactionConstants.PRIMARY_PARTITION_KEY;
+
 
 public class LocalPreferencesTestDatabase {
 

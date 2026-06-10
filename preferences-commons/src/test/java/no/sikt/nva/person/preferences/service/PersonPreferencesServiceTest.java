@@ -2,7 +2,7 @@ package no.sikt.nva.person.preferences.service;
 
 import no.sikt.nva.person.preferences.commons.model.PersonPreferences;
 import no.sikt.nva.person.preferences.commons.service.PersonPreferencesService;
-import no.sikt.nva.person.preferences.test.support.LocalPreferencesTestDatabase;
+import no.sikt.nva.person.preferences.commons.LocalPreferencesTestDatabase;
 import nva.commons.apigateway.exceptions.NotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

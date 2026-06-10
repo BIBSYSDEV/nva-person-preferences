@@ -1,4 +1,4 @@
-package no.sikt.nva.person.preferences.storage;
+package no.sikt.nva.person.preferences.commons;
 
 public final class PersonPreferencesTransactionConstants {
 

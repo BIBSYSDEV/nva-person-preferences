@@ -9,7 +9,7 @@ import no.sikt.nva.person.preferences.commons.model.PersonPreferencesDao;
 
 import java.util.Map;
 
-import static no.sikt.nva.person.preferences.storage.PersonPreferencesTransactionConstants.PRIMARY_PARTITION_KEY;
+import static no.sikt.nva.person.preferences.commons.PersonPreferencesTransactionConstants.PRIMARY_PARTITION_KEY;
 import static nva.commons.core.attempt.Try.attempt;
 
 public class ServiceWithTransactions {
