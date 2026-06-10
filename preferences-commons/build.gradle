@@ -1,22 +1,24 @@
 plugins {
     id 'nva.person.preferences.java-conventions'
 }
+
 dependencies {
-    implementation project(":preferences-storage")
-    implementation libs.nva.core
-    implementation libs.nva.json
-    implementation libs.nva.commons.apigateway
-
-
-    implementation libs.aws.sdk.dynamodb
-
-    testImplementation project(":preferences-test-support")
-    testImplementation libs.bundles.testing
-    testImplementation project(path: ':preferences-test-support')
+    api(nvaCatalog.aws.sdk.dynamo)
+    api(nvaCatalog.jackson.annotations)
+    api(nvaCatalog.jackson.databind)
+    api(nvaLibs.apigateway)
+    implementation(nvaLibs.core)
+    implementation(nvaLibs.json)
+    implementation(project(":preferences-storage"))
+    testImplementation(nvaCatalog.hamcrest)
+    testImplementation(nvaCatalog.jackson.core)
+    testImplementation(nvaCatalog.junit.jupiter.api)
+    testImplementation(nvaLibs.testutils)
+    testImplementation(project(":preferences-test-support"))
+    testImplementation(project(':preferences-test-support'))
 }
 
 test {
-    useJUnitPlatform()
     environment "ALLOWED_ORIGIN", "*"
     environment "TABLE_NAME", "nonExistentTable"
 }

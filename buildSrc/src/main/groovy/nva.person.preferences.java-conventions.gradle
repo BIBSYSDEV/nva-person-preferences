@@ -1,63 +1,22 @@
 plugins {
-    id 'java'
-    id 'pmd'
-    id 'jacoco-report-aggregation'
+    id 'nva.java-conventions'
 }
 
-
-group = 'com.github.bibsysdev'
-
-dependencies {
-
-    testImplementation libs.bundles.testing
-}
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_21 // source-code version and must be <= targetCompatibility
-    targetCompatibility = JavaVersion.VERSION_21 // bytecode target version
-}
-
-repositories {
-    mavenCentral()
-    maven { url 'https://jitpack.io' }
-}
-
-tasks.named('test') {
-    useJUnitPlatform()
-    failFast = true
-    testLogging {
-        events 'skipped', 'passed', 'failed'
+nva {
+    errorprone {
+        allErrorsAsWarnings = false
+    }
+    pmd {
+        rulesetFile = rootProject.file('config/pmd/ruleset.xml')
+    }
+    spotless {
+        enabled = false
     }
 }
 
-pmd {
-    toolVersion = '7.11.0'
-    ruleSetConfig = rootProject.resources.text.fromFile('config/pmd/ruleset.xml')
-    ruleSets = []
-    ignoreFailures = false
-}
-
-
-check.dependsOn jacocoTestCoverageVerification
-jacocoTestCoverageVerification.dependsOn(jacocoTestReport)
-
-jacocoTestCoverageVerification {
-
-    violationRules {
-        rule {
-            limit {
-                counter = 'METHOD'
-                value = 'COVEREDRATIO'
-                minimum = 1.000
-            }
-        }
-
-        rule {
-            limit {
-                counter = 'CLASS'
-                value = 'COVEREDRATIO'
-                minimum = 1.000
-            }
-        }
-    }
+test {
+    environment("API_HOST", "api.fake.nva.aws.unit.no")
+    environment("COGNITO_AUTHORIZER_URLS", "http://localhost:3000")
+    environment("LOG_LEVEL", "info")
+    environment("LOG4J_CONFIGURATION_FILE", "classpath:nva-log4j2.xml")
 }
