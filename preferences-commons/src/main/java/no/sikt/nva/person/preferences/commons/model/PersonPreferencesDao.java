@@ -1,9 +1,8 @@
 package no.sikt.nva.person.preferences.commons.model;
 
-import com.amazonaws.services.dynamodbv2.document.Item;
-import com.amazonaws.services.dynamodbv2.document.ItemUtils;
-import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import no.unit.nva.commons.json.JsonUtils;
+import software.amazon.awssdk.enhanced.dynamodb.document.EnhancedDocument;
+import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 
 import java.net.URI;
 import java.time.Instant;
@@ -18,9 +17,8 @@ public record PersonPreferencesDao(URI personId,
                                    Instant modified) {
 
     public Map<String, AttributeValue> toDynamoFormat() {
-        var item = attempt(() -> Item.fromJSON(
-                JsonUtils.dynamoObjectMapper.writeValueAsString(this))).orElseThrow();
-        return ItemUtils.toAttributeValues(item);
+        return attempt(() -> EnhancedDocument.fromJson(
+                JsonUtils.dynamoObjectMapper.writeValueAsString(this)).toMap()).orElseThrow();
     }
 
     public PersonPreferencesDao.Builder copy() {
@@ -59,8 +57,8 @@ public record PersonPreferencesDao(URI personId,
         }
 
         public PersonPreferencesDao fromDynamoFormat(Map<String, AttributeValue> map) {
-            return attempt(() -> JsonUtils.dynamoObjectMapper.readValue(ItemUtils.toItem(map).toJSON(),
-                    PersonPreferencesDao.class))
+            var json = EnhancedDocument.fromAttributeValueMap(map).toJson();
+            return attempt(() -> JsonUtils.dynamoObjectMapper.readValue(json, PersonPreferencesDao.class))
                     .orElseThrow();
         }
 

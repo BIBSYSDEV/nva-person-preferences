@@ -1,70 +1,52 @@
 package no.sikt.nva.person.preferences.commons;
 
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
-import com.amazonaws.services.dynamodbv2.local.embedded.DynamoDBEmbedded;
-import com.amazonaws.services.dynamodbv2.model.AttributeDefinition;
-import com.amazonaws.services.dynamodbv2.model.BillingMode;
-import com.amazonaws.services.dynamodbv2.model.CreateTableRequest;
-import com.amazonaws.services.dynamodbv2.model.KeySchemaElement;
-import com.amazonaws.services.dynamodbv2.model.KeyType;
-import com.amazonaws.services.dynamodbv2.model.ScalarAttributeType;
 import org.junit.jupiter.api.AfterEach;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
+import software.amazon.awssdk.services.dynamodb.model.AttributeDefinition;
+import software.amazon.awssdk.services.dynamodb.model.BillingMode;
+import software.amazon.awssdk.services.dynamodb.model.CreateTableRequest;
+import software.amazon.awssdk.services.dynamodb.model.KeySchemaElement;
+import software.amazon.awssdk.services.dynamodb.model.KeyType;
+import software.amazon.awssdk.services.dynamodb.model.ScalarAttributeType;
+import software.amazon.dynamodb.services.local.embedded.DynamoDBEmbedded;
 
 import static no.sikt.nva.person.preferences.commons.PersonPreferencesTransactionConstants.PRIMARY_PARTITION_KEY;
 
 
 public class LocalPreferencesTestDatabase {
 
-    protected AmazonDynamoDB client;
+    protected DynamoDbClient client;
 
     public void init(String tableName) {
-        client = DynamoDBEmbedded.create().amazonDynamoDB();
-        CreateTableRequest request = createTableRequest(tableName);
-        client.createTable(request);
+        client = DynamoDBEmbedded.create(null, true).dynamoDbClient();
+        client.createTable(createTableRequest(tableName));
     }
 
     @AfterEach
     public void shutdown() {
-        client.shutdown();
+        client.close();
     }
 
     private CreateTableRequest createTableRequest(String tableName) {
-        return new CreateTableRequest()
-                .withTableName(tableName)
-                .withAttributeDefinitions(attributeDefinitions())
-                .withKeySchema(primaryKeySchema())
-                .withBillingMode(BillingMode.PAY_PER_REQUEST);
-    }
-
-    private AttributeDefinition[] attributeDefinitions() {
-        List<AttributeDefinition> attributesList = new ArrayList<>();
-        attributesList.add(newAttribute());
-        AttributeDefinition[] attributesArray = new AttributeDefinition[attributesList.size()];
-        attributesList.toArray(attributesArray);
-        return attributesArray;
-    }
-
-    private Collection<KeySchemaElement> primaryKeySchema() {
-        return keySchema();
-    }
-
-    private Collection<KeySchemaElement> keySchema() {
-        return List.of(newKeyElement());
+        return CreateTableRequest.builder()
+                .tableName(tableName)
+                .attributeDefinitions(newAttribute())
+                .keySchema(newKeyElement())
+                .billingMode(BillingMode.PAY_PER_REQUEST)
+                .build();
     }
 
     private KeySchemaElement newKeyElement() {
-        return new KeySchemaElement()
-                .withAttributeName(PRIMARY_PARTITION_KEY)
-                .withKeyType(KeyType.HASH);
+        return KeySchemaElement.builder()
+                .attributeName(PRIMARY_PARTITION_KEY)
+                .keyType(KeyType.HASH)
+                .build();
     }
 
     private AttributeDefinition newAttribute() {
-        return new AttributeDefinition()
-                .withAttributeName(PRIMARY_PARTITION_KEY)
-                .withAttributeType(ScalarAttributeType.S);
+        return AttributeDefinition.builder()
+                .attributeName(PRIMARY_PARTITION_KEY)
+                .attributeType(ScalarAttributeType.S)
+                .build();
     }
 }

@@ -1,6 +1,5 @@
 package no.sikt.nva.person.preferences.rest;
 
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.lambda.runtime.Context;
 import no.sikt.nva.person.preferences.commons.model.PersonPreferences;
 import no.sikt.nva.person.preferences.commons.model.PersonPreferences.Builder;
@@ -12,6 +11,7 @@ import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.apigateway.exceptions.UnauthorizedException;
 import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 
 import java.net.HttpURLConnection;
 import java.net.URI;
@@ -28,7 +28,7 @@ public class UpsertPersonPreferencesHandler extends ApiGatewayHandler<Preference
 
     @JacocoGenerated
     public UpsertPersonPreferencesHandler() {
-        this(new PersonPreferencesService(AmazonDynamoDBClientBuilder.defaultClient(), TABLE_NAME),
+        this(new PersonPreferencesService(DynamoDbClient.create(), TABLE_NAME),
                 new Environment());
     }
 

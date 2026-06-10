@@ -1,11 +1,11 @@
 package no.sikt.nva.person.preferences.commons.service;
 
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
-import com.amazonaws.services.dynamodbv2.model.AttributeValue;
-import com.amazonaws.services.dynamodbv2.model.Put;
-import com.amazonaws.services.dynamodbv2.model.TransactWriteItem;
-import com.amazonaws.services.dynamodbv2.model.TransactWriteItemsRequest;
 import no.sikt.nva.person.preferences.commons.model.PersonPreferencesDao;
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
+import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
+import software.amazon.awssdk.services.dynamodb.model.Put;
+import software.amazon.awssdk.services.dynamodb.model.TransactWriteItem;
+import software.amazon.awssdk.services.dynamodb.model.TransactWriteItemsRequest;
 
 import java.util.Map;
 
@@ -18,10 +18,10 @@ public class ServiceWithTransactions {
     public static final String KEY_NOT_EXISTS_CONDITION = keyNotExistsCondition();
     public static final String PARTITION_KEY_EQUALITY_CONDITION = "#partitionKey=:partitionKey";
     public static final String PARTITION_KEY_VALUE_PLACEHOLDER = ":partitionKey";
-    private final AmazonDynamoDB client;
+    private final DynamoDbClient client;
     private final String tableName;
 
-    protected ServiceWithTransactions(AmazonDynamoDB client, String tableName) {
+    protected ServiceWithTransactions(DynamoDbClient client, String tableName) {
         this.client = client;
         this.tableName = tableName;
     }
@@ -30,7 +30,7 @@ public class ServiceWithTransactions {
         return String.format("attribute_not_exists(%s)", PARTITION_KEY_NAME_PLACEHOLDER);
     }
 
-    protected final AmazonDynamoDB getClient() {
+    protected final DynamoDbClient getClient() {
         return client;
     }
 
@@ -40,29 +40,31 @@ public class ServiceWithTransactions {
     }
 
     protected TransactWriteItem newPutTransactionItem(PersonPreferencesDao data) {
-        return new TransactWriteItem().withPut(constructNewPut(data));
+        return TransactWriteItem.builder().put(constructNewPut(data)).build();
     }
 
     protected TransactWriteItem updatePutTransactionItem(PersonPreferencesDao data) {
-        return new TransactWriteItem().withPut(constructUpdatePut(data));
+        return TransactWriteItem.builder().put(constructUpdatePut(data)).build();
     }
 
     private Put constructNewPut(PersonPreferencesDao dao) {
-        return new Put()
-                .withItem(dao.toDynamoFormat())
-                .withTableName(tableName)
-                .withConditionExpression(KEY_NOT_EXISTS_CONDITION)
-                .withExpressionAttributeNames(Map.of(PARTITION_KEY_NAME_PLACEHOLDER, PRIMARY_PARTITION_KEY));
+        return Put.builder()
+                .item(dao.toDynamoFormat())
+                .tableName(tableName)
+                .conditionExpression(KEY_NOT_EXISTS_CONDITION)
+                .expressionAttributeNames(Map.of(PARTITION_KEY_NAME_PLACEHOLDER, PRIMARY_PARTITION_KEY))
+                .build();
     }
 
     private Put constructUpdatePut(PersonPreferencesDao dao) {
         var expressionAttributeValues = Map.of(
-                PARTITION_KEY_VALUE_PLACEHOLDER, new AttributeValue(dao.personId().toString()));
-        return new Put()
-                .withItem(dao.toDynamoFormat())
-                .withTableName(tableName)
-                .withConditionExpression(PARTITION_KEY_EQUALITY_CONDITION)
-                .withExpressionAttributeNames(Map.of(PARTITION_KEY_NAME_PLACEHOLDER, PRIMARY_PARTITION_KEY))
-                .withExpressionAttributeValues(expressionAttributeValues);
+                PARTITION_KEY_VALUE_PLACEHOLDER, AttributeValue.fromS(dao.personId().toString()));
+        return Put.builder()
+                .item(dao.toDynamoFormat())
+                .tableName(tableName)
+                .conditionExpression(PARTITION_KEY_EQUALITY_CONDITION)
+                .expressionAttributeNames(Map.of(PARTITION_KEY_NAME_PLACEHOLDER, PRIMARY_PARTITION_KEY))
+                .expressionAttributeValues(expressionAttributeValues)
+                .build();
     }
 }
