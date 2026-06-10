@@ -10,12 +10,17 @@ Globals:
     Timeout: 20
     Runtime: java21
     MemorySize: 1536
+    AutoPublishAlias: live
+    SnapStart:
+      ApplyOn: PublishedVersions
     Environment:
       Variables:
+        ALLOWED_ORIGIN: !Ref AllowedOrigins
         API_HOST: !Ref ApiDomain
         COGNITO_AUTHORIZER_URLS: !Join [ ",", !Ref CognitoAuthorizerUrls ]
-        LOG_LEVEL: "info"
         LOG4J_CONFIGURATION_FILE: classpath:nva-log4j2.xml
+        LOG_LEVEL: "info"
+        TABLE_NAME: !Ref NvaPersonPreferencesTable2
   Api:
     Cors:
       AllowMethods: "'PUT, GET,OPTIONS,DELETE,POST'"
@@ -167,15 +172,8 @@ Resources:
       CodeUri: preferences-rest
       Handler: no.sikt.nva.person.preferences.rest.UpsertPersonPreferencesHandler::handleRequest
       Role: !GetAtt PreferencesLambdaRole.Arn
-      MemorySize: 1536
-      AutoPublishAlias: live
-      SnapStart:
-        ApplyOn: PublishedVersions
       Environment:
         Variables:
-          ALLOWED_ORIGIN: !Ref AllowedOrigins
-          API_HOST: !Ref ApiDomain
-          TABLE_NAME: !Ref NvaPersonPreferencesTable2
           COGNITO_HOST: !Ref CognitoAuthorizationUri
       Events:
         GetEvent:
@@ -192,14 +190,6 @@ Resources:
       CodeUri: preferences-rest
       Handler: no.sikt.nva.person.preferences.rest.FetchPersonPreferencesHandler::handleRequest
       Role: !GetAtt PreferencesLambdaRole.Arn
-      MemorySize: 1536
-      AutoPublishAlias: live
-      SnapStart:
-        ApplyOn: PublishedVersions
-      Environment:
-        Variables:
-          ALLOWED_ORIGIN: !Ref AllowedOrigins
-          TABLE_NAME: !Ref NvaPersonPreferencesTable2
       Events:
         GetEvent:
           Type: Api
