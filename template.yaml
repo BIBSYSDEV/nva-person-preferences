@@ -172,9 +172,6 @@ Resources:
       CodeUri: preferences-rest
       Handler: no.sikt.nva.person.preferences.rest.UpsertPersonPreferencesHandler::handleRequest
       Role: !GetAtt PreferencesLambdaRole.Arn
-      Environment:
-        Variables:
-          COGNITO_HOST: !Ref CognitoAuthorizationUri
       Events:
         GetEvent:
           Type: Api
