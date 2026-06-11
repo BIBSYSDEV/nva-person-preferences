@@ -1,6 +1,12 @@
 package no.sikt.nva.person.preferences.rest;
 
+import static java.util.Objects.isNull;
+
 import com.amazonaws.services.lambda.runtime.Context;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import no.sikt.nva.person.preferences.commons.model.PersonPreferences;
 import no.sikt.nva.person.preferences.commons.model.PersonPreferences.Builder;
 import no.sikt.nva.person.preferences.commons.service.PersonPreferencesService;
@@ -13,64 +19,61 @@ import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 
-import java.net.HttpURLConnection;
-import java.net.URI;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
+public class UpsertPersonPreferencesHandler
+    extends ApiGatewayHandler<PreferencesRequest, PersonPreferences> {
 
-import static java.util.Objects.isNull;
+  private static final String CRISTIN_ID = "cristinId";
+  private static final String TABLE_NAME = new Environment().readEnv("TABLE_NAME");
+  private final PersonPreferencesService personPreferencesService;
 
-public class UpsertPersonPreferencesHandler extends ApiGatewayHandler<PreferencesRequest, PersonPreferences> {
+  @JacocoGenerated
+  public UpsertPersonPreferencesHandler() {
+    this(new PersonPreferencesService(DynamoDbClient.create(), TABLE_NAME), new Environment());
+  }
 
-    private static final String CRISTIN_ID = "cristinId";
-    private static final String TABLE_NAME = new Environment().readEnv("TABLE_NAME");
-    private final PersonPreferencesService personPreferencesService;
+  public UpsertPersonPreferencesHandler(
+      PersonPreferencesService personPreferencesService, Environment environment) {
+    super(PreferencesRequest.class, environment);
+    this.personPreferencesService = personPreferencesService;
+  }
 
-    @JacocoGenerated
-    public UpsertPersonPreferencesHandler() {
-        this(new PersonPreferencesService(DynamoDbClient.create(), TABLE_NAME),
-                new Environment());
+  private static void validateRequest(RequestInfo requestInfo) throws UnauthorizedException {
+    if (isNotAuthenticated(requestInfo)) {
+      throw new UnauthorizedException();
     }
+  }
 
-    public UpsertPersonPreferencesHandler(PersonPreferencesService personPreferencesService, Environment environment) {
-        super(PreferencesRequest.class, environment);
-        this.personPreferencesService = personPreferencesService;
-    }
+  private static boolean isNotAuthenticated(RequestInfo requestInfo) throws UnauthorizedException {
+    return isNull(requestInfo.getCurrentCustomer()) && isNull(requestInfo.getPersonCristinId())
+        || !getCristinId(requestInfo).equals(requestInfo.getPersonCristinId());
+  }
 
-    private static void validateRequest(RequestInfo requestInfo) throws UnauthorizedException {
-        if (isNotAuthenticated(requestInfo)) {
-            throw new UnauthorizedException();
-        }
-    }
+  private static URI getCristinId(RequestInfo requestInfo) {
+    return URI.create(
+        URLDecoder.decode(requestInfo.getPathParameters().get(CRISTIN_ID), StandardCharsets.UTF_8));
+  }
 
-    private static boolean isNotAuthenticated(RequestInfo requestInfo) throws UnauthorizedException {
-        return isNull(requestInfo.getCurrentCustomer()) && isNull(requestInfo.getPersonCristinId())
-                || !getCristinId(requestInfo).equals(requestInfo.getPersonCristinId());
-    }
+  @Override
+  protected void validateRequest(
+      PreferencesRequest preferencesRequest, RequestInfo requestInfo, Context context)
+      throws ApiGatewayException {
+    validateRequest(requestInfo);
+  }
 
-    private static URI getCristinId(RequestInfo requestInfo) {
-        return URI.create(URLDecoder.decode(requestInfo.getPathParameters().get(CRISTIN_ID), StandardCharsets.UTF_8));
-    }
+  @Override
+  protected PersonPreferences processInput(
+      PreferencesRequest input, RequestInfo requestInfo, Context context)
+      throws UnauthorizedException, NotFoundException {
 
-    @Override
-    protected void validateRequest(PreferencesRequest preferencesRequest, RequestInfo requestInfo, Context context)
-            throws ApiGatewayException {
-        validateRequest(requestInfo);
-    }
+    return new Builder(personPreferencesService)
+        .withPersonId(requestInfo.getPersonCristinId())
+        .withPromotedPublications(input.promotedPublications())
+        .build()
+        .upsert();
+  }
 
-    @Override
-    protected PersonPreferences processInput(PreferencesRequest input, RequestInfo requestInfo, Context context)
-            throws UnauthorizedException, NotFoundException {
-
-        return new Builder(personPreferencesService)
-                .withPersonId(requestInfo.getPersonCristinId())
-                .withPromotedPublications(input.promotedPublications())
-                .build()
-                .upsert();
-    }
-
-    @Override
-    protected Integer getSuccessStatusCode(PreferencesRequest input, PersonPreferences output) {
-        return HttpURLConnection.HTTP_OK;
-    }
+  @Override
+  protected Integer getSuccessStatusCode(PreferencesRequest input, PersonPreferences output) {
+    return HttpURLConnection.HTTP_OK;
+  }
 }
