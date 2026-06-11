@@ -2,7 +2,7 @@ AWSTemplateFormatVersion: 2010-09-09
 Transform: AWS::Serverless-2016-10-31
 Description: >
   AWS
-  
+
   SAM Template for Nva Person Preferences API
 
 Globals:
@@ -19,7 +19,7 @@ Globals:
       Variables:
         ALLOWED_ORIGIN: !Ref AllowedOrigins
         API_HOST: !Ref ApiDomain
-        COGNITO_AUTHORIZER_URLS: !Join [ ",", !Ref CognitoAuthorizerUrls ]
+        COGNITO_AUTHORIZER_URLS: !Join [",", !Ref CognitoAuthorizerUrls]
         LOG4J_CONFIGURATION_FILE: classpath:nva-log4j2.xml
         LOG_LEVEL: "info"
         TABLE_NAME: !Ref NvaPersonPreferencesTable2
@@ -31,17 +31,17 @@ Globals:
 
 Parameters:
   CognitoAuthorizerArn:
-    Type: 'AWS::SSM::Parameter::Value<String>'
+    Type: "AWS::SSM::Parameter::Value<String>"
     Description: Reference to Cognito UserPool for the stage
     Default: CognitoAuthorizerArn
   CognitoAuthorizationUri:
-    Type: 'AWS::SSM::Parameter::Value<String>'
-    Default: '/NVA/CognitoUri'
+    Type: "AWS::SSM::Parameter::Value<String>"
+    Default: "/NVA/CognitoUri"
   CognitoAuthorizerUrls:
     Type: AWS::SSM::Parameter::Value<CommaDelimitedList>
     Default: CognitoAuthorizerUrls
   ApiDomain:
-    Type: 'AWS::SSM::Parameter::Value<String>'
+    Type: "AWS::SSM::Parameter::Value<String>"
     Description: The Api domain
     Default: /NVA/ApiDomain
   CustomDomainBasePath:
@@ -50,18 +50,17 @@ Parameters:
     Default: person-preferences
   Suffix:
     Type: String
-    Default: ''
+    Default: ""
     Description: Suffix used for naming resources for feature branches to avoid conflicts.
   AllowedOrigins:
     Type: String
     Description: comma separated list of external clients that are allowed to contact the HTTP APIs, "*" indicates that all origins are allowed
-    Default: '*'
+    Default: "*"
 
 Conditions:
-  WithSuffix: !Not [ !Equals [ !Ref Suffix, '' ] ]
+  WithSuffix: !Not [!Equals [!Ref Suffix, ""]]
 
 Resources:
-
   ApiAccessLogGroup:
     Type: AWS::Logs::LogGroup
 
@@ -86,7 +85,7 @@ Resources:
         PointInTimeRecoveryEnabled: true
       Tags:
         - Key: IncludedInBackup
-          Value: 'true'
+          Value: "true"
 
   #===========================Api========================================================
 
@@ -99,7 +98,7 @@ Resources:
       StageName: Prod
       EndpointConfiguration: REGIONAL
       DefinitionBody:
-        'Fn::Transform':
+        "Fn::Transform":
           Name: AWS::Include
           Parameters:
             Location: ./docs/openapi.yaml
@@ -127,8 +126,8 @@ Resources:
         Statement:
           - Effect: Allow
             Principal:
-              Service: [ lambda.amazonaws.com ]
-            Action: [ 'sts:AssumeRole' ]
+              Service: [lambda.amazonaws.com]
+            Action: ["sts:AssumeRole"]
       Policies:
         - PolicyName: invokeFunction
           PolicyDocument:
@@ -137,7 +136,7 @@ Resources:
               - Effect: Allow
                 Action:
                   - lambda:InvokeFunction
-                Resource: '*'
+                Resource: "*"
         - PolicyName: writeLog
           PolicyDocument:
             Version: 2012-10-17
@@ -147,7 +146,7 @@ Resources:
                   - logs:CreateLogGroup
                   - logs:CreateLogStream
                   - logs:PutLogEvents
-                Resource: '*'
+                Resource: "*"
 
   DatabaseAccessLambdaPermissions:
     Type: AWS::IAM::Policy
@@ -156,7 +155,7 @@ Resources:
       Roles:
         - !Ref PreferencesLambdaRole
       PolicyDocument:
-        Version: '2012-10-17'
+        Version: "2012-10-17"
         Statement:
           - Effect: Allow
             Action:
@@ -170,7 +169,7 @@ Resources:
   UpsertPersonPreferencesHandler:
     Type: AWS::Serverless::Function
     Properties:
-      Description: 'Creates/Updates preferences for person'
+      Description: "Creates/Updates preferences for person"
       CodeUri: preferences-rest
       Handler: no.sikt.nva.person.preferences.rest.UpsertPersonPreferencesHandler::handleRequest
       Role: !GetAtt PreferencesLambdaRole.Arn
@@ -185,7 +184,7 @@ Resources:
   FetchPersonPreferencesHandler:
     Type: AWS::Serverless::Function
     Properties:
-      Description: 'Fetches preferences for person'
+      Description: "Fetches preferences for person"
       CodeUri: preferences-rest
       Handler: no.sikt.nva.person.preferences.rest.FetchPersonPreferencesHandler::handleRequest
       Role: !GetAtt PreferencesLambdaRole.Arn

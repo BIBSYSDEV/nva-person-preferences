@@ -7,7 +7,7 @@ paths:
     parameters:
       - in: path
         name: cristinId+
-        description: 'UTF-8 Encoded cristin identifier of nva user'
+        description: "UTF-8 Encoded cristin identifier of nva user"
         schema:
           type: string
         required: true
@@ -18,19 +18,19 @@ paths:
       x-amazon-apigateway-integration:
         uri:
           Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${FetchPersonPreferencesHandler.Arn}:live/invocations
-        responses: { }
+        responses: {}
         httpMethod: POST
         type: AWS_PROXY
       responses:
-        '200':
+        "200":
           description: "Successfully fetched"
-        '404':
+        "404":
           description: "Person preferences not found"
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Problem"
-        '500':
+        "500":
           description: "Internal server error"
           content:
             application/json:
@@ -45,30 +45,31 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Preferences'
+              $ref: "#/components/schemas/Preferences"
       security:
-        - CognitoUserPool: [
-          'https://api.nva.unit.no/scopes/backend',
-          'https://api.nva.unit.no/scopes/frontend',
-          'aws.cognito.signin.user.admin',
-        ]
+        - CognitoUserPool:
+            [
+              "https://api.nva.unit.no/scopes/backend",
+              "https://api.nva.unit.no/scopes/frontend",
+              "aws.cognito.signin.user.admin",
+            ]
       x-amazon-apigateway-integration:
         uri:
           Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UpsertPersonPreferencesHandler.Arn}:live/invocations
-        responses: { }
+        responses: {}
         httpMethod: POST
         type: AWS_PROXY
       responses:
-        '200':
+        "200":
           description: "Successfully created/updated"
-        '401':
+        "401":
           description: "Unauthorized"
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Problem"
 
-        '500':
+        "500":
           description: "Internal server error"
           content:
             application/json:

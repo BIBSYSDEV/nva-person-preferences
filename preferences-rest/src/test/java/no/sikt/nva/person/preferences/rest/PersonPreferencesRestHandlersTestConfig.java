@@ -5,9 +5,7 @@ import no.unit.nva.commons.json.JsonUtils;
 
 public final class PersonPreferencesRestHandlersTestConfig {
 
-    public static final ObjectMapper restApiMapper = JsonUtils.dtoObjectMapper;
+  public static final ObjectMapper restApiMapper = JsonUtils.dtoObjectMapper;
 
-    private PersonPreferencesRestHandlersTestConfig() {
-
-    }
+  private PersonPreferencesRestHandlersTestConfig() {}
 }
