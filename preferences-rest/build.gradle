@@ -19,4 +19,6 @@ dependencies {
     testImplementation(nvaLibs.json)
     testImplementation(nvaLibs.testutils)
     testImplementation(testFixtures(project(":preferences-commons")))
+    testRuntimeOnly(nvaCatalog.junit.jupiter.engine)
+    testRuntimeOnly(nvaCatalog.junit.platform.launcher)
 }
