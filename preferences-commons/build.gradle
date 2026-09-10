@@ -18,4 +18,6 @@ dependencies {
     testImplementation(nvaCatalog.jackson.core)
     testImplementation(nvaCatalog.junit.jupiter.api)
     testImplementation(nvaLibs.testutils)
+    testRuntimeOnly(nvaCatalog.junit.jupiter.engine)
+    testRuntimeOnly(nvaCatalog.junit.platform.launcher)
 }
