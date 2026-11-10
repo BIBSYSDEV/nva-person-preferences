@@ -10,7 +10,7 @@ Globals:
     Timeout: 20
     Architectures:
       - arm64
-    Runtime: java21
+    Runtime: java25
     MemorySize: 1536
     AutoPublishAlias: live
     SnapStart:

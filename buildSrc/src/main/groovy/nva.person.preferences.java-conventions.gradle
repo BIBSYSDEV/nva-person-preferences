@@ -6,6 +6,9 @@ nva {
     errorprone {
         allErrorsAsWarnings = false
     }
+    java {
+        languageVersion = 25
+    }
     pmd {
         analyzeTests = false
         excludedRules = [
@@ -18,6 +21,9 @@ nva {
 }
 
 test {
+    // DynamoDBLocal loads the native sqlite4java library via System.load, which JDK 24+
+    // (JEP 472) warns about today and will block in a future release.
+    jvmArgs '--enable-native-access=ALL-UNNAMED'
     environment("ALLOWED_ORIGIN", "*")
     environment("API_HOST", "api.fake.nva.aws.unit.no")
     environment("COGNITO_AUTHORIZER_URLS", "http://localhost:3000")
