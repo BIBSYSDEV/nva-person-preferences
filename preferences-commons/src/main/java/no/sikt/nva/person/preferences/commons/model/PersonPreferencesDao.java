@@ -14,10 +14,9 @@ public record PersonPreferencesDao(
     URI personId, List<URI> promotedPublications, Instant created, Instant modified) {
 
   public Map<String, AttributeValue> toDynamoFormat() {
-    return attempt(
-            () ->
-                EnhancedDocument.fromJson(JsonUtils.dynamoObjectMapper.writeValueAsString(this))
-                    .toMap())
+    return attempt(() ->
+            EnhancedDocument.fromJson(JsonUtils.dynamoObjectMapper.writeValueAsString(this))
+                .toMap())
         .orElseThrow();
   }
 
